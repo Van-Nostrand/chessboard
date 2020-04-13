@@ -3,14 +3,15 @@ import './Tile.css';
 
 const Tile = (props) => {
   let style = {
-    background: props.backgroundColor,
-    // width: props.size + "px",
+    backgroundColor: props.backgroundColor,
     width: `${props.size}px`,
     height: `${props.size}px`,
-    // height: props.size + "px",
-    border: `1px solid ${props.borderC}`
-    // border: "1px solid " + props.borderC
+    border: `${props.borderSize}px solid ${props.borderColour}`,
+    margin: "0",
+    padding: "0",
+    boxSizing: "border-box"
   };
+  
   return(
     <div className="tile" onClick={props.onClick} style={style}>
     </div>);

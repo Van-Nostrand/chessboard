@@ -1,33 +1,34 @@
-import React, {Component} from 'react';
-import './Piece.css';
+import React from 'react';
+import pieceImg from "./pieces.png";
 
-class Piece extends Component{
+const Piece = ({data, size, onClick}) => {
 
-  render(){
-    let x = 62 * this.props.xC + 12;
-    let y = 62 * this.props.yC + 12;
+    let x = size * data.xC;
+    let y = size * data.yC;
+   
 
     let style = {
-      width: this.props.clicked? "56px" : "62px",
-      height: this.props.clicked? "56px" : "62px",
-      background: this.props.source,
-      backgroundSize: "370px",
-      backgroundPosition: this.props.pngPos,
-      backgroundOrigin: "border-box",
-      position: "absolute",
-      border: this.props.clicked ? "3px solid red" : "0px",
-      left: x + "px",
-      top: y + "px"
+        width: data.clicked? "56px" : "62px",
+        height: data.clicked? "56px" : "62px",
+        backgroundImage: `url(${pieceImg})`,
+        backgroundSize: "370px",
+        backgroundPosition: data.pngPos,
+        backgroundOrigin: "border-box",
+        position: "absolute",
+        border: `3px solid ${data.bkground}`,
+        transform: `translate(${x}px,${y}px)`
     }
+  
     return(
-      <div
-        className="piece"
-        style={style}
-        name={this.props.name}
-        onClick={this.props.onClick}></div>
+        <div
+            className="piece"
+            style={style}
+            name={data.name}
+            onClick={() => onClick(data.name)}></div>
     );
-  }
+  
 
 };
 
 export default Piece;
+

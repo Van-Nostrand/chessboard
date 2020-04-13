@@ -11,18 +11,6 @@ const TILE_SIZE = 60;
 const TILE_BORDER_SIZE = 1;
 const BORDER_SIZE = 12;
 
-/*
-resize = () => this.forceUpdate()
-
-componentDidMount() {
-  window.addEventListener('resize', this.resize)
-}
-
-componentWillUnmount() {
-  window.removeEventListener('resize', this.resize)
-}
-*/
-
 let posFunc = function(x,y){
   return({
     left: x * (TILE_SIZE + TILE_BORDER_SIZE) + BORDER_SIZE,
@@ -134,7 +122,7 @@ class App extends Component {
         backgroundColor={color}
         borderC={TILE_BORDER}
         size={TILE_SIZE}
-        onClick={(e) => this.handleClick(e)} />
+        onClick={this.handleClick} />
     ));
     let pieces = this.state.pieces.map((p, i) => (
       <Piece
@@ -146,7 +134,7 @@ class App extends Component {
         absY={p.absY}
         pngPos={p.pngPos}
         clicked={p.clicked}
-        onClick={(e) => this.handleClick(e)}
+        onClick={this.handleClick}
         source={"url(" + require("./pieces.png") + ")"} />
     ));
     return (
@@ -162,14 +150,4 @@ class App extends Component {
 }
 
 export default App;
-{/* <Piece
-        key={"piece" + i}
-        name={p.name}
-        xC={p.xC}
-        yC={p.yC}
-        absX={p.absX}
-        absY={p.absY}
-        pngPos={p.pngPos}
-        clicked={p.clicked}
-        onClick={(e) => this.handleClick(e)}
-        source={"url(" + require("./pieces.png") + ")"} /> */}
+
