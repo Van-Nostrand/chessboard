@@ -1,22 +1,29 @@
 import React from 'react';
 import pieceImg from "./pieces.png";
 
-const Piece = ({data, size, onClick}) => {
+const ORIGINALWIDTH = 2000;
+const ORIGINALHEIGHT = 667;
+const RAWPIECEHEIGHT = 333.5;
+
+const BACKGROUNDSIZE = 400;
+
+const Piece = ({data, size, onClick, border}) => {
 
     let x = size * data.xC;
     let y = size * data.yC;
-   
 
     let style = {
-        width: data.clicked? "56px" : "62px",
-        height: data.clicked? "56px" : "62px",
+        width: size,
+        height: size,
         backgroundImage: `url(${pieceImg})`,
-        backgroundSize: "370px",
+        backgroundSize: `${BACKGROUNDSIZE}px`,
         backgroundPosition: data.pngPos,
         backgroundOrigin: "border-box",
         position: "absolute",
-        border: `3px solid ${data.bkground}`,
-        transform: `translate(${x}px,${y}px)`
+        transform: `translate(${x}px,${y}px)`,
+        border: border,
+        boxSizing: "border-box",
+        pointerEvents: "all"
     }
   
     return(
@@ -24,7 +31,7 @@ const Piece = ({data, size, onClick}) => {
             className="piece"
             style={style}
             name={data.name}
-            onClick={() => onClick(data.name)}></div>
+            onClick={(e) => onClick(e, data.name)}></div>
     );
   
 
