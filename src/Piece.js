@@ -7,21 +7,22 @@ import pieceImg from "./pieces.png";
 
 const BACKGROUNDSIZE = 400;
 
-const Piece = ({data, size, onClick, border, rules}) => {
-  console.log(rules);
-  let x = size * data.xC;
-  let y = size * data.yC;
-
+const Piece = ({name, size, onClick, border, rules}) => {
+  
+  let borderLogic = border === name ? "1px solid yellow" : "";
+  let isDead = rules.dead ? 
+    `translate(${-50}px,${-50}px)` : 
+    `translate(${size * rules.xC}px,${size * rules.yC}px)`;
   let style = {
     width: size,
     height: size,
     backgroundImage: `url(${pieceImg})`,
     backgroundSize: `${BACKGROUNDSIZE}px`,
-    backgroundPosition: data.pngPos,
+    backgroundPosition: rules.pngPos,
     backgroundOrigin: "border-box",
     position: "absolute",
-    transform: `translate(${x}px,${y}px)`,
-    border: border,
+    transform: isDead,
+    border: borderLogic,
     boxSizing: "border-box",
     pointerEvents: "all"
   }
@@ -30,8 +31,8 @@ const Piece = ({data, size, onClick, border, rules}) => {
     <div
         className="piece"
         style={style}
-        name={data.name}
-        onClick={(e) => onClick(e, data.name)}></div>
+        name={name}
+        onClick={(e) => onClick(e, name)}></div>
   );
 };
 

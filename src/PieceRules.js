@@ -2,7 +2,7 @@ export default function rules(piece){
   
   const rookRules = function(){
     const rules = {
-      move: [7,0] || [0,7] || [-7,0] || [0,-7],
+      move: [[7,0], [0,7], [-7,0], [0,-7]],
       capture: "same",
       jump: false,
       castleing: true,
@@ -13,7 +13,7 @@ export default function rules(piece){
   
   const knightRules = function(){
     const rules = {
-      move: [2,1] || [2,-1] || [1,2] || [-1,2] || [-2,1] || [-2,-1] || [1,-2] || [-1,-2],
+      move: [[2,1], [2,-1], [1,2], [-1,2], [-2,1], [-2,-1], [1,-2], [-1,-2]],
       capture: "same",
       jump: true,
       castleing: false
@@ -23,7 +23,7 @@ export default function rules(piece){
   
   const bishopRules = function(){
     const rules = {
-      move: [7,7] || [-7,7] || [7,-7] || [-7,-7],
+      move: [[7,7], [-7,7], [7,-7], [-7,-7]],
       capture: "same",
       jump: false,
       castleing: false
@@ -33,7 +33,7 @@ export default function rules(piece){
   
   const queenRules = function(){
     const rules = {
-      move: [7,0] || [0,7] || [7,7] || [-7,0] || [0,-7] || [-7,-7] || [-7,7] || [7,-7],
+      move: [[7,0], [0,7], [7,7], [-7,0], [0,-7], [-7,-7], [-7,7], [7,-7]],
       capture: "same",
       jump: false,
       castleing: false
@@ -43,7 +43,7 @@ export default function rules(piece){
   
   const kingRules = function(){
     const rules = {
-      move: [0,1] || [1,1] || [1,0] || [-1,0] || [-1,-1] || [0,-1] || [1,-1] || [-1,1],
+      move: [[0,1], [1,1], [1,0], [-1,0], [-1,-1], [0,-1], [1,-1], [-1,1]],
       capture: "same",
       jump: false,
       castleing: true,
@@ -60,10 +60,10 @@ export default function rules(piece){
     // the capture can only be made on the move immediately after the enemy pawn makes the double-step move; otherwise, the right to capture it en passant is lost.
   
     //array describing valid moves
-    let colour = name.match(/^w/) ? 0 : 1;
+    let colour = /^w/.test(name) ? 0 : 1;
     const rules = {
-      move:  colour === 0 ? [0,1] || [0,2] : [0,-1] || [0,-2],
-      capture: colour === 0 ? [1,1] || [-1,1] : [1,-1] || [-1,-1],
+      move:  colour === 0 ? [[0,-1], [0,-2]] : [[0,1], [0,2]],
+      capture: colour === 0 ? [[1,-1], [-1,-1]] : [[1,1], [-1,1]],
       jump: false,
       castleing: false,
       enPassant: true,
@@ -71,17 +71,16 @@ export default function rules(piece){
     }   
     return rules;
   }
-  switch(piece.name){
-    case /^.R/: return rookRules();
-    case /^.N/: return knightRules();
-    case /^.B/: return bishopRules();
-    case /^.Q/: return queenRules();
-    case /^.K/: return kingRules();
-    case /^.P/: return pawnRules(piece.name);
-    default: return;
+  switch(true){
+    case /^.R/.test(piece): return rookRules();
+    case /^.N/.test(piece): return knightRules();
+    case /^.B/.test(piece): return bishopRules();
+    case /^.Q/.test(piece): return queenRules();
+    case /^.K/.test(piece): return kingRules();
+    case /^.P/.test(piece): return pawnRules(piece);
+    default: console.log(`error getting rules. piece is ${piece}`);
   }
 }
-
 
 // const pieceRegex = {
 //   rook: /^.R/,
