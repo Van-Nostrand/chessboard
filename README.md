@@ -4,7 +4,7 @@ TODO: April 11
 - implement regex that identifies piece types - DONE
 - clean up App.js constructor function - WORKED AROUND IT
 - - clean up game initialization - DONE!
-- implement checker tile pattern
+- implement checker tile pattern - DONE
 - implement piece killing
 - - implement legal moves
 - - - implement turn taking

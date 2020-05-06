@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+// import App from './App';
 import TestBoard from "./TestBoard";
 import * as serviceWorker from './serviceWorker';
-import Piece from "./Piece";
+// import Piece from "./Piece";
 
 ReactDOM.render(<TestBoard />, document.getElementById('root'));
 
