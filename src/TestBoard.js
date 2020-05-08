@@ -74,6 +74,8 @@ class TestBoard extends Component{
       //TODO - if illegal, handle it
     } 
   }
+
+  
   
   //HANDLE PIECE CLICKS
   pieceClick = (e, name) => {
@@ -94,6 +96,10 @@ class TestBoard extends Component{
   }
   
   pieceKill = (piece, target) => {
+    if(this.state.piecesObject[piece].rules.capture !== "same"){
+      this.setState({selectedPiece: ""});
+      return;
+    }
     let newstate = {...this.state.piecesObject};
     newstate[piece].xC = newstate[target].xC;
     newstate[piece].yC = newstate[target].yC;
@@ -101,19 +107,56 @@ class TestBoard extends Component{
   
     this.setState({piecesObject: newstate, selectedPiece: ""});
   }
+
+  createRange = (start, end) => {
+    if(start < end) {
+      return Array.from({length: (end - start)}, (v,k) => start === 0 ? k + start + 1: k + start)
+    } else {
+      throw "invalid arguments";
+    }
+  }
   
   checkLegality = (cell) => {
+    //TODO - move rules are a range. incorporate that.
     let isLegal = false;
     let moverules = this.state.piecesObject[this.state.selectedPiece].rules.move;
     let pieceCoordinates = [this.state.piecesObject[this.state.selectedPiece].xC, this.state.piecesObject[this.state.selectedPiece].yC];
     let difference = [cell[0] - pieceCoordinates[0], cell[1] - pieceCoordinates[1]];
-    for(let i = 0; i < moverules.length; i++){
-      if(difference[0] === moverules[i][0] && difference[1] === moverules[i][1]){
-        isLegal = true;
-      }
-    }
+
+    let moveRanges = new Array(moverules.length);
+   
+    moverules.forEach((ruleset, i) => {
+      let newrange = new Array(ruleset.length);
+   
+      ruleset.forEach((limit, j) => {
+        try{
+          if(limit > 0){
+            newrange[j] = this.createRange(0,limit);
+          } else if (limit < 0){
+            newrange[j] = this.createRange(limit,0);
+          } else {
+            newrange[j] = [0];
+          }
+        } catch(err) {
+          console.log(err)
+        }
+      })
+      moveRanges[i] = newrange;
+    })
+
+    // I have my ranges, now I just need to check if the difference is within those ranges. 
+    moveRanges.forEach((ruleset, i) => {
+      let truthArr = [false, false];
+      ruleset.forEach((domain, j) => {
+        if(domain.includes(difference[j])){
+          truthArr[j] = true;
+        }
+        if(truthArr[0] && truthArr[1]){
+          isLegal = true;
+        }
+      })
+    })
     
-    //TODO - check for legality of move
     return isLegal;
   }
 
