@@ -1,24 +1,20 @@
 import React from 'react';
 import pieceImg from "./pieces.png";
 
-// const ORIGINALWIDTH = 2000;
-// const ORIGINALHEIGHT = 667;
-// const RAWPIECEHEIGHT = 333.5;
-
 const BACKGROUNDSIZE = 400;
 
-const Piece = ({name, size, onClick, border, rules}) => {
-  
-  let borderLogic = border === name ? "1px solid yellow" : "";
-  let isDead = rules.dead ? 
+const Piece = (props) => {
+  //TODO - go over style and properties
+  let borderLogic = props.border === props.name ? "1px solid yellow" : "";
+  let isDead = props.dead ? 
     `translate(${-50}px,${-50}px)` : 
-    `translate(${size * rules.xC}px,${size * rules.yC}px)`;
+    `translate(${props.size * props.xC}px,${props.size * props.yC}px)`;
   let style = {
-    width: size,
-    height: size,
+    width: props.size,
+    height: props.size,
     backgroundImage: `url(${pieceImg})`,
     backgroundSize: `${BACKGROUNDSIZE}px`,
-    backgroundPosition: rules.pngPos,
+    backgroundPosition: props.pngPos,
     backgroundOrigin: "border-box",
     position: "absolute",
     transform: isDead,
@@ -26,13 +22,12 @@ const Piece = ({name, size, onClick, border, rules}) => {
     boxSizing: "border-box",
     pointerEvents: "all"
   }
-
   return(
     <div
         className="piece"
         style={style}
-        name={name}
-        onClick={(e) => onClick(e, name)}></div>
+        name={props.name}
+        onClick={(e) => props.onClick(e, props.name)}></div>
   );
 };
 

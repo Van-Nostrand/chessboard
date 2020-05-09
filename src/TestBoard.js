@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
 import "./TestBoard.css";
-import rules from "./PieceRules";
+import rulesets from "./PieceRules";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
@@ -15,8 +15,9 @@ import {
 class TestBoard extends Component{
   constructor(props){
     super(props);
-
+    console.log("constructor");
     //create checkerboard
+    //why is this done here?
     let tileBool = true;
     let tileArr = new Array(BOARDDIMENSIONS[0]).fill().map((column, i) => {
       return column = new Array(BOARDDIMENSIONS[1]).fill().map((tile,j) => {
@@ -24,9 +25,12 @@ class TestBoard extends Component{
         return tileBool? LIGHT_TILE : DARK_TILE;
       });
     });
+
+    //imbue all the piece objects with their rulesets
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
-      PIECE_OBJECTS[piece].rules = rules(piece);
+      PIECE_OBJECTS[piece].rules = rulesets(piece);
     })
+    // console.log(PIECE_OBJECTS);
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -34,16 +38,17 @@ class TestBoard extends Component{
       tileBorderSize: TILEBORDERSIZE,
       piecesObject: PIECE_OBJECTS,
       tileArr,
-      selectedPiece: ""
+      turn: true,
+      selectedPiece: "",
+      messageBoard: "no piece selected"
     }
   }
 
-  
-
   //HANDLE TILE CLICKS
+  //only sets state if illegal move detected
   tileClick = (e) => {
     
-    //ACCIDENTALLY CLICKING A TILE
+    //Clicking a tile while no piece selected
     if(this.state.selectedPiece.length === 0){
       return;
     }
@@ -56,111 +61,115 @@ class TestBoard extends Component{
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
 
       //Then perform the legality check
-      let legal = this.checkLegality(cell);
-
+      let legal = this.checkMoveLegality(cell);
             
       if(legal){
-        //is legal, so 
-        let newPieceState = {...this.state.piecesObject};
-        newPieceState[this.state.selectedPiece].xC = cell[0];
-        newPieceState[this.state.selectedPiece].yC = cell[1];
-        this.setState({piecesObject: newPieceState, selectedPiece: ""});
+        this.pieceMove(cell);
       } else if(!legal){
         console.log("ILLEGAL!");
+        this.setState({selectedPiece: "", messageBoard: "ILLEGAL! FUCK YOU!"});
       } else {
-        console.log("move is neither legal nor illegal, im confused...");
+        console.log("move is neither legal nor illegal. debug now");
       }
-      
-      //TODO - if illegal, handle it
     } 
   }
 
-  
-  
-  //HANDLE PIECE CLICKS
+  //Handle piece clicks
+  //may set state on selections, but not on actions
   pieceClick = (e, name) => {
     
-    //IF THIS IS A PIECE SELECTION
+    //Selecting a piece
     if(this.state.selectedPiece.length === 0){
-      this.setState({selectedPiece: name});
+
+      //TODO - once turn taking is implemented, implement selection legality and changing selections
+      let legal = this.checkSelectionLegality(name);
+      if(legal) this.setState({selectedPiece: name, messageBoard: `piece ${name} is selected`});
+      else this.setState({messageBoard: "Illegal selection, try again"});
     }
-    //IF THIS IS A PIECE DESELECTION
+    //Deselecting a piece
     else if(this.state.selectedPiece === name){
-      this.setState({selectedPiece: ""});
+      this.setState({selectedPiece: "", messageBoard: "no piece selected"});
     }
-    //IF THIS IS AN ATTACK TARGET SELECTION
+    //Attacking a piece
     else if(this.state.selectedPiece.length > 0 && name !== this.state.selectedPiece){
-      this.pieceKill(this.state.selectedPiece, name);
+      let legal = this.checkAttackLegality(name);
+      if(legal) this.pieceKill(name);
+      else this.setState({selectedPiece: "", messageBoard: "illegal attack"});
+    } else {
+      console.log("something is wrong in pieceClick");
     }
-    //TODO - implement attacks
   }
-  
-  pieceKill = (piece, target) => {
-    if(this.state.piecesObject[piece].rules.capture !== "same"){
-      this.setState({selectedPiece: ""});
-      return;
-    }
+
+  //moves the currently selected piece to cell
+  pieceMove = (cell) => {
+    
     let newstate = {...this.state.piecesObject};
-    newstate[piece].xC = newstate[target].xC;
-    newstate[piece].yC = newstate[target].yC;
+    let selectedpc = this.state.selectedPiece;
+
+    newstate[selectedpc].xC = cell[0];
+    newstate[selectedpc].yC = cell[1];
+
+    this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `piece ${selectedpc} moved to ${cell[0]},${cell[1]}`});
+  }
+
+  //moves a piece to kill another piece
+  pieceKill = (target) => {
+    
+    let newstate = {...this.state.piecesObject};
+    let selectedpc = this.state.selectedPiece;
+
+    newstate[selectedpc].xC = newstate[target].xC;
+    newstate[selectedpc].yC = newstate[target].yC;
     newstate[target].dead = true;
   
-    this.setState({piecesObject: newstate, selectedPiece: ""});
+    this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `${selectedpc} has successfully attacked ${target}`});
   }
 
-  createRange = (start, end) => {
-    if(start < end) {
-      return Array.from({length: (end - start)}, (v,k) => start === 0 ? k + start + 1: k + start)
+  handleTurns = () => {
+        
+  }
+
+  checkSelectionLegality = (target) => {
+    // debugger;
+    if(this.state.turn){
+      return /^w/.test(target);
+    } else if(!this.state.turn) {
+      return /^b/.test(target);
     } else {
-      throw "invalid arguments";
+      return console.log("something is wrong");
     }
   }
-  
-  checkLegality = (cell) => {
-    //TODO - move rules are a range. incorporate that.
+
+  //checks the legality of attacks
+  checkAttackLegality = (target) => {
+    console.log(target);
+    //target is string
     let isLegal = false;
-    let moverules = this.state.piecesObject[this.state.selectedPiece].rules.move;
-    let pieceCoordinates = [this.state.piecesObject[this.state.selectedPiece].xC, this.state.piecesObject[this.state.selectedPiece].yC];
-    let difference = [cell[0] - pieceCoordinates[0], cell[1] - pieceCoordinates[1]];
-
-    let moveRanges = new Array(moverules.length);
-   
-    moverules.forEach((ruleset, i) => {
-      let newrange = new Array(ruleset.length);
-   
-      ruleset.forEach((limit, j) => {
-        try{
-          if(limit > 0){
-            newrange[j] = this.createRange(0,limit);
-          } else if (limit < 0){
-            newrange[j] = this.createRange(limit,0);
-          } else {
-            newrange[j] = [0];
-          }
-        } catch(err) {
-          console.log(err)
-        }
-      })
-      moveRanges[i] = newrange;
-    })
-
-    // I have my ranges, now I just need to check if the difference is within those ranges. 
-    moveRanges.forEach((ruleset, i) => {
-      let truthArr = [false, false];
-      ruleset.forEach((domain, j) => {
-        if(domain.includes(difference[j])){
-          truthArr[j] = true;
-        }
-        if(truthArr[0] && truthArr[1]){
-          isLegal = true;
-        }
-      })
-    })
-    
+    let selectedpc = this.state.piecesObject[this.state.selectedPiece];
+    let targetpc = this.state.piecesObject[target];
+    let attack = [targetpc.xC - selectedpc.xC, targetpc.yC - selectedpc.yC];
+    if(selectedpc.rules.attacklogic == null){
+      isLegal = selectedpc.rules.movelogic(attack[0], attack[1]);
+    } else if (selectedpc.rules.attacklogic){
+      isLegal = selectedpc.rules.attacklogic(attack[0],attack[1]);
+    }
+    console.log(isLegal);
     return isLegal;
   }
 
+  //checks the legality of moves
+  checkMoveLegality = (cell) => {
+    let isLegal = false;
+    let piece = this.state.piecesObject[this.state.selectedPiece];
+    
+    let move = [cell[0] - piece.xC, cell[1] - piece.yC];
+    isLegal = piece.rules.movelogic(move[0],move[1]);
+    // debugger;
+    return isLegal;
+  }
+  
   render(){
+    console.log("render");
     //GENERATE TILES
     let boardTiles = this.makeTiles();
 
@@ -183,6 +192,7 @@ class TestBoard extends Component{
       display: "flex", 
       alignItems: "center", 
       justifyContent: "center",
+      flexFlow: "row",
       height: "100vh"
     }
     let piecesContainerStyle = {
@@ -196,15 +206,25 @@ class TestBoard extends Component{
       position: "absolute",
       pointerEvents: "none"
     }
-
+    let h3Style = {
+      display: "inline",
+      alignSelf: "flex-end",
+      
+    }
+    let h2Style = {
+      display: "inline",
+      alignSelf: "flex-start"
+    }
     return(
       <div style={outerStyle}>
+        <h2 style={h2Style}>{this.state.turn ? "White turn" : "Black turn"}</h2>
         <div id="tile-container" style={tileContainerStyle}>
           {boardTiles}
         </div>
         <div id="pieces-container" style={piecesContainerStyle} >
           {pieceObjects}
         </div>
+        <h3 style={h3Style}>{this.state.messageBoard}</h3>
       </div>
     )
   }
@@ -226,8 +246,10 @@ class TestBoard extends Component{
   makePieces = () => {
     return Object.keys(this.state.piecesObject).map((name, i) => {
       return <Piece 
-                rules={this.state.piecesObject[name]}
-                actualrules={rules(name)}
+                xC={this.state.piecesObject[name].xC}
+                yC={this.state.piecesObject[name].yC}
+                dead={this.state.piecesObject[name].dead}
+                pngPos={this.state.piecesObject[name].pngPos}
                 key={name}
                 name={name}
                 size={TILESIZE}
