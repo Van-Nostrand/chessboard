@@ -21,6 +21,18 @@ class ChessGovernor{
 
     return clear;
   }
+
+  //target = string, turn = bool
+  //returns bool, or string if there's an error
+  static checkSelectionLegality = (target, turn) => {
+    if(turn){
+      return /^w/.test(target);
+    } else if(!turn) {
+      return /^b/.test(target);
+    } else {
+      return console.log("something is wrong");
+    }
+  }
   
   //checks the legality of moving to an empty space
   //returns bool

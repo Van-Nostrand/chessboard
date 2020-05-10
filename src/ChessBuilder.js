@@ -15,6 +15,8 @@ class ChessBuilder {
     return grid;
   }
 
+  
+
   //this takes in all the piece data and returns an object that details for every piece which pieces it can attack
   //piecesObject = object
   //returns an object
@@ -47,7 +49,6 @@ class ChessBuilder {
           let newAttackArr = [];
           
           do{
-
             // Knights have different path rules
             if(newPieceState[piece].rules.jump){
               let testX = pieceX + path[0];
