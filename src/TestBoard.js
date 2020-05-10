@@ -3,6 +3,8 @@ import Tile from "./Tile";
 import Piece from "./Piece";
 import "./TestBoard.css";
 import rulesets from "./PieceRules";
+import ChessGovernor from "./ChessGovernor";
+import ChessBuilder from "./ChessBuilder";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
@@ -15,9 +17,8 @@ import {
 class TestBoard extends Component{
   constructor(props){
     super(props);
-    console.log("constructor");
+
     //create checkerboard
-    //why is this done here?
     let tileBool = true;
     let tileArr = new Array(BOARDDIMENSIONS[0]).fill().map((column, i) => {
       return column = new Array(BOARDDIMENSIONS[1]).fill().map((tile,j) => {
@@ -29,8 +30,7 @@ class TestBoard extends Component{
     //imbue all the piece objects with their rulesets
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
       PIECE_OBJECTS[piece].rules = rulesets(piece);
-    })
-    // console.log(PIECE_OBJECTS);
+    });
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -61,7 +61,7 @@ class TestBoard extends Component{
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
 
       //Then perform the legality check
-      let legal = this.checkMoveLegality(cell);
+      let legal = ChessGovernor.checkMoveLegality(this.state.selectedPiece, cell, this.state.piecesObject);
             
       if(legal){
         this.pieceMove(cell);
@@ -77,6 +77,7 @@ class TestBoard extends Component{
   //Handle piece clicks
   //may set state on selections, but not on actions
   pieceClick = (e, name) => {
+    // debugger;
     
     //Selecting a piece
     if(this.state.selectedPiece.length === 0){
@@ -108,6 +109,7 @@ class TestBoard extends Component{
 
     newstate[selectedpc].xC = cell[0];
     newstate[selectedpc].yC = cell[1];
+    if(newstate[selectedpc].rules.firstMove) newstate[selectedpc].rules.firstMove = false;
 
     this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `piece ${selectedpc} moved to ${cell[0]},${cell[1]}`});
   }
@@ -120,17 +122,128 @@ class TestBoard extends Component{
 
     newstate[selectedpc].xC = newstate[target].xC;
     newstate[selectedpc].yC = newstate[target].yC;
+    newstate[target].xC = -1;
+    newstate[target].yC = -1;
     newstate[target].dead = true;
   
     this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `${selectedpc} has successfully attacked ${target}`});
   }
 
-  handleTurns = () => {
-        
+  buildPathGrid = () => {
+    let grid = {};
+    let piecenames = Object.keys(this.state.piecesObject);
+    piecenames.forEach((piece, i) => {
+      let str = `${this.state.piecesObject[piece].xC},${this.state.piecesObject[piece].yC}`;
+      grid[str] = piece;
+    }) ;
+    return grid;
+  }
+
+  buildAttackGrid = () => {
+    let pathgrid = this.buildPathGrid();
+    let attackgrid = {};
+    let piecenames = Object.keys(this.state.piecesObject);
+    let piecesstate = {...this.state.piecesObject};
+    
+    piecenames.forEach((piece, i) => {
+     
+      let pieceX = piecesstate[piece].xC;
+      let pieceY = piecesstate[piece].yC;
+      attackgrid[piece] = new Array(piecesstate[piece].rules.paths);
+
+      attackgrid[piece] = attackgrid[piece].map((pathArr, j) => {
+        return pathArr.map((path, n) => {
+          let morepath = true;
+          let counter = 1;
+          let movearr = [];
+          let attackarr = [];
+
+          do{
+
+            // Knights have different path rules
+            if(piecesstate[piece].rules.jump){
+              let testX = pieceX + path[0];
+              let testY = pieceY + path[1];
+              let str = `${testX},${testY}`;
+              
+              //if within boundaries of board
+              if(testX >= 0 && testY >= 0 && testX < BOARDDIMENSIONS[0] && testY < BOARDDIMENSIONS[1]){
+                //if an empty cell for movin'
+                if(!pathgrid[str] && piecesstate[piece].rules.movelogic(path[0],path[1])){
+                  movearr.push(str);
+                  morepath = false;
+                }
+                //if an occupied cell for fight'un
+                else if(pathgrid[str] && piecesstate[piece].rules.movelogic(testX,testY)){
+                  attackarr.push(pathgrid[str]);
+                  morepath = false;
+                }
+                else{
+                  morepath = false;
+                }
+              }
+              else {
+                morepath = false;
+              }
+            } 
+            //for every other piece
+            else {
+              let testX = pieceX + (counter * path[0]);
+              let testY = pieceY + (counter * path[1]);
+              let str = `${testX},${testY}`;
+             
+              //if not within board boundaries
+              if(testX < 0 || testY < 0 || testX > BOARDDIMENSIONS[0] - 1 || testY > BOARDDIMENSIONS[1] - 1){
+                morepath = false;
+              } else {
+                //if a piece exists on this cell
+                if(pathgrid[str]) {
+                  //if on same team
+                  if(piece.charAt(0) === pathgrid[str].charAt(0)) {
+                    morepath = false;
+                  //if not on the same team
+                  } else {
+                    //most pieces
+                    if(!piecesstate[piece].rules.attacklogic && piecesstate[piece].rules.movelogic(testX,testY)){
+                      attackarr.push(pathgrid[str]);
+                    }
+                    //special case for pawns
+                    else if(piecesstate[piece].rules.attacklogic && piecesstate[piece].rules.attacklogic(testX,testY)){
+                      attackarr.push(pathgrid[str]);
+                    }
+                  }
+                //if no piece exists here 
+                } else {
+                  //if the piece can legally move here
+                  if(piecesstate[piece].rules.movelogic(testX,testY)){
+                    movearr.push(str);
+                  }
+                  else{
+                    morepath = false;
+                  }
+                }
+                //condition to catch endless loops during development
+                if (counter > 10) {
+                  console.log("runaway do-while loop");
+                  morepath = false;
+                }
+              }
+            }
+            ++counter;
+          }while(morepath);
+          return movearr;
+        })
+      })
+    });
+    // console.log(attackgrid);
+    return attackgrid;
+
+    //iterate through the list and figure out 
+    
   }
 
   checkSelectionLegality = (target) => {
-    // debugger;
+    
     if(this.state.turn){
       return /^w/.test(target);
     } else if(!this.state.turn) {
@@ -142,34 +255,52 @@ class TestBoard extends Component{
 
   //checks the legality of attacks
   checkAttackLegality = (target) => {
-    console.log(target);
-    //target is string
+    
     let isLegal = false;
     let selectedpc = this.state.piecesObject[this.state.selectedPiece];
     let targetpc = this.state.piecesObject[target];
+
+    //check if attacking same team
+    if(this.state.selectedPiece.charAt(0) === target.charAt(0)) return isLegal;
+
     let attack = [targetpc.xC - selectedpc.xC, targetpc.yC - selectedpc.yC];
+
+    //if a normal piece is attacking
     if(selectedpc.rules.attacklogic == null){
       isLegal = selectedpc.rules.movelogic(attack[0], attack[1]);
+    
+      //special case for pawn attacks
     } else if (selectedpc.rules.attacklogic){
-      isLegal = selectedpc.rules.attacklogic(attack[0],attack[1]);
+      return selectedpc.rules.attacklogic(attack[0],attack[1]);
     }
-    console.log(isLegal);
+
+    //check the path
+    isLegal = this.checkPath([selectedpc.xC, selectedpc.yC], [targetpc.xC, targetpc.yC]);
+
     return isLegal;
   }
 
-  //checks the legality of moves
-  checkMoveLegality = (cell) => {
-    let isLegal = false;
-    let piece = this.state.piecesObject[this.state.selectedPiece];
-    
-    let move = [cell[0] - piece.xC, cell[1] - piece.yC];
-    isLegal = piece.rules.movelogic(move[0],move[1]);
-    // debugger;
-    return isLegal;
+  checkPath = (piece, target) => {
+    let clear = true;
+    let grid = this.buildPathGrid();
+    let xSign = 1 * Math.sign(target[0]);
+    let ySign = 1 * Math.sign(target[1]);
+
+    for(
+      let x = xSign, y = ySign; 
+      xSign === 1 ? x < target[0] : x > target[0], 
+      ySign === 1 ? y < target[1] : y > target[1]; 
+      x = x + (1 * xSign), 
+      y = y + (1 * ySign)){
+      
+        if(grid[`${x + piece[0]},${y + piece[1]}`]) clear = false;
+    }   
+
+    return clear;
   }
   
   render(){
-    console.log("render");
+    
     //GENERATE TILES
     let boardTiles = this.makeTiles();
 

@@ -6,13 +6,25 @@ export default function rulesets(piece){
       capture: "same",
       jump: true,
       castleing: false,
-      movelogic: (x,y) => x !== 0 && y !== 0 && x < 3 && x > -3 && y < 3 && y > -3 && ((x%2 === 0 && y%1 === 0) ^ (y%2 === 0 && x%1 === 0))
+      paths: [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]],
+      movelogic: (x,y) => 
+        x !== 0 !== y && 
+        // y !== 0 && 
+        x !== y &&
+        x < 3 && x > -3 && 
+        y < 3 && y > -3 && (
+          x%2 === 0 ^ y%2 === 0 
+        )
     }
     return rules;
   }
   const rookRules = function(){
     const rules = {
       movelogic: (x,y) => x === 0 ^ y === 0,
+      castlelogic: (king, rook) => {
+        return true;
+      },
+      paths: [[0,-1],[1,0],[0,1],[-1,0]],
       attacklogic: null,
       capture: "same",
       jump: false,
@@ -24,6 +36,7 @@ export default function rulesets(piece){
   const bishopRules = function(){
     const rules = {
       movelogic: (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1),
+      paths: [[1,-1],[1,1],[-1,1],[-1,-1]],
       attacklogic: null,
       capture: "same",
       jump: false,
@@ -37,6 +50,7 @@ export default function rulesets(piece){
         x !== 0 && y !== 0 && 
           (x/y === 1 || x/y === -1)
         ) ^ (x === 0 ^ y === 0),
+      paths: [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
       attacklogic: null,
       capture: "same",
       jump: false,
@@ -47,6 +61,10 @@ export default function rulesets(piece){
   const kingRules = function(){
     const rules = {
       movelogic: (x,y) => x < 2 && x > -2 && y < 2 && y > -2,
+      castlelogic: (king, rook) => {
+        return true;
+      },
+      paths: [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
       attacklogic: null,
       capture: "same",
       jump: false,
@@ -69,8 +87,19 @@ export default function rulesets(piece){
       jump: false,
       castleing: false,
       enPassant: true,
-      movelogic: (x, y) => x === 0 && (!rules.firstMove? y === 1 * direction : y === 1 * direction || y === 2 * direction),
-      attacklogic: (x,y) => (x === 1 || x === -1) && (y === 1 * direction)
+      movelogic: (x, y) => {
+        if(rules.firstMove) return x === 0 && (y === 1 * direction || y === 2 * direction);
+        else if(!rules.firstMove) return x === 0 && y === 1 * direction ;
+      },
+      attacklogic: (x,y) => (x === 1 || x === -1) && (y === 1 * direction),
+      enpassantlogic: (x,y,targetcell,victim) => {
+        
+        return (
+          targetcell[0] === victim[0] && 
+          (targetcell[1] === victim[1] + 1 || 
+            targetcell[1] === victim[1] - 1));
+      },
+      paths: [[-1,direction], [1,direction]]
     }
     return rules;
   }
