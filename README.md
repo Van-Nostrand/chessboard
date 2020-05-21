@@ -22,3 +22,6 @@ piece {
     xCoordinate: int,
     yCoordinate: int
 }
+
+May 20th 2020 - 
+decided that ChessBuilder isn't necessary: TestBoard will create a list of cells that are occupied, and the pieces now have a method called rules.vision which allows them to "see" their moves themselves. Governor will probably remain just to hold static methods. 

@@ -1,12 +1,60 @@
 export default function rulesets(piece){
+
+  //TODO - DON'T LET VISION CHECK OUTSIDE OF BOARD BOUNDARIES!!!
+  //rook bishop and queen will all be checking their paths until they run out of room, so they get the same method
+  const rookBishopQueenVision = (piecesObject, occupiedObject, pieceName) => {
+    let pathsObject = {};
+
+    // let piecenames = Object.keys(piecesObject);
+    let subject = piecesObject[pieceName];
+
+    //foreach path?
+    
+    subject.rules.paths.forEach((path, i) => {
+      //chase down each path until it hits a piece
+      let count = 1;
+      let pathDone = false;
+      let pathArr = [];
+     
+      do{
+        let cellCheck = `${subject.xC + (path[0] * count)},${subject.yC + (path[1] * count)}`;
+        
+
+        //if the cell being checked does not show up in the list of occupied cells, it is a valid move so push that cell to the array 
+        debugger;
+        if (!occupiedObject[cellCheck]){
+          pathArr.push(cellCheck);
+          count = count + 1;
+        }else{
+          pathDone = true;
+        }
+
+      }while(!pathDone);
+      console.log("left the loop")
+      pathsObject[path] = pathArr;
+     
+    });
+    // return pathsObject;
+  }
+
+  //knight and king each only move one space, and only check each path once, so they get their own method
+  const knightKingVision = (piecesObject, occupiedObject, pieceName) => {
+    
+  }
+
+  //pawns would get lumped in with knight and king if not for their initial 2 space move and en passant
+  const pawnVision = (piecesObject, occupiedObject, pieceName) => {
+
+  }
   
-  const knightRules = function(){
+  const knightRules = () => {
     const rules = {
       attacklogic: null,
       capture: "same",
       jump: true,
       castleing: false,
       paths: [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]],
+      vision: knightKingVision,
       movelogic: (x,y) => 
         x !== 0 !== y && 
         // y !== 0 && 
@@ -18,7 +66,7 @@ export default function rulesets(piece){
     }
     return rules;
   }
-  const rookRules = function(){
+  const rookRules = () => {
     const rules = {
       movelogic: (x,y) => x === 0 ^ y === 0,
       castlelogic: (king, rook) => {
@@ -29,22 +77,25 @@ export default function rulesets(piece){
       capture: "same",
       jump: false,
       castleing: true,
-      firstMove: false
+      firstMove: false,
+      vision: rookBishopQueenVision
     }
     return rules;
   }
-  const bishopRules = function(){
+  const bishopRules = () => {
     const rules = {
       movelogic: (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1),
       paths: [[1,-1],[1,1],[-1,1],[-1,-1]],
       attacklogic: null,
       capture: "same",
       jump: false,
-      castleing: false
+      castleing: false,
+      vision: rookBishopQueenVision
     }
     return rules; 
   }
-  const queenRules = function(){
+  const queenRules = () => {
+    console.log(rookBishopQueenVision);
     const rules = {
       movelogic: (x,y) => (
         x !== 0 && y !== 0 && 
@@ -54,11 +105,12 @@ export default function rulesets(piece){
       attacklogic: null,
       capture: "same",
       jump: false,
-      castleing: false
+      castleing: false,
+      vision: rookBishopQueenVision
     }
     return rules; 
   }
-  const kingRules = function(){
+  const kingRules = () => {
     const rules = {
       movelogic: (x,y) => x < 2 && x > -2 && y < 2 && y > -2,
       castlelogic: (king, rook) => {
@@ -70,7 +122,8 @@ export default function rulesets(piece){
       jump: false,
       castleing: true,
       inCheck: false,
-      firstMove: false
+      firstMove: false,
+      vision: knightKingVision
     }
     return rules;
   }
@@ -87,6 +140,7 @@ export default function rulesets(piece){
       jump: false,
       castleing: false,
       enPassant: true,
+      vision: pawnVision,
       movelogic: (x, y) => {
         if(rules.firstMove) return x === 0 && (y === 1 * direction || y === 2 * direction);
         else if(!rules.firstMove) return x === 0 && y === 1 * direction ;
@@ -113,4 +167,5 @@ export default function rulesets(piece){
     case /^.P/.test(piece): return pawnRules(piece);
     default: console.log(`error getting rules. piece is ${piece}`);
   }
+
 }

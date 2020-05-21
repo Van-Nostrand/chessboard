@@ -1,3 +1,5 @@
+import ChessBuilder from "./ChessBuilder";
+
 //This class exists entirely to house some static functions
 //These functions compare piece coordinates to a grid and decide if a move is legal or not
 class ChessGovernor{
@@ -45,13 +47,10 @@ class ChessGovernor{
     isLegal = pieceLedger[selectedpc].rules.movelogic(move[0],move[1]);
 
     //check that the path is clear
+    //only the knight is exempt
     if(!pieceLedger[selectedpc].rules.jump) {
       isLegal = this.checkPath([pieceLedger[selectedpc].xC,pieceLedger[selectedpc].yC], move, pieceLedger);
     }
-    else{
-
-    }
-    
     return isLegal;
   }
 
@@ -62,6 +61,8 @@ class ChessGovernor{
   static checkAttackLegality = (selectedpc, targetpc, pieceLedger) => {
     
     let isLegal = false;
+
+    //TODO - build the grid here? 
     
     //can't attack your own team
     if(selectedpc.charAt(0) === targetpc.charAt(0)) return isLegal;

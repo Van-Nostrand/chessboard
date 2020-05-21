@@ -14,6 +14,9 @@ import {
   PIECE_OBJECTS
 } from "./CONSTANTS";
 
+//This is the main component for this whole game
+//It handles clicks and selections, and maintains the list of pieces and tiles
+//I think the board will prompt selected pieces to trigger their "vision" methods
 class TestBoard extends Component{
   constructor(props){
     super(props);
@@ -32,6 +35,10 @@ class TestBoard extends Component{
       PIECE_OBJECTS[piece].rules = rulesets(piece);
     });
 
+    //initial occupiedObject creation
+    //this is an object that is an easy reference to occupied cells
+    let occupiedObject = this.buildOccupiedObject(PIECE_OBJECTS);
+
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE,
@@ -40,6 +47,7 @@ class TestBoard extends Component{
       tileArr,
       turn: true,
       selectedPiece: "",
+      occupiedObject,
       messageBoard: "no piece selected"
     }
   }
@@ -67,7 +75,7 @@ class TestBoard extends Component{
         this.pieceMove(cell);
       } else if(!legal){
         console.log("ILLEGAL!");
-        this.setState({selectedPiece: "", messageBoard: "ILLEGAL! FUCK YOU!"});
+        this.setState({selectedPiece: "", messageBoard: "Not legal"});
       } else {
         console.log("move is neither legal nor illegal. debug now");
       }
@@ -82,10 +90,14 @@ class TestBoard extends Component{
     //Selecting a piece
     if(this.state.selectedPiece.length === 0){
 
-      //TODO - once turn taking is implemented, implement selection legality and changing selections
-      let legal = ChessGovernor.checkSelectionLegality(name, this.state.turn);
-      if(legal) this.setState({selectedPiece: name, messageBoard: `piece ${name} is selected`});
-      else this.setState({messageBoard: "Illegal selection, try again"});
+      //check turn 
+      if(ChessGovernor.checkSelectionLegality(name, this.state.turn)) {
+        console.log(this.state.piecesObject[name].rules.vision(this.state.piecesObject, this.state.occupiedObject, name));
+        this.setState({selectedPiece: name, messageBoard: `piece ${name} is selected`});
+      }
+      else {
+        this.setState({messageBoard: "Illegal selection, try again"});
+      }
     }
     //Deselecting a piece
     else if(this.state.selectedPiece === name){
@@ -102,80 +114,62 @@ class TestBoard extends Component{
   }
 
   //moves the currently selected piece to cell
+  //TODO - build a new occupiedObject
   pieceMove = (cell) => {
     
-    let newstate = {...this.state.piecesObject};
+    let newPieceState = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
-    newstate[selectedpc].xC = cell[0];
-    newstate[selectedpc].yC = cell[1];
-    if(newstate[selectedpc].rules.firstMove) newstate[selectedpc].rules.firstMove = false;
+    newPieceState[selectedpc].xC = cell[0];
+    newPieceState[selectedpc].yC = cell[1];
+    if(newPieceState[selectedpc].rules.firstMove) newPieceState[selectedpc].rules.firstMove = false;
 
-    this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `piece ${selectedpc} moved to ${cell[0]},${cell[1]}`});
+    let newOccupiedObject = this.buildOccupiedObject(newPieceState);
+
+    this.setState({
+      piecesObject: newPieceState, 
+      occupiedObject: newOccupiedObject,
+      turn: !this.state.turn, 
+      selectedPiece: "", 
+      messageBoard: `piece ${selectedpc} moved to ${cell[0]},${cell[1]}`
+    });
   }
 
   //moves a piece to kill another piece
+  //TODO - build a new occupiedObject
   pieceKill = (target) => {
     
-    let newstate = {...this.state.piecesObject};
+    let newPieceState = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
-    newstate[selectedpc].xC = newstate[target].xC;
-    newstate[selectedpc].yC = newstate[target].yC;
-    newstate[target].xC = -1;
-    newstate[target].yC = -1;
-    newstate[target].dead = true;
+    newPieceState[selectedpc].xC = newPieceState[target].xC;
+    newPieceState[selectedpc].yC = newPieceState[target].yC;
+    newPieceState[target].xC = -1;
+    newPieceState[target].yC = -1;
+    newPieceState[target].dead = true;
+    let newOccupiedObject = this.buildOccupiedObject(newPieceState);
   
-    this.setState({piecesObject: newstate, turn: !this.state.turn, selectedPiece: "", messageBoard: `${selectedpc} has successfully attacked ${target}`});
+    this.setState({
+      piecesObject: newPieceState, 
+      occupiedObject: newOccupiedObject, 
+      turn: !this.state.turn,
+      selectedPiece: "",
+      messageBoard: `${selectedpc} has successfully attacked ${target}`
+    });
   }
 
-  //checks the legality of attacks
-  // checkAttackLegality = (target) => {
-    
-  //   let isLegal = false;
-  //   let selectedpc = this.state.piecesObject[this.state.selectedPiece];
-  //   let targetpc = this.state.piecesObject[target];
-
-  //   //check if attacking same team
-  //   if(this.state.selectedPiece.charAt(0) === target.charAt(0)) return isLegal;
-
-  //   let attack = [targetpc.xC - selectedpc.xC, targetpc.yC - selectedpc.yC];
-
-  //   //if a normal piece is attacking
-  //   if(selectedpc.rules.attacklogic == null){
-  //     isLegal = selectedpc.rules.movelogic(attack[0], attack[1]);
-    
-  //     //special case for pawn attacks
-  //   } else if (selectedpc.rules.attacklogic){
-  //     return selectedpc.rules.attacklogic(attack[0],attack[1]);
-  //   }
-
-  //   //check the path
-  //   isLegal = this.checkPath([selectedpc.xC, selectedpc.yC], [targetpc.xC, targetpc.yC]);
-
-  //   return isLegal;
-  // }
-
-  checkPath = (piece, target) => {
-    let clear = true;
-    let grid = ChessBuilder.buildPathGrid();
-    let xSign = 1 * Math.sign(target[0]);
-    let ySign = 1 * Math.sign(target[1]);
-
-    for(
-      let x = xSign, y = ySign; 
-      xSign === 1 ? x < target[0] : x > target[0], 
-      ySign === 1 ? y < target[1] : y > target[1]; 
-      x = x + (1 * xSign), 
-      y = y + (1 * ySign)){
-      
-        if(grid[`${x + piece[0]},${y + piece[1]}`]) clear = false;
-    }   
-
-    return clear;
+  //this returns an object with a list of coordinates of each piece, the key being the coordinate and the value being the piece name
+  buildOccupiedObject = (piecesObject) => {
+    let grid = {};
+    let piecenames = Object.keys(piecesObject);
+    piecenames.forEach((piece, i) => {
+      grid[`${piecesObject[piece].xC},${piecesObject[piece].yC}`] = piece;
+    }) ;
+    return grid;
   }
   
   render(){
+    // console.log(this.state.piecesObject);
     
     //GENERATE TILES
     let boardTiles = this.makeTiles();
@@ -236,6 +230,8 @@ class TestBoard extends Component{
     )
   }
 
+  //makes the tiles for the game
+  //TODO - consider having ChessBuilder do this
   makeTiles = () => {
     return new Array(this.state.boardDimensions[0]).fill().map((column, i) => {
       return new Array(this.state.boardDimensions[1]).fill().map((tile,j) => {
@@ -250,6 +246,8 @@ class TestBoard extends Component{
     });
   }
 
+  //makes the pieces for the game
+  //TODO - consider having ChessBuilder do this
   makePieces = () => {
     return Object.keys(this.state.piecesObject).map((name, i) => {
       return <Piece 
