@@ -5,10 +5,10 @@ TODO: April 11
 - clean up App.js constructor function - WORKED AROUND IT
 - - clean up game initialization - DONE!
 - implement checker tile pattern - DONE
-- implement piece killing
-- - implement legal moves
-- - - implement turn taking
-- redo how pieces report their positioning. are pixels efficient?
+- implement piece killing - DONE
+- - implement legal moves - halfway
+- - - implement turn taking - DONE
+- redo how pieces report their positioning - in progress
 
 possible board hierarchy:
 

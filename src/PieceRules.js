@@ -1,48 +1,78 @@
 export default function rulesets(piece){
 
-  //TODO - DON'T LET VISION CHECK OUTSIDE OF BOARD BOUNDARIES!!!
+  //TODO - reimplement BOARDSIZE so that it is dynamic and not a hard-coded variable
+  //TODO - implement a rook/castling test
   //rook bishop and queen will all be checking their paths until they run out of room, so they get the same method
   const rookBishopQueenVision = (piecesObject, occupiedObject, pieceName) => {
     let pathsObject = {};
+    const BOARDSIZE = 8;
 
-    // let piecenames = Object.keys(piecesObject);
     let subject = piecesObject[pieceName];
-
-    //foreach path?
     
+    //investigate each path until it hits a piece or border
     subject.rules.paths.forEach((path, i) => {
-      //chase down each path until it hits a piece
+      debugger;
       let count = 1;
       let pathDone = false;
       let pathArr = [];
      
       do{
-        let cellCheck = `${subject.xC + (path[0] * count)},${subject.yC + (path[1] * count)}`;
-        
+        let testX = subject.xC + (path[0] * count);
+        let testY = subject.yC + (path[1] * count);
+        let cellCheck = `${testX},${testY}`;
 
-        //if the cell being checked does not show up in the list of occupied cells, it is a valid move so push that cell to the array 
-        debugger;
-        if (!occupiedObject[cellCheck]){
+        //if the cell being checked does not show up in the list of occupied cells and is within valid board space, it is a valid move so push that cell to the array 
+        if(occupiedObject[cellCheck]){
+          console.log("success!");
+        }
+        
+        if (testX >= 0 && testX < BOARDSIZE && testY >= 0 && testY < BOARDSIZE && !(occupiedObject.hasOwnProperty(`${testX},${testY}`))){
           pathArr.push(cellCheck);
           count = count + 1;
-        }else{
+        }
+        //implemented a check to see if filled space is a capturable enemy piece
+        else if(occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== subject.name.charAt(0)){
+          pathArr.push(cellCheck);
           pathDone = true;
         }
+        else{
+          pathDone = true;
+        }
+        console.log(`testing ${testX},${testY} against ${occupiedObject}`);
 
       }while(!pathDone);
-      console.log("left the loop")
-      pathsObject[path] = pathArr;
+      if(pathArr.length > 0) pathsObject[path] = pathArr;
      
     });
-    // return pathsObject;
+    return pathsObject;
   }
 
-  //knight and king each only move one space, and only check each path once, so they get their own method
+  //TODO - implement a King/castling check
+  //TODO - consider implementing an "in-check" check here
+  //knight and king can only have one move per path, so they get their own method
   const knightKingVision = (piecesObject, occupiedObject, pieceName) => {
+    let pathsObject = {};
+    const BOARDSIZE = 8;
+    let subject = piecesObject[pieceName];
+
+    subject.rules.paths.forEach((path, i) => {
+      let testX = subject.xC + path[0];
+      let testY = subject.yC + path[1];
+      let cellCheck = `${testX},${testY}`;
+
+      if (
+        !occupiedObject[cellCheck] && 
+        testX >= 0 && testX < BOARDSIZE && 
+        testY >= 0 && testY < BOARDSIZE
+      ){
+        pathsObject[path] = [testX, testY];
+      }
+    });
+    return pathsObject;
     
   }
 
-  //pawns would get lumped in with knight and king if not for their initial 2 space move and en passant
+  //pawns have more complicated rules for attacking and moving, so they get their own method
   const pawnVision = (piecesObject, occupiedObject, pieceName) => {
 
   }
@@ -95,7 +125,6 @@ export default function rulesets(piece){
     return rules; 
   }
   const queenRules = () => {
-    console.log(rookBishopQueenVision);
     const rules = {
       movelogic: (x,y) => (
         x !== 0 && y !== 0 && 

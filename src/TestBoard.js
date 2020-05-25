@@ -31,8 +31,10 @@ class TestBoard extends Component{
     });
 
     //imbue all the piece objects with their rulesets
+    //also added a name property, which is the pieces name
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
       PIECE_OBJECTS[piece].rules = rulesets(piece);
+      PIECE_OBJECTS[piece].name = piece;
     });
 
     //initial occupiedObject creation
@@ -85,13 +87,13 @@ class TestBoard extends Component{
   //Handle piece clicks
   //may set state on selections, but not on actions
   pieceClick = (e, name) => {
-    // debugger;
     
-    //Selecting a piece
+    //if selecting a piece
     if(this.state.selectedPiece.length === 0){
 
       //check turn 
       if(ChessGovernor.checkSelectionLegality(name, this.state.turn)) {
+        //TESTING PIECE VISION
         console.log(this.state.piecesObject[name].rules.vision(this.state.piecesObject, this.state.occupiedObject, name));
         this.setState({selectedPiece: name, messageBoard: `piece ${name} is selected`});
       }
@@ -99,11 +101,11 @@ class TestBoard extends Component{
         this.setState({messageBoard: "Illegal selection, try again"});
       }
     }
-    //Deselecting a piece
+    //if deselecting a piece
     else if(this.state.selectedPiece === name){
       this.setState({selectedPiece: "", messageBoard: "no piece selected"});
     }
-    //Attacking a piece
+    //if attacking a piece
     else if(this.state.selectedPiece.length > 0 && name !== this.state.selectedPiece){
       let legal = ChessGovernor.checkAttackLegality(this.state.selectedPiece, name, this.state.piecesObject);
       if(legal) this.pieceKill(name);
