@@ -4,7 +4,6 @@ import Piece from "./Piece";
 import "./TestBoard.css";
 import rulesets from "./PieceRules";
 import ChessGovernor from "./ChessGovernor";
-import ChessBuilder from "./ChessBuilder";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
@@ -33,7 +32,9 @@ class TestBoard extends Component{
     //imbue all the piece objects with their rulesets
     //also added a name property, which is the pieces name
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
-      PIECE_OBJECTS[piece].rules = rulesets(piece);
+      let rules = rulesets(piece);
+      let ruleKeys = Object.keys(rules);
+      ruleKeys.forEach(rule => PIECE_OBJECTS[piece][rule] = rules[rule]);
       PIECE_OBJECTS[piece].name = piece;
     });
 
@@ -71,8 +72,10 @@ class TestBoard extends Component{
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
 
       //Then perform the legality check
-      let legal = ChessGovernor.checkMoveLegality(this.state.selectedPiece, cell, this.state.piecesObject);
-            
+      let legal = ChessGovernor.checkMoveLegality(this.state.selectedPiece, cell, this.state.piecesObject, this.state.occupiedObject);
+      
+      // let legal = ChessGovernor.
+
       if(legal){
         this.pieceMove(cell);
       } else if(!legal){
@@ -91,11 +94,22 @@ class TestBoard extends Component{
     //if selecting a piece
     if(this.state.selectedPiece.length === 0){
 
-      //check turn 
+      //check turn, then confirm selection and update piece.view
       if(ChessGovernor.checkSelectionLegality(name, this.state.turn)) {
+
+        //update the pieces view
+        let newPiecesObject = {...this.state.piecesObject};
+        let newPieceView = newPiecesObject[name].vision(newPiecesObject, this.state.occupiedObject, name);
+        newPiecesObject[name].view = newPieceView;
+        
         //TESTING PIECE VISION
-        console.log(this.state.piecesObject[name].rules.vision(this.state.piecesObject, this.state.occupiedObject, name));
-        this.setState({selectedPiece: name, messageBoard: `piece ${name} is selected`});
+        console.log(newPieceView);
+
+        this.setState({
+          piecesObject: newPiecesObject,
+          selectedPiece: name, 
+          messageBoard: `piece ${name} is selected`
+        });
       }
       else {
         this.setState({messageBoard: "Illegal selection, try again"});
@@ -107,7 +121,7 @@ class TestBoard extends Component{
     }
     //if attacking a piece
     else if(this.state.selectedPiece.length > 0 && name !== this.state.selectedPiece){
-      let legal = ChessGovernor.checkAttackLegality(this.state.selectedPiece, name, this.state.piecesObject);
+      let legal = ChessGovernor.checkAttackLegality(this.state.selectedPiece, name, this.state.piecesObject, this.state.occupiedObject);
       if(legal) this.pieceKill(name);
       else this.setState({selectedPiece: "", messageBoard: "illegal attack"});
     } else {
@@ -119,17 +133,30 @@ class TestBoard extends Component{
   //TODO - build a new occupiedObject
   pieceMove = (cell) => {
     
-    let newPieceState = {...this.state.piecesObject};
+    let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
-    newPieceState[selectedpc].xC = cell[0];
-    newPieceState[selectedpc].yC = cell[1];
-    if(newPieceState[selectedpc].rules.firstMove) newPieceState[selectedpc].rules.firstMove = false;
+    if(newPieceObject[selectedpc].hasOwnProperty("enPassant") && newPieceObject[selectedpc].enPassant) newPieceObject[selectedpc].enPassant = false;
 
-    let newOccupiedObject = this.buildOccupiedObject(newPieceState);
+    if(newPieceObject[selectedpc].firstMove){
+      newPieceObject[selectedpc].firstMove = false;
+
+      if(
+        newPieceObject[selectedpc].name.charAt(1) === "P" && 
+        !newPieceObject[selectedpc].enPassant &&
+        cell[0] - newPieceObject[selectedpc].xC === 0 &&
+        (cell[1] - newPieceObject[selectedpc].yC === 2 || cell[1] - newPieceObject[selectedpc].yC === -2) 
+        ){
+          newPieceObject[selectedpc].enPassant = true;
+      }
+    }
+    newPieceObject[selectedpc].xC = cell[0];
+    newPieceObject[selectedpc].yC = cell[1];
+
+    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
 
     this.setState({
-      piecesObject: newPieceState, 
+      piecesObject: newPieceObject, 
       occupiedObject: newOccupiedObject,
       turn: !this.state.turn, 
       selectedPiece: "", 
@@ -138,21 +165,20 @@ class TestBoard extends Component{
   }
 
   //moves a piece to kill another piece
-  //TODO - build a new occupiedObject
   pieceKill = (target) => {
     
-    let newPieceState = {...this.state.piecesObject};
+    let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
-    newPieceState[selectedpc].xC = newPieceState[target].xC;
-    newPieceState[selectedpc].yC = newPieceState[target].yC;
-    newPieceState[target].xC = -1;
-    newPieceState[target].yC = -1;
-    newPieceState[target].dead = true;
-    let newOccupiedObject = this.buildOccupiedObject(newPieceState);
+    newPieceObject[selectedpc].xC = newPieceObject[target].xC;
+    newPieceObject[selectedpc].yC = newPieceObject[target].yC;
+    newPieceObject[target].xC = -1;
+    newPieceObject[target].yC = -1;
+    newPieceObject[target].dead = true;
+    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
   
     this.setState({
-      piecesObject: newPieceState, 
+      piecesObject: newPieceObject, 
       occupiedObject: newOccupiedObject, 
       turn: !this.state.turn,
       selectedPiece: "",
@@ -161,17 +187,19 @@ class TestBoard extends Component{
   }
 
   //this returns an object with a list of coordinates of each piece, the key being the coordinate and the value being the piece name
+  //TODO - I'm certain this is efficient, but go over other options sometime
   buildOccupiedObject = (piecesObject) => {
     let grid = {};
     let piecenames = Object.keys(piecesObject);
     piecenames.forEach((piece, i) => {
-      grid[`${piecesObject[piece].xC},${piecesObject[piece].yC}`] = piece;
+      let coordinates = `${piecesObject[piece].xC},${piecesObject[piece].yC}`;
+      if(!grid[coordinates]) grid[coordinates] = [piece];
+      else if(grid[coordinates]) grid[coordinates].push(piece);
     }) ;
     return grid;
   }
   
   render(){
-    // console.log(this.state.piecesObject);
     
     //GENERATE TILES
     let boardTiles = this.makeTiles();

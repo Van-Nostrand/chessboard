@@ -1,29 +1,34 @@
-import ChessBuilder from "./ChessBuilder";
-
 //This class exists entirely to house some static functions
 //These functions compare piece coordinates to a grid and decide if a move is legal or not
 class ChessGovernor{
   
-  //checks that pathing is correct
-  //returns bool
-  //pieceCoordinates = int array, targetCoordinates = int array, grid = object
-  static checkPath = (pieceCoordinates, targetCoordinates, grid) => {
-    let clear = true;
-    let xSign = 1 * Math.sign(targetCoordinates[0]);
-    let ySign = 1 * Math.sign(targetCoordinates[1]);
-    for(
-      let x = xSign, y = ySign; 
-      xSign === 1 ? x < targetCoordinates[0] : x > targetCoordinates[0], 
-      ySign === 1 ? y < targetCoordinates[1] : y > targetCoordinates[1]; 
-      x = x + (1 * xSign), 
-      y = y + (1 * ySign)){
-      
-        if(grid[`${x + pieceCoordinates[0]},${y + pieceCoordinates[1]}`]) clear = false;
-    }   
+  static checkPath = (selectedPieceName, targetCoordinates, piecesObject) => {
+    let clear = false;
+
+    let dx = targetCoordinates[0] - piecesObject[selectedPieceName].xC;
+    let dy = targetCoordinates[1] - piecesObject[selectedPieceName].yC;
+    let xSign = Math.sign(dx);
+    let ySign = Math.sign(dy);
+
+    let path = "";
+
+    //an exception for knights
+    //it's beginning to look like I'm just going to have to move all of this logic into the pieces...
+    if(selectedPieceName.charAt(1) === "N"){
+      path = `${dx},${dy}`;
+    } else{
+      path = `${xSign},${ySign}`;
+    }
+    // debugger;
+    if(piecesObject[selectedPieceName].view[path] && piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)){
+      clear = true;
+    }
 
     return clear;
   }
 
+  //checks that a selection is correct
+  // returns bool, or outputs to console on error
   //target = string, turn = bool
   //returns bool, or string if there's an error
   static checkSelectionLegality = (target, turn) => {
@@ -38,52 +43,54 @@ class ChessGovernor{
   
   //checks the legality of moving to an empty space
   //returns bool
-  //selectedpc = string, target = int array, pieceLedger = object
-  static checkMoveLegality = (selectedpc, target, pieceLedger) => {
+  //selectedPieceName = string, target = int array, piecesObject = object
+  static checkMoveLegality = (selectedPieceName, target, piecesObject, occupiedObject) => {
     
     let isLegal = false;
-    let move = [target[0] - pieceLedger[selectedpc].xC, target[1] - pieceLedger[selectedpc].yC];
+    let moveDelta = [target[0] - piecesObject[selectedPieceName].xC, target[1] - piecesObject[selectedPieceName].yC];
     
-    isLegal = pieceLedger[selectedpc].rules.movelogic(move[0],move[1]);
+    isLegal = piecesObject[selectedPieceName].movelogic(moveDelta[0],moveDelta[1]);
 
     //check that the path is clear
     //only the knight is exempt
-    if(!pieceLedger[selectedpc].rules.jump) {
-      isLegal = this.checkPath([pieceLedger[selectedpc].xC,pieceLedger[selectedpc].yC], move, pieceLedger);
+    if(!piecesObject[selectedPieceName].jump) {
+      isLegal = this.checkPath(
+        selectedPieceName, 
+        target,
+        piecesObject
+      );
     }
     return isLegal;
   }
 
   //checks the legality of attacks
   //returns bool
-  //selectedpc = string, targetpc = string, pieceLedger = object
-  //TODO - Knights can't attack
-  static checkAttackLegality = (selectedpc, targetpc, pieceLedger) => {
+  static checkAttackLegality = (selectedPieceName, targetPieceName, piecesObject, occupiedObject) => {
     
     let isLegal = false;
+    // debugger;
 
-    //TODO - build the grid here? 
-    
     //can't attack your own team
-    if(selectedpc.charAt(0) === targetpc.charAt(0)) return isLegal;
+    if(selectedPieceName.charAt(0) === targetPieceName.charAt(0)) return isLegal;
 
-    let attack = [pieceLedger[targetpc].xC - pieceLedger[selectedpc].xC, pieceLedger[targetpc].yC - pieceLedger[selectedpc].yC];
+    let attack = [piecesObject[targetPieceName].xC - piecesObject[selectedPieceName].xC, piecesObject[targetPieceName].yC - piecesObject[selectedPieceName].yC];
 
     //if a normal piece is attacking
-    if(pieceLedger[selectedpc].rules.attacklogic == null){
-      isLegal = pieceLedger[selectedpc].rules.movelogic(attack[0], attack[1]);
+    if(piecesObject[selectedPieceName].attacklogic == null){
+      isLegal = piecesObject[selectedPieceName].movelogic(attack[0], attack[1]);
     
       //special case for pawn attacks
-    } else if (pieceLedger[selectedpc].rules.attacklogic){
-      return pieceLedger[selectedpc].rules.attacklogic(attack[0],attack[1]);
+    } else if (piecesObject[selectedPieceName].attacklogic){
+      return piecesObject[selectedPieceName].attacklogic(attack[0],attack[1]);
     }
-
     //check the path
-    isLegal = this.checkPath([pieceLedger[selectedpc].xC, pieceLedger[selectedpc].yC], [pieceLedger[targetpc].xC, pieceLedger[targetpc].yC]);
+    isLegal = this.checkPath(
+      selectedPieceName, 
+      [piecesObject[targetPieceName].xC, piecesObject[targetPieceName].yC], 
+      piecesObject);
 
     return isLegal;
   }
-
 }
 
 export default ChessGovernor;
