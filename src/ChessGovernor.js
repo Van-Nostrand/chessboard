@@ -5,6 +5,7 @@ class ChessGovernor{
   static checkPath = (selectedPieceName, targetCoordinates, piecesObject) => {
     let clear = false;
 
+    //TODO - I ALREADY HAVE delta x/y from checkMoveLegality
     let dx = targetCoordinates[0] - piecesObject[selectedPieceName].xC;
     let dy = targetCoordinates[1] - piecesObject[selectedPieceName].yC;
     let xSign = Math.sign(dx);
@@ -19,7 +20,6 @@ class ChessGovernor{
     } else{
       path = `${xSign},${ySign}`;
     }
-    // debugger;
     if(piecesObject[selectedPieceName].view[path] && piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)){
       clear = true;
     }
@@ -45,7 +45,6 @@ class ChessGovernor{
   //returns bool
   //selectedPieceName = string, target = int array, piecesObject = object
   static checkMoveLegality = (selectedPieceName, target, piecesObject, occupiedObject) => {
-    
     let isLegal = false;
     let moveDelta = [target[0] - piecesObject[selectedPieceName].xC, target[1] - piecesObject[selectedPieceName].yC];
     
@@ -68,7 +67,6 @@ class ChessGovernor{
   static checkAttackLegality = (selectedPieceName, targetPieceName, piecesObject, occupiedObject) => {
     
     let isLegal = false;
-    // debugger;
 
     //can't attack your own team
     if(selectedPieceName.charAt(0) === targetPieceName.charAt(0)) return isLegal;
@@ -90,6 +88,10 @@ class ChessGovernor{
       piecesObject);
 
     return isLegal;
+  }
+
+  static areKingsInCheck = () => {
+    
   }
 }
 

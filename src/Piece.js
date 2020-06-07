@@ -3,7 +3,6 @@ import pieceImg from "./pieces.png";
 
 const BACKGROUNDSIZE = 400;
 //TODO - remove need for hard-coded BACKGROUNDSIZE property
-//TODO - go over style and properties
 const Piece = (props) => {
   let borderLogic = props.border === props.name ? "1px solid yellow" : "";
   let isDead = props.dead ? 

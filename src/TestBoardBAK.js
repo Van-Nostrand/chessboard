@@ -1,9 +1,3 @@
-/*
-IM ATTEMPTING TO IMPLEMENT PROPER OOP CLASSES
-ITS GOING BADLY
-CONSIDER REVERTING TO TESTBOARDBAK
-*/
-
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
@@ -65,9 +59,9 @@ class TestBoard extends Component{
 
     //initial occupiedObject creation
     //this is an object that is an easy reference to occupied cells
-    let occupiedObject = this.buildOccupiedObject(newPiecesObject);
+    let occupiedObject = this.buildOccupiedObject(PIECE_OBJECTS);
 
-    let piecesObject = this.updatePieceVision(newPiecesObject, occupiedObject);
+    let piecesObject = this.updatePieceVision(PIECE_OBJECTS, occupiedObject);
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -83,8 +77,6 @@ class TestBoard extends Component{
   }
 
   imbueClass = (name, pieceData) => {
-    console.log(pieceData);
-    console.log("that was piecedata");
     switch(name.charAt(1)) {
       case "P": return new PawnClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
       case "K": return new KingClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
@@ -164,12 +156,12 @@ class TestBoard extends Component{
   updatePieceVision = (piecesObject, occupiedObject) => {
     
     let pieceNames = Object.keys(piecesObject);
-    // debugger;
+    debugger;
 
     for(let i = 0; i < pieceNames.length; i++){
-      debugger;
+
       //if the piece isn't dead, update vision
-      if(piecesObject[pieceNames[i]].x >= 0){
+      if(piecesObject[pieceNames[i]].xC >= 0){
         let newPieceView = piecesObject[pieceNames[i]].vision(piecesObject, occupiedObject, pieceNames[i]);
         piecesObject[pieceNames[i]].view = newPieceView;
       }
@@ -186,7 +178,7 @@ class TestBoard extends Component{
 
     for(let i = 0; i < pieceNames.length; i++){
       //if the piece isn't dead, update vision
-      if(newPiecesObject[pieceNames[i]].x >= 0){
+      if(newPiecesObject[pieceNames[i]].xC >= 0){
         let newPieceView = newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedObject, pieceNames[i]);
         newPiecesObject[pieceNames[i]].view = newPieceView;
       }
@@ -227,14 +219,14 @@ class TestBoard extends Component{
       if(
         newPieceObject[selectedpc].name.charAt(1) === "P" && 
         !newPieceObject[selectedpc].enPassant &&
-        cell[0] - newPieceObject[selectedpc].x === 0 &&
-        (cell[1] - newPieceObject[selectedpc].y === 2 || cell[1] - newPieceObject[selectedpc].y === -2) 
+        cell[0] - newPieceObject[selectedpc].xC === 0 &&
+        (cell[1] - newPieceObject[selectedpc].yC === 2 || cell[1] - newPieceObject[selectedpc].yC === -2) 
         ){
           newPieceObject[selectedpc].enPassant = true;
       }
     }
-    newPieceObject[selectedpc].x = cell[0];
-    newPieceObject[selectedpc].y = cell[1];
+    newPieceObject[selectedpc].xC = cell[0];
+    newPieceObject[selectedpc].yC = cell[1];
     
     let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
 
@@ -247,10 +239,10 @@ class TestBoard extends Component{
     let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
-    newPieceObject[selectedpc].x = newPieceObject[target].x;
-    newPieceObject[selectedpc].y = newPieceObject[target].y;
-    newPieceObject[target].x = -1;
-    newPieceObject[target].y = -1;
+    newPieceObject[selectedpc].xC = newPieceObject[target].xC;
+    newPieceObject[selectedpc].yC = newPieceObject[target].yC;
+    newPieceObject[target].xC = -1;
+    newPieceObject[target].yC = -1;
     newPieceObject[target].dead = true;
 
     let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
@@ -264,7 +256,7 @@ class TestBoard extends Component{
     let grid = {};
     let piecenames = Object.keys(piecesObject);
     piecenames.forEach((piece, i) => {
-      let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
+      let coordinates = `${piecesObject[piece].xC},${piecesObject[piece].yC}`;
       if(!grid[coordinates]) grid[coordinates] = [piece];
       else if(grid[coordinates]) grid[coordinates].push(piece);
     }) ;
@@ -295,7 +287,7 @@ class TestBoard extends Component{
     let outerStyle = {
       display: "flex", 
       alignItems: "center", 
-      justifyontent: "center",
+      justifyContent: "center",
       flexFlow: "row",
       height: "100vh"
     }
@@ -352,10 +344,9 @@ class TestBoard extends Component{
   //makes the pieces for the game
   makePieces = () => {
     return Object.keys(this.state.piecesObject).map((name, i) => {
-      // debugger;
       return <Piece 
-                x={this.state.piecesObject[name].x}
-                y={this.state.piecesObject[name].y}
+                xC={this.state.piecesObject[name].xC}
+                yC={this.state.piecesObject[name].yC}
                 dead={this.state.piecesObject[name].dead}
                 pngPos={this.state.piecesObject[name].pngPos}
                 key={name}
