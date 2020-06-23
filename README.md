@@ -22,3 +22,7 @@ So far, pieces can be clicked on and moved, and they will respect general rules 
 * add a system for players and player names, scorekeeping
 * try refactoring it as an electron app
 * try refactoring it as an android app
+
+
+##### June 22 2020
+updated documentation. pick up work tomorrow on TestBoard.js line 245. Was implementing enpassant. I've made some of this too complicated... 

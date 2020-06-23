@@ -1,14 +1,7 @@
-/*
-IM ATTEMPTING TO IMPLEMENT PROPER OOP CLASSES
-ITS GOING BADLY
-CONSIDER REVERTING TO TESTBOARDBAK
-*/
-
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
-import "./TestBoard.css";
-import rulesets from "./PieceRules";
+// import rulesets from "./PieceRules";
 import ChessGovernor from "./ChessGovernor";
 import {
   BOARDDIMENSIONS, 
@@ -45,8 +38,10 @@ class TestBoard extends Component{
       });
     });
 
-    //imbue all the piece objects with their rulesets
-    //also added a name property, which is the pieces name
+    /* 
+      PieceRules is an older method I used to handle piece logic
+      I switched to PieceClasses, as I found that using a more OOP approach made more sense
+    */
     // Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
     //   let rules = rulesets(piece);
     //   let ruleKeys = Object.keys(rules);
@@ -55,7 +50,7 @@ class TestBoard extends Component{
     // });
 
     //------------------------
-    //TESTING PIECE CLASSES
+    // PIECE CLASSES
     //-------------------------
     let newPiecesObject = {};
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
@@ -63,10 +58,15 @@ class TestBoard extends Component{
       
     });
 
-    //initial occupiedObject creation
-    //this is an object that is an easy reference to occupied cells
+    /*
+      I use occupiedObject as a way to easily reference occupied cells by providing a string describing cell coordinates as an argument
+      example: if(!occupiedObject["x,y"]) then cell is empty, else, it is occupied
+    */
     let occupiedObject = this.buildOccupiedObject(newPiecesObject);
 
+    /*
+      read the intro to PieceClasses for a rundown on how Pieces are structured
+    */
     let piecesObject = this.updatePieceVision(newPiecesObject, occupiedObject);
 
     this.state = {
@@ -83,23 +83,23 @@ class TestBoard extends Component{
   }
 
   imbueClass = (name, pieceData) => {
-    console.log(pieceData);
-    console.log("that was piecedata");
+    // console.log(pieceData);
+    // console.log("that was piecedata");
     switch(name.charAt(1)) {
-      case "P": return new PawnClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
-      case "K": return new KingClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
-      case "N": return new KnightClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
-      case "Q": return new QueenClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
-      case "R": return new RookClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
-      case "B": return new BishopClass(name, pieceData.xC, pieceData.yC, pieceData.pngPos);
+      case "P": return new PawnClass(name, pieceData.x, pieceData.y, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
+      case "K": return new KingClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+      case "N": return new KnightClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+      case "Q": return new QueenClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+      case "R": return new RookClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+      case "B": return new BishopClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
       default: console.log("error imbueing classes");
     }
   }
 
   //HANDLE TILE CLICKS
   //only sets state if illegal move detected
+  //TODO - handle En Passant
   tileClick = (e) => {
-
     //Clicking a tile while no piece selected
     if(this.state.selectedPiece.length === 0){
       return;
@@ -129,7 +129,6 @@ class TestBoard extends Component{
   //Handle piece clicks
   //may set state on selections, but not on actions
   pieceClick = (e, name) => {
-    
     //if selecting a piece
     if(this.state.selectedPiece.length === 0){
 
@@ -164,10 +163,8 @@ class TestBoard extends Component{
   updatePieceVision = (piecesObject, occupiedObject) => {
     
     let pieceNames = Object.keys(piecesObject);
-    // debugger;
 
     for(let i = 0; i < pieceNames.length; i++){
-      debugger;
       //if the piece isn't dead, update vision
       if(piecesObject[pieceNames[i]].x >= 0){
         let newPieceView = piecesObject[pieceNames[i]].vision(piecesObject, occupiedObject, pieceNames[i]);
@@ -184,22 +181,21 @@ class TestBoard extends Component{
 
     let pieceNames = Object.keys(newPiecesObject);
 
+    //updating piece vision
     for(let i = 0; i < pieceNames.length; i++){
-      //if the piece isn't dead, update vision
       if(newPiecesObject[pieceNames[i]].x >= 0){
         let newPieceView = newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedObject, pieceNames[i]);
         newPiecesObject[pieceNames[i]].view = newPieceView;
       }
     }
 
+    //beginning to implement "is the king in check?"
     let kingLocations = [];
     Object.keys(newOccupiedObject).forEach((occupiedCell, i) => {
       if(newOccupiedObject[occupiedCell][0].charAt(1) === "K"){
         kingLocations.push( [occupiedCell, newOccupiedObject[occupiedCell][0]]);
       }
     });
-
-    console.log(kingLocations);
     
     //determine if this is a piecemove or piecekill based on whether the second args variable is an array
     let messageBoard = Array.isArray(args[1]) ? `piece ${args[0]} moved to ${args[1][0]},${args[1][1]}` : `${args[0]} has successfully attacked ${args[1]}`;
@@ -218,12 +214,20 @@ class TestBoard extends Component{
     
     let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
+    let deltas = [cell[0] - newPieceObject[selectedpc].x,cell[1] - newPieceObject[selectedpc].y];
+    console.log("the deltas");
+    console.log(deltas);
+    console.log("the cell");
+    console.log(cell);
 
+    //REMOVES ENPASSANT FLAG
     if(newPieceObject[selectedpc].hasOwnProperty("enPassant") && newPieceObject[selectedpc].enPassant) newPieceObject[selectedpc].enPassant = false;
 
     if(newPieceObject[selectedpc].firstMove){
       newPieceObject[selectedpc].firstMove = false;
 
+      // CREATES ENPASSANT FLAG
+      //if the piece is a pawn AND not flagged for enpassant AND did not just move diagonally AND moved two spaces
       if(
         newPieceObject[selectedpc].name.charAt(1) === "P" && 
         !newPieceObject[selectedpc].enPassant &&
@@ -232,7 +236,23 @@ class TestBoard extends Component{
         ){
           newPieceObject[selectedpc].enPassant = true;
       }
+    } else if(newPieceObject[selectedpc].enPassant){
+      newPieceObject[selectedpc].enPassant = false;
     }
+
+    debugger;
+    //if this is enpassant attack
+    //RESUME WORK HERE
+    if(selectedpc.charAt(1) === "P"){
+      let attackArray = Object.keys(newPieceObject[selectedpc].view).filter(path => newPieceObject[selectedpc].view[path[0]] === cell);
+      console.log(attackArray); 
+      if(attackArray.length > 1){
+        this.enPassant(attackArray);
+        return;
+      }
+    }
+
+
     newPieceObject[selectedpc].x = cell[0];
     newPieceObject[selectedpc].y = cell[1];
     
@@ -256,6 +276,26 @@ class TestBoard extends Component{
     let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
 
     this.updateGame(newPieceObject, newOccupiedObject, selectedpc, target);
+  }
+
+  //enpassant method
+  enPassant(attackPlan, occupiedObject = this.state.occupiedObject){
+    debugger;
+    let newPieceObject = {...this.state.piecesObject};
+    let selectedpc = this.state.selectedPiece;
+
+    //move selected piece to empty tile
+    newPieceObject[selectedpc].x = attackPlan[0][0];
+    newPieceObject[selectedpc].y = attackPlan[0][1];
+
+    //kill opponents pawn
+    newPieceObject[occupiedObject[attackPlan[1]]].x = -1;
+    newPieceObject[occupiedObject[attackPlan[1]]].y = -1;
+    newPieceObject[occupiedObject[attackPlan[1]]].dead = true;
+
+    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
+
+    this.updateGame(newPieceObject, newOccupiedObject, selectedpc, attackPlan[1]);
   }
 
   //this returns an object with a list of coordinates of each piece, the key being the coordinate and the value being the piece name
@@ -352,7 +392,6 @@ class TestBoard extends Component{
   //makes the pieces for the game
   makePieces = () => {
     return Object.keys(this.state.piecesObject).map((name, i) => {
-      // debugger;
       return <Piece 
                 x={this.state.piecesObject[name].x}
                 y={this.state.piecesObject[name].y}
