@@ -240,7 +240,7 @@ class TestBoard extends Component{
       newPieceObject[selectedpc].enPassant = false;
     }
 
-    debugger;
+    // debugger;
     //if this is enpassant attack
     //RESUME WORK HERE
     if(selectedpc.charAt(1) === "P"){
