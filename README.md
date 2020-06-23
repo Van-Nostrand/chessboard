@@ -1,27 +1,24 @@
-This is a chessboard app that has haunted me since College. I tried it in Java and never finished it. Let's see if I can finish it in React.
+# Chess!
+This is a project that has haunted me since College. I originally tried to do it in Java but screwed it up at the time. After, I was too busy to get around to finishing it. I've thought about it many times over the years so I figured I'd try to finish it for fun.
 
-TODO: April 11 
-- implement regex that identifies piece types - DONE
-- clean up App.js constructor function - WORKED AROUND IT
-- - clean up game initialization - DONE!
-- implement checker tile pattern - DONE
-- implement piece killing - DONE
-- - implement legal moves - halfway
-- - - implement turn taking - DONE
-- redo how pieces report their positioning - in progress
+### Where it's at (June 22 2020)
+So far, pieces can be clicked on and moved, and they will respect general rules of piece movement. Pieces cannot be selected out of turn; so if it's whites turn you can't select black pieces, and vice versa.
 
-possible board hierarchy:
+### Todo: for now
+- implement castling
+- implement "en passant"
+- implement checks for whether or not the king is "in check"
+- implement pawn promotion
+- change how dead pieces are displayed
 
-1. Game manages an abstract grid object and an abstract collection of piece data. Each piece knows its own position. Game passes cell contents to grid, then the grid handles rendering.  
-
-piece {
-    name: string,
-    color: int,
-    pieceImage: string,
-    selectedPiece: bool,
-    xCoordinate: int,
-    yCoordinate: int
-}
-
-May 20th 2020 - 
-decided that ChessBuilder isn't necessary: TestBoard will create a list of cells that are occupied, and the pieces now have a method called rules.vision which allows them to "see" their moves themselves. Governor will probably remain just to hold static methods. 
+### Todo: in the future
+- implement "click and drag to move" for pieces
+- implement an optional "possible moves" overlay for selected pieces
+- make it look nice
+-- add a timer
+-- try my hand at svg... eliminate the need for the piece png files
+-- implement changeable color schemes
+- change piece references to actual chess notation
+- add a system for players and player names, scorekeeping
+- try refactoring it as an electron app
+- try refactoring it as an android app
