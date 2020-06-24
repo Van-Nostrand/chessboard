@@ -5,8 +5,9 @@ class ChessGovernor{
   static checkPath = (selectedPieceName, targetCoordinates, piecesObject) => {
     let clear = false;
 
-    let dx = targetCoordinates[0] - piecesObject[selectedPieceName].xC;
-    let dy = targetCoordinates[1] - piecesObject[selectedPieceName].yC;
+    //TODO - I ALREADY HAVE delta x/y from checkMoveLegality
+    let dx = targetCoordinates[0] - piecesObject[selectedPieceName].x;
+    let dy = targetCoordinates[1] - piecesObject[selectedPieceName].y;
     let xSign = Math.sign(dx);
     let ySign = Math.sign(dy);
 
@@ -19,11 +20,7 @@ class ChessGovernor{
     } else{
       path = `${xSign},${ySign}`;
     }
-
-    if(
-      piecesObject[selectedPieceName].view[path] && 
-      piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)
-    ){
+    if(piecesObject[selectedPieceName].view[path] && piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)){
       clear = true;
     }
 
@@ -47,9 +44,8 @@ class ChessGovernor{
   //returns bool
   //selectedPieceName = string, target = int array, piecesObject = object
   static checkMoveLegality = (selectedPieceName, target, piecesObject, occupiedObject) => {
-    
     let isLegal = false;
-    let moveDelta = [target[0] - piecesObject[selectedPieceName].xC, target[1] - piecesObject[selectedPieceName].yC];
+    let moveDelta = [target[0] - piecesObject[selectedPieceName].x, target[1] - piecesObject[selectedPieceName].y];
     
     isLegal = piecesObject[selectedPieceName].movelogic(moveDelta[0],moveDelta[1]);
 
@@ -72,15 +68,14 @@ class ChessGovernor{
   static checkAttackLegality = (selectedPieceName, targetPieceName, piecesObject, occupiedObject) => {
     
     let isLegal = false;
-    // debugger;
 
     //can't attack your own team
     if(selectedPieceName.charAt(0) === targetPieceName.charAt(0)) return isLegal;
 
-    let attack = [piecesObject[targetPieceName].xC - piecesObject[selectedPieceName].xC, piecesObject[targetPieceName].yC - piecesObject[selectedPieceName].yC];
+    let attack = [piecesObject[targetPieceName].x - piecesObject[selectedPieceName].x, piecesObject[targetPieceName].y - piecesObject[selectedPieceName].y];
 
     //if a normal piece is attacking
-    if(piecesObject[selectedPieceName].attacklogic == null){
+    if(!piecesObject[selectedPieceName].attacklogic){
       isLegal = piecesObject[selectedPieceName].movelogic(attack[0], attack[1]);
     
       //special case for pawn attacks
@@ -90,10 +85,14 @@ class ChessGovernor{
     //check the path
     isLegal = this.checkPath(
       selectedPieceName, 
-      [piecesObject[targetPieceName].xC, piecesObject[targetPieceName].yC], 
+      [piecesObject[targetPieceName].x, piecesObject[targetPieceName].y], 
       piecesObject);
 
     return isLegal;
+  }
+
+  static areKingsInCheck = () => {
+    
   }
 }
 

@@ -1,6 +1,6 @@
+//TODO - reimplement BOARDSIZE constants so that it is dynamic and not hard-coded
 export default function rulesets(piece){
 
-  //TODO - reimplement BOARDSIZE so that it is dynamic and not a hard-coded variable
   //TODO - implement a rook/castling test
   //rook bishop and queen will all be checking their paths until they run out of room, so they get the same method
   const rookBishopQueenVision = (piecesObject, occupiedObject, pieceName) => {
@@ -14,15 +14,13 @@ export default function rulesets(piece){
       let count = 1;
       let pathDone = false;
       let pathArr = [];
-     
-     
+    
       do{
         let testX = subject.xC + (path[0] * count);
         let testY = subject.yC + (path[1] * count);
         let cellCheck = `${testX},${testY}`;
 
         //if the cell being checked does not show up in the list of occupied cells and is within valid board space, it is a valid move so push that cell to the array 
-        
         if (testX >= 0 && testX < BOARDSIZE && testY >= 0 && testY < BOARDSIZE && !occupiedObject[cellCheck]){
           pathArr.push(cellCheck);
           count = count + 1;
@@ -43,10 +41,30 @@ export default function rulesets(piece){
     return pathsObject;
   }
 
-  //TODO - implement a King/castling check
-  //TODO - consider implementing an "in-check" check here
-  //knight and king can only have one move per path, so they get their own method
-  const knightKingVision = (piecesObject, occupiedObject, pieceName) => {
+  const knightVision = (piecesObject, occupiedObject, pieceName) => {
+    let pathsObject = {};
+    const BOARDSIZE = 8;
+    let subject = piecesObject[pieceName];
+
+    subject.paths.forEach((path, i) => {
+      let testX = subject.xC + path[0];
+      let testY = subject.yC + path[1];
+      let cellCheck = `${testX},${testY}`;
+
+      if (
+        !occupiedObject[cellCheck] && 
+        testX >= 0 && testX < BOARDSIZE && 
+        testY >= 0 && testY < BOARDSIZE
+      ){
+        pathsObject[path] = [cellCheck];
+      }else if(occupiedObject[cellCheck] && occupiedObject[cellCheck][0].charAt(0) !== subject.name.charAt(0)){
+        pathsObject[path] = [cellCheck]
+      }
+    });
+    return pathsObject;
+  }
+
+  const kingVision = (piecesObject, occupiedObject, pieceName) => {
     let pathsObject = {};
     const BOARDSIZE = 8;
     let subject = piecesObject[pieceName];
@@ -71,7 +89,6 @@ export default function rulesets(piece){
       }
     });
     return pathsObject;
-    
   }
 
   //pawns have more complicated rules for attacking and moving, so they get their own method
@@ -132,10 +149,11 @@ export default function rulesets(piece){
   const knightRules = () => {
     const rules = {
       attacklogic: null,
+      kingInCheck: false,
       capture: "same",
       jump: true,
       paths: [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]],
-      vision: knightKingVision,
+      vision: knightVision,
       movelogic: (x,y) => 
         x !== 0 !== y && 
         x !== y &&
@@ -151,6 +169,8 @@ export default function rulesets(piece){
       movelogic: (x,y) => x === 0 ^ y === 0,
       paths: [[0,-1],[1,0],[0,1],[-1,0]],
       attacklogic: null,
+      kingInCheck: false,
+      capture: "same",
       jump: false,
       firstMove: true,
       vision: rookBishopQueenVision
@@ -162,6 +182,8 @@ export default function rulesets(piece){
       movelogic: (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1),
       paths: [[1,-1],[1,1],[-1,1],[-1,-1]],
       attacklogic: null,
+      kingInCheck: false,
+      capture: "same",
       jump: false,
       vision: rookBishopQueenVision
     }
@@ -181,6 +203,7 @@ export default function rulesets(piece){
       ,
       paths: [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
       attacklogic: null,
+      kingInCheck: false,
       capture: "same",
       jump: false,
       vision: rookBishopQueenVision
@@ -195,8 +218,8 @@ export default function rulesets(piece){
       capture: "same",
       jump: false,
       inCheck: false,
-      firstMove: true,
-      vision: knightKingVision
+      firstMove: false,
+      vision: kingVision
     }
     return rules;
   }
@@ -215,6 +238,7 @@ export default function rulesets(piece){
       jump: false,
       enPassant: false,
       promotion: false, 
+      kingInCheck: false,
       vision: pawnVision,
       movelogic: (x, y) => {
         if(rules.firstMove) return x === 0 && (y === 1 * direction || y === 2 * direction);
