@@ -15,14 +15,21 @@ import {
   PIECE_OBJECTS,
   W_KING_CHECK_TEST
 } from "./CONSTANTS";
-import {
-  KingClass,
-  QueenClass,
-  RookClass,
-  KnightClass,
-  BishopClass,
-  PawnClass
-} from "./PieceClasses";
+// import {
+//   KingClass,
+//   QueenClass,
+//   RookClass,
+//   KnightClass,
+//   BishopClass,
+//   PawnClass
+// } from "./PieceClasses";
+import KingClass from "./pieceData/KingClass";
+import QueenClass from "./pieceData/QueenClass";
+import RookClass from "./pieceData/RookClass";
+import PawnClass from "./pieceData/PawnClass";
+import BishopClass from "./pieceData/BishopClass";
+import KnightClass from "./pieceData/KnightClass";
+
 
 //This is the main component for this whole game
 //It handles clicks and selections, and maintains the list of pieces and tiles
@@ -87,8 +94,6 @@ class TestBoard extends Component{
   }
 
   imbueClass = (name, pieceData) => {
-    // console.log(pieceData);
-    // console.log("that was piecedata");
     switch(name.charAt(1)) {
       case "P": return new PawnClass(name, pieceData.x, pieceData.y, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
       case "K": return new KingClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
@@ -133,6 +138,11 @@ class TestBoard extends Component{
   //Handle piece clicks
   //may set state on selections, but not on actions
   pieceClick = (e, name) => {
+    // console.log("occupied object");
+    // console.log(this.state.occupiedObject);
+
+    if(name.charAt(1) === "R") console.log(this.state.piecesObject[name].newVision(this.state.occupiedObject));
+
     //if selecting a piece
     if(this.state.selectedPiece.length === 0){
 
@@ -219,16 +229,16 @@ class TestBoard extends Component{
     let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
     let deltas = [cell[0] - newPieceObject[selectedpc].x,cell[1] - newPieceObject[selectedpc].y];
-    console.log("the deltas");
-    console.log(deltas);
-    console.log("the cell");
-    console.log(cell);
+    // console.log("the deltas");
+    // console.log(deltas);
+    // console.log("the cell");
+    // console.log(cell);
 
     //REMOVES ENPASSANT FLAG
     if(newPieceObject[selectedpc].hasOwnProperty("enPassant") && newPieceObject[selectedpc].enPassant) newPieceObject[selectedpc].enPassant = false;
 
-    if(newSinglePiece.firstMove){
-      newSinglePiece.firstMove = false;
+    if(newPieceObject[selectedpc].firstMove){
+      newPieceObject[selectedpc].firstMove = false;
 
       // CREATES ENPASSANT FLAG
       //if the piece is a pawn AND not flagged for enpassant AND did not just move diagonally AND moved two spaces
@@ -238,7 +248,7 @@ class TestBoard extends Component{
         cell[0] - newPieceObject[selectedpc].x === 0 &&
         (cell[1] - newPieceObject[selectedpc].y === 2 || cell[1] - newPieceObject[selectedpc].y === -2) 
         ){
-          newSinglePiece.enPassant = true;
+          newPieceObject[selectedpc].enPassant = true;
       }
     } else if(newPieceObject[selectedpc].enPassant){
       newPieceObject[selectedpc].enPassant = false;
@@ -249,7 +259,7 @@ class TestBoard extends Component{
     //RESUME WORK HERE
     if(selectedpc.charAt(1) === "P"){
       let attackArray = Object.keys(newPieceObject[selectedpc].view).filter(path => newPieceObject[selectedpc].view[path[0]] === cell);
-      console.log(attackArray); 
+
       if(attackArray.length > 1){
         this.enPassant(attackArray);
         return;
@@ -284,7 +294,7 @@ class TestBoard extends Component{
 
   //enpassant method
   enPassant(attackPlan, occupiedObject = this.state.occupiedObject){
-    debugger;
+    // debugger;
     let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
 
