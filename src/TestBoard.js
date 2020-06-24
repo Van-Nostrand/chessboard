@@ -1,3 +1,6 @@
+//TODO - Rename occupiedObject to pieceMap or something similar
+//TODO - rename piecesObject to piecesLedger or something similar
+//TODO - Explore updating just an individual piece rather than the whole pieceLedger
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
@@ -10,7 +13,8 @@ import {
   TILEBORDERSIZE, 
   LIGHT_TILE, 
   DARK_TILE,
-  PIECE_OBJECTS
+  PIECE_OBJECTS,
+  W_KING_CHECK_TEST
 } from "./CONSTANTS";
 
 //This is the main component for this whole game
@@ -31,22 +35,34 @@ class TestBoard extends Component{
 
     //imbue all the piece objects with their rulesets
     //also added a name property, which is the pieces name
-    Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
-      let rules = rulesets(piece);
-      let ruleKeys = Object.keys(rules);
-      ruleKeys.forEach(rule => PIECE_OBJECTS[piece][rule] = rules[rule]);
-      PIECE_OBJECTS[piece].name = piece;
-    });
-
+    // Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
+    //   let rules = rulesets(piece);
+    //   let ruleKeys = Object.keys(rules);
+    //   ruleKeys.forEach(rule => PIECE_OBJECTS[piece][rule] = rules[rule]);
+    //   PIECE_OBJECTS[piece].name = piece;
+    // });
+    
     //initial occupiedObject creation
     //this is an object that is an easy reference to occupied cells
-    let occupiedObject = this.buildOccupiedObject(PIECE_OBJECTS);
+    // let occupiedObject = this.buildOccupiedObject(PIECE_OBJECTS);
+
+    //WHITE KING TESTING
+    Object.keys(W_KING_CHECK_TEST).forEach((piece, i) => {
+      let rules = rulesets(piece);
+      let ruleKeys = Object.keys(rules);
+      ruleKeys.forEach(rule => W_KING_CHECK_TEST[piece][rule] = rules[rule]);
+      W_KING_CHECK_TEST[piece].name = piece;
+    });
+
+    //WHITE KING TESTING
+    let occupiedObject = this.buildOccupiedObject(W_KING_CHECK_TEST);    
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE,
       tileBorderSize: TILEBORDERSIZE,
-      piecesObject: PIECE_OBJECTS,
+      // piecesObject: PIECE_OBJECTS,
+      piecesObject: W_KING_CHECK_TEST,
       tileArr,
       turn: true,
       selectedPiece: "",
@@ -73,8 +89,6 @@ class TestBoard extends Component{
 
       //Then perform the legality check
       let legal = ChessGovernor.checkMoveLegality(this.state.selectedPiece, cell, this.state.piecesObject, this.state.occupiedObject);
-      
-      // let legal = ChessGovernor.
 
       if(legal){
         this.pieceMove(cell);
@@ -82,7 +96,7 @@ class TestBoard extends Component{
         console.log("ILLEGAL!");
         this.setState({selectedPiece: "", messageBoard: "Not legal"});
       } else {
-        console.log("move is neither legal nor illegal. debug now");
+        console.log("move is neither legal nor illegal. debug now!");
       }
     } 
   }
@@ -98,6 +112,7 @@ class TestBoard extends Component{
       if(ChessGovernor.checkSelectionLegality(name, this.state.turn)) {
 
         //update the pieces view
+        //TODO - Move this to the end of movePiece
         let newPiecesObject = {...this.state.piecesObject};
         let newPieceView = newPiecesObject[name].vision(newPiecesObject, this.state.occupiedObject, name);
         newPiecesObject[name].view = newPieceView;
@@ -132,35 +147,41 @@ class TestBoard extends Component{
   //moves the currently selected piece to cell
   //TODO - build a new occupiedObject
   pieceMove = (cell) => {
-    
-    let newPieceObject = {...this.state.piecesObject};
-    let selectedpc = this.state.selectedPiece;
 
-    if(newPieceObject[selectedpc].hasOwnProperty("enPassant") && newPieceObject[selectedpc].enPassant) newPieceObject[selectedpc].enPassant = false;
+    //testing out a refactor
+    let newSinglePiece = {...this.state.piecesObject[this.state.selectedPiece]};
+    console.log("here's newSinglePiece before moving");
+    console.log(newSinglePiece);
 
-    if(newPieceObject[selectedpc].firstMove){
-      newPieceObject[selectedpc].firstMove = false;
+    //NEW WAY
+    if(newSinglePiece.hasOwnProperty("enPassant") && 
+      newSinglePiece.enPassant) newSinglePiece.enPassant = false;
+
+    if(newSinglePiece.firstMove){
+      newSinglePiece.firstMove = false;
 
       if(
-        newPieceObject[selectedpc].name.charAt(1) === "P" && 
-        !newPieceObject[selectedpc].enPassant &&
-        cell[0] - newPieceObject[selectedpc].xC === 0 &&
-        (cell[1] - newPieceObject[selectedpc].yC === 2 || cell[1] - newPieceObject[selectedpc].yC === -2) 
+        newSinglePiece.name.charAt(1) === "P" && 
+        !newSinglePiece.enPassant &&
+        cell[0] - newSinglePiece.xC === 0 &&
+        (cell[1] - newSinglePiece.yC === 2 || cell[1] - newSinglePiece.yC === -2) 
         ){
-          newPieceObject[selectedpc].enPassant = true;
+          newSinglePiece.enPassant = true;
       }
     }
-    newPieceObject[selectedpc].xC = cell[0];
-    newPieceObject[selectedpc].yC = cell[1];
+    newSinglePiece.xC = cell[0];
+    newSinglePiece.yC = cell[1];
 
-    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
+    let newPiecesLedger = {...this.state.piecesObject, [this.state.selectedPiece]: newSinglePiece};
+
+    let newOccupiedObject = this.buildOccupiedObject(newPiecesLedger);
 
     this.setState({
-      piecesObject: newPieceObject, 
+      piecesObject: newPiecesLedger, 
       occupiedObject: newOccupiedObject,
       turn: !this.state.turn, 
       selectedPiece: "", 
-      messageBoard: `piece ${selectedpc} moved to ${cell[0]},${cell[1]}`
+      messageBoard: `piece ${this.state.selectedPiece} moved to ${cell[0]},${cell[1]}`
     });
   }
 

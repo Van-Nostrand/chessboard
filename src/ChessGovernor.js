@@ -19,8 +19,11 @@ class ChessGovernor{
     } else{
       path = `${xSign},${ySign}`;
     }
-    // debugger;
-    if(piecesObject[selectedPieceName].view[path] && piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)){
+
+    if(
+      piecesObject[selectedPieceName].view[path] && 
+      piecesObject[selectedPieceName].view[path].includes(`${targetCoordinates[0]},${targetCoordinates[1]}`)
+    ){
       clear = true;
     }
 
@@ -30,7 +33,6 @@ class ChessGovernor{
   //checks that a selection is correct
   // returns bool, or outputs to console on error
   //target = string, turn = bool
-  //returns bool, or string if there's an error
   static checkSelectionLegality = (target, turn) => {
     if(turn){
       return /^w/.test(target);
@@ -53,7 +55,9 @@ class ChessGovernor{
 
     //check that the path is clear
     //only the knight is exempt
-    if(!piecesObject[selectedPieceName].jump) {
+    // if(!piecesObject[selectedPieceName].jump) {
+    if(!selectedPieceName.charAt(1) === "N") {
+
       isLegal = this.checkPath(
         selectedPieceName, 
         target,

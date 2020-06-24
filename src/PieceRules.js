@@ -62,8 +62,12 @@ export default function rulesets(piece){
         testY >= 0 && testY < BOARDSIZE
       ){
         pathsObject[path] = [cellCheck];
-      }else if(occupiedObject[cellCheck] && occupiedObject[cellCheck][0].charAt(0) !== subject.name.charAt(0)){
-        pathsObject[path] = [cellCheck]
+      }
+      else if(
+        occupiedObject[cellCheck] && 
+        occupiedObject[cellCheck][0].charAt(0) !== subject.name.charAt(0)
+      ){
+        pathsObject[path] = [cellCheck];
       }
     });
     return pathsObject;
@@ -79,16 +83,24 @@ export default function rulesets(piece){
     let testX1 = subject.xC + subject.paths[0][0];
     let testY1 = subject.yC + subject.paths[0][1];
     let testMove1 = `${testX1},${testY1}`;
-    if(!occupiedObject[testMove1] && testX1 < BOARDSIZE && testX1 >= 0 && testY1 < BOARDSIZE && testY1 >=0 ) pathsObject[`${subject.paths[0]}`] = [testMove1];
+    if(
+      !occupiedObject[testMove1] && 
+      testX1 < BOARDSIZE && 
+      testX1 >= 0 && 
+      testY1 < BOARDSIZE && 
+      testY1 >=0 ) 
+        pathsObject[`${subject.paths[0]}`] = [testMove1];
 
     if(subject.firstMove){
       let testX2 = subject.xC + subject.paths[1][0];
       let testY2 = subject.yC + subject.paths[1][1];
       let testMove2 = `${testX2},${testY2}`;
 
-      if(!occupiedObject[testMove2] && 
+      if(
+        !occupiedObject[testMove2] && 
         testX1 < BOARDSIZE && testX1 >= 0 && 
-        testY1 < BOARDSIZE && testY1 >=0){
+        testY1 < BOARDSIZE && testY1 >=0
+      ){
         
         pathsObject[`${subject.paths[0]}`].push(testMove2);
       }
@@ -98,17 +110,20 @@ export default function rulesets(piece){
     let testX3 = subject.xC + subject.paths[2][0];
     let testY3 = subject.yC + subject.paths[2][1];
     let testAttack1 = `${testX3},${testY3}`;
-    if(occupiedObject[testAttack1] && 
-      occupiedObject[testAttack1][0].charAt(0) !== subject.name.charAt(0)
-      ) pathsObject[`${subject.paths[2]}`] = [testAttack1];
+    if(
+      occupiedObject[testAttack1] && 
+      occupiedObject[testAttack1][0].charAt(0) !== subject.name.charAt(0)) 
+        pathsObject[`${subject.paths[2]}`] = [testAttack1];
 
     let testX4 = subject.xC + subject.paths[3][0];
     let testY4 = subject.yC + subject.paths[3][1];
     let testAttack2 = `${testX4},${testY4}`;
-    if(occupiedObject[testAttack2] &&
-      occupiedObject[testAttack2][0].charAt(0) !== subject.name.charAt(0)) pathsObject[`${subject.paths[3]}`] = [testAttack2];
+    if(
+      occupiedObject[testAttack2] &&
+      occupiedObject[testAttack2][0].charAt(0) !== subject.name.charAt(0)) 
+        pathsObject[`${subject.paths[3]}`] = [testAttack2];
 
-    
+    //TODO - Implement en passant
     //if on 5th rank and enemy has en passant flag, test en passant
 
     return pathsObject;
@@ -119,33 +134,25 @@ export default function rulesets(piece){
       attacklogic: null,
       capture: "same",
       jump: true,
-      castleing: false,
       paths: [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]],
       vision: knightKingVision,
       movelogic: (x,y) => 
         x !== 0 !== y && 
         x !== y &&
         x < 3 && x > -3 && 
-        y < 3 && y > -3 && (
-          x%2 === 0 ^ y%2 === 0 
-        )
+        y < 3 && y > -3 && 
+        (x%2 === 0 ^ y%2 === 0)
     }
     return rules;
   }
 
-  //TODO - implement castlelogic
   const rookRules = () => {
     const rules = {
       movelogic: (x,y) => x === 0 ^ y === 0,
-      castlelogic: (king, rook) => {
-        return true;
-      },
       paths: [[0,-1],[1,0],[0,1],[-1,0]],
       attacklogic: null,
-      capture: "same",
       jump: false,
-      castleing: true,
-      firstMove: false,
+      firstMove: true,
       vision: rookBishopQueenVision
     }
     return rules;
@@ -155,9 +162,7 @@ export default function rulesets(piece){
       movelogic: (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1),
       paths: [[1,-1],[1,1],[-1,1],[-1,-1]],
       attacklogic: null,
-      capture: "same",
       jump: false,
-      castleing: false,
       vision: rookBishopQueenVision
     }
     return rules; 
@@ -178,25 +183,19 @@ export default function rulesets(piece){
       attacklogic: null,
       capture: "same",
       jump: false,
-      castleing: false,
       vision: rookBishopQueenVision
     }
     return rules; 
   }
-  //TODO - implement castlelogic
   const kingRules = () => {
     const rules = {
       movelogic: (x,y) => x < 2 && x > -2 && y < 2 && y > -2,
-      castlelogic: (king, rook) => {
-        return true;
-      },
       paths: [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
       attacklogic: null,
       capture: "same",
       jump: false,
-      castleing: true,
       inCheck: false,
-      firstMove: false,
+      firstMove: true,
       vision: knightKingVision
     }
     return rules;
@@ -214,7 +213,6 @@ export default function rulesets(piece){
     const rules = {
       firstMove: true,
       jump: false,
-      castleing: false,
       enPassant: false,
       promotion: false, 
       vision: pawnVision,
