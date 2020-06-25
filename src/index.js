@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import TestBoard from "./TestBoard";
+import './styles/index.css';
+import ChessGame from "./ChessGame";
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<TestBoard />, document.getElementById('root'));
+ReactDOM.render(<ChessGame />, document.getElementById('root'));
 
 serviceWorker.unregister();

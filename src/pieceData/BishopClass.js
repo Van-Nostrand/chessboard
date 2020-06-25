@@ -2,9 +2,9 @@ import PieceClass from "./PieceClass";
 
 export default class BishopClass extends PieceClass{
   constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos);
+    super(name, x, y, pngPos, [[1,-1],[1,1],[-1,1],[-1,-1]], true);
+    
     this.view = {};
-    this.paths = [[1,-1],[1,1],[-1,1],[-1,-1]];
   }
 
   movelogic = (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1);

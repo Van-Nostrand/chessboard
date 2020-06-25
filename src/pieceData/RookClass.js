@@ -1,11 +1,13 @@
+/*
+Rooks
+*/
 import PieceClass from "./PieceClass";
 
 export default class RookClass extends PieceClass{
   constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos);
-    this.view = {};
+    super(name, x, y, pngPos, [[0,-1],[1,0],[0,1],[-1,0]], true);
     
-    this.paths = [[0,-1],[1,0],[0,1],[-1,0]];
+    this.view = {};
     this.castleing = true;
     this.firstMove = false;
   }

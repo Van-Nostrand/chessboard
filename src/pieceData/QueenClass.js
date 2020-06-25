@@ -2,9 +2,9 @@ import PieceClass from "./PieceClass";
 
 export default class QueenClass extends PieceClass{
   constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos);
+    super(name, x, y, pngPos, [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]], true);
+    
     this.view = {};
-    this.paths = [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]];
   } 
 
   movelogic = (x,y) => {

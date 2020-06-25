@@ -1,15 +1,21 @@
+/*==== PAWNS ====
+attacklogic() - similar to movelogic(), this pawn-exclusive function determines if a pawn can attack
+direction - a property set by this.name.charAt(0) which determines the direction this pawn may move in
+promotion - an unimplemented property to determine if the piece has promoted or not, however this will likely not be used. 
+fifthRank - an integer which represents the pawns 5th rank. Used to track en passant checks. 
+*/
 import PieceClass from "./PieceClass";
 
 export default class PawnClass extends PieceClass{
   constructor(name, x, y, pngPos, direction){
-    super(name, x, y, pngPos);
+    super(name, x, y, pngPos, [[0,direction],[0,direction + direction],[-1,direction], [1,direction]], false);
+    
     this.view = {};
     this.firstMove = true;
     this.enPassant = false;
     this.promotion = false; 
     this.direction = direction;
     this.fifthRank = direction === -1 ? 3 : 4;
-    this.paths = [[0,direction],[0,direction + direction],[-1,direction], [1,direction]];
   }
   
   attacklogic = (x,y) => (x === 1 || x === -1) && (y === 1 * this.direction);
@@ -22,7 +28,11 @@ export default class PawnClass extends PieceClass{
     }
   };
 
-  flagInPassing(){
+  enPassantOrMove = () => {
+
+  }
+
+  flagInPassing = () => {
     this.enPassant = !this.enPassant;
   }
 
@@ -106,6 +116,7 @@ export default class PawnClass extends PieceClass{
           if(occupiedObject[cell][0].charAt(0) !== this.name.charAt(0) && occupiedObject[cell][0].charAt(1) === "P"){
             return occupiedObject[cell];
           }
+          return;
         });
         console.log("the pawns");
         console.log(pawns);

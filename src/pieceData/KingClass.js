@@ -1,9 +1,12 @@
+/*==== KINGS ====
+inCheck - this will be used to signal whether the king is in check... not sure if I'll be using it this way
+*/
 import PieceClass from "./PieceClass";
 
 export default class KingClass extends PieceClass{
   constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos);
-    this.paths = [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]];
+    super(name, x, y, pngPos, [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]], false);
+    
     this.view = {};
     this.inCheck = false;
     this.firstMove = false;

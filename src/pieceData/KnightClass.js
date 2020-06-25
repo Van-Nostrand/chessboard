@@ -1,11 +1,15 @@
+/*==== KNIGHTS ====
+  jump - this allows them to jump other pieces. might be phased out by a simple class check
+  note that because knights move in an "L" shape, their paths property and movelogic function and external legality checks work a bit differently than other pieces
+*/
 import PieceClass from "./PieceClass";
 
 export default class KnightClass extends PieceClass{
   constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos);
+    super(name, x, y, pngPos, [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]], false);
+    
     this.view = {};
     this.jump = true;
-    this.paths = [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]];
   }
 
   movelogic = (x,y) => 
