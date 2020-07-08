@@ -105,8 +105,8 @@ export default class PawnClass extends PieceClass{
         (parseInt(cell.charAt(0)) === this.x - 1 && parseInt(cell.charAt(2)) === this.y) || 
         (parseInt(cell.charAt(0)) === this.x + 1 && parseInt(cell.charAt(2)) === this.y)
       );
-      console.log(occupiedObject);
-      console.log(keys);
+      // console.log(occupiedObject);
+      // console.log(keys);
 
 
       // if there's pieces there...
