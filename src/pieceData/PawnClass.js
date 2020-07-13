@@ -43,6 +43,55 @@ export default class PawnClass extends PieceClass{
         targetcell[1] === victim[1] - 1));
   };
 
+  newVision = (piecesObject, occupiedObject) => {
+    let pathsObject = {};
+
+    // FIRST: test diagonal cells for attacks
+    //left
+    let attkX1 = this.x + this.paths[2][0];
+    let attkY1 = this.y + this.paths[2][1];
+    let testAttack1 = `${attkX1},${attkY1}`;
+    if(occupiedObject[testAttack1] && occupiedObject[testAttack1][0].charAt(0) !== this.name.charAt(0)) {
+
+      pathsObject[`${this.paths[2]}`] = [testAttack1];
+      
+    }
+      
+    //right
+    let attkX2 = this.x + this.paths[3][0];
+    let attkY2 = this.y + this.paths[3][1];
+    let testAttack2 = `${attkX2},${attkY2}`;
+    if(occupiedObject[testAttack2] && occupiedObject[testAttack2][0].charAt(0) !== this.name.charAt(0)) {
+
+      pathsObject[`${this.paths[3]}`] = [testAttack2];
+
+    } 
+
+    //SECOND: test cell ahead for movement
+    let moveX1 = this.x + this.paths[0][0];
+    let moveY1 = this.y + this.paths[0][1];
+    let testMove1 = `${moveX1},${moveY1}`;
+    if(!occupiedObject[testMove1] && moveX1 < BOARDSIZE && moveX1 >= 0 && moveY1 < BOARDSIZE && moveY1 >=0 ) pathsObject[`${this.paths[0]}`] = [testMove1];
+
+    //THIRD: if first move, test two cells ahead as well
+    if(this.firstMove){
+      let moveX2 = this.x + this.paths[1][0];
+      let moveY2 = this.y + this.paths[1][1];
+      let testMove2 = `${moveX2},${moveY2}`;
+
+      if(!occupiedObject[testMove2] && 
+        moveX2 < BOARDSIZE && moveX2 >= 0 && 
+        moveY2 < BOARDSIZE && moveY2 >= 0){
+        
+        pathsObject[`${this.paths[0]}`].push(testMove2);
+      }
+    }
+
+    //FOURTH: if on 5th rank, use diagonal cell knowledge to test en passant
+    //attkX1,attkY1 and attkX2,attkY2
+    
+  }
+
   vision = (piecesObject, occupiedObject, pieceName) => {
     let pathsObject = {};
     const BOARDSIZE = 8;
