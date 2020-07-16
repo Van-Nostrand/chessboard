@@ -157,9 +157,12 @@ class ChessGame extends Component{
 
     for(let i = 0; i < pieceNames.length; i++){
       //TESTING NEW PAWN VISION
-      if( pieceNames[i].charAt(1) === "B" && pieceNames[i].charAt(0) === "b"){
-        let trialview = newPiecesObject[pieceNames[i]].pseudovision(newOccupiedCells);
-        newPiecesObject[pieceNames[i]].newview = trialview;
+      // if( pieceNames[i].charAt(1) === "B" && pieceNames[i].charAt(0) === "b"){
+      //   let trialview = newPiecesObject[pieceNames[i]].pseudovision(newOccupiedCells);
+      //   newPiecesObject[pieceNames[i]].newview = trialview;
+      // }
+      if(/^wK/.test(pieceNames[i])){
+        newPiecesObject[pieceNames[i]].amIChecked(newOccupiedCells);
       }
 
       //if the piece isn't dead, update vision

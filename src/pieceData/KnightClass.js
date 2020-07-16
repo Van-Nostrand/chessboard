@@ -47,29 +47,4 @@ export default class KnightClass extends PieceClass{
     return pathsObject;
   }
   
-  vision = (piecesObject, occupiedObject, pieceName) => {
- 
-    let pathsObject = {};
-    const BOARDSIZE = 8;
-    let subject = piecesObject[pieceName];
-
-    subject.paths.forEach((path, i) => {
-      let testX = subject.x + path[0];
-      let testY = subject.y + path[1];
-      let cellCheck = `${testX},${testY}`;
-
-      if (
-        !occupiedObject[cellCheck] && 
-        testX >= 0 && testX < BOARDSIZE && 
-        testY >= 0 && testY < BOARDSIZE
-      ){
-        pathsObject[path] = [cellCheck];
-      }else if(occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== subject.name.charAt(0)){
-        pathsObject[path] = [cellCheck]
-      }
-    });
-
-    this.view = pathsObject;
-    return pathsObject;
-  }
 }
