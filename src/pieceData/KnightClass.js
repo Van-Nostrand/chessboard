@@ -8,7 +8,7 @@ export default class KnightClass extends PieceClass{
   constructor(name, x, y, pngPos){
     super(name, x, y, pngPos, [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]], false);
     
-    this.view = {};
+    // this.view = {};
     this.jump = true;
   }
 
@@ -20,6 +20,33 @@ export default class KnightClass extends PieceClass{
         x%2 === 0 ^ y%2 === 0 
       );
 
+  pseudovision = (occupiedObject) => {
+    let pathsObject = {};
+    const BOARDSIZE = 8;
+
+    this.paths.forEach((path, i) => {
+      let testX = this.x + path[0];
+      let testY = this.y + path[1];
+      let cellCheck = `${testX},${testY}`;
+
+      if (
+        !occupiedObject[cellCheck] && 
+        testX >= 0 && testX < BOARDSIZE && 
+        testY >= 0 && testY < BOARDSIZE
+      ){
+        pathsObject[cellCheck] = "m";
+      }
+      else if(occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== this.name.charAt(0)){
+        pathsObject[cellCheck] = "a";
+      }
+      else if (occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) === this.name.charAt(0)){
+        pathsObject[cellCheck] = "b";
+      }
+    });
+    this.newview = pathsObject;
+    return pathsObject;
+  }
+  
   vision = (piecesObject, occupiedObject, pieceName) => {
  
     let pathsObject = {};
@@ -37,11 +64,12 @@ export default class KnightClass extends PieceClass{
         testY >= 0 && testY < BOARDSIZE
       ){
         pathsObject[path] = [cellCheck];
-      }else if(occupiedObject[cellCheck] && occupiedObject[cellCheck][0].charAt(0) !== subject.name.charAt(0)){
+      }else if(occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== subject.name.charAt(0)){
         pathsObject[path] = [cellCheck]
       }
     });
+
+    this.view = pathsObject;
     return pathsObject;
-    
   }
 }

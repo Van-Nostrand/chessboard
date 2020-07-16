@@ -10,9 +10,10 @@ export default class PawnClass extends PieceClass{
   constructor(name, x, y, pngPos, direction){
     super(name, x, y, pngPos, [[0,direction],[0,direction + direction],[-1,direction], [1,direction]], false);
     
-    this.view = {};
     this.firstMove = true;
+    this.justHadFirstMove = false;
     this.enPassant = false;
+    this.enPassantTurn = 0;
     this.promotion = false; 
     this.direction = direction;
     this.fifthRank = direction === -1 ? 3 : 4;
@@ -21,21 +22,36 @@ export default class PawnClass extends PieceClass{
   attacklogic = (x,y) => (x === 1 || x === -1) && (y === 1 * this.direction);
 
   movelogic = (x, y) => {
+    let success = false;
     if(this.firstMove) {
-      return x === 0 && (y === 1 * this.direction || y === 2 * this.direction);
+
+      success = x === 0 && (y === 1 * this.direction || y === 2 * this.direction);
     } else if(!this.firstMove) {
-      return x === 0 && y === 1 * this.direction ;
+      success = x === 0 && y === 1 * this.direction ;
+    }
+    //if the move is ok and it's a double move, flag for enpassant and "just had first move"
+    if(success && (y === 2 || y === -2)){
+      this.enPassant = true;
+      this.justHadFirstMove = true;
+      return success;
+    }
+    //if the move is ok and the "just had first move" flag is set, it needs to be cleared
+    else if (success && this.justHadFirstMove){
+      this.justHadFirstMove = false;
+      this.enPassant = false;
+      return success;
+    }
+    else{
+      return success;
     }
   };
 
-  enPassantOrMove = () => {
-
+  flagInPassing = (turnNumber) => {
+    this.enPassant = true;
+    this.enPassantTurn = turnNumber;
   }
 
-  flagInPassing = () => {
-    this.enPassant = !this.enPassant;
-  }
-
+  //not needed?
   enpassantlogic = (x,y,targetcell,victim) => {
     return (
       targetcell[0] === victim[0] && 
@@ -43,56 +59,61 @@ export default class PawnClass extends PieceClass{
         targetcell[1] === victim[1] - 1));
   };
 
-  newVision = (piecesObject, occupiedObject) => {
+  pseudovision = (occupiedObject, piecesObject) => {
+   
+    // create an empty object that will store potential moves
     let pathsObject = {};
 
-    // FIRST: test diagonal cells for attacks
-    //left
-    let attkX1 = this.x + this.paths[2][0];
-    let attkY1 = this.y + this.paths[2][1];
-    let testAttack1 = `${attkX1},${attkY1}`;
-    if(occupiedObject[testAttack1] && occupiedObject[testAttack1][0].charAt(0) !== this.name.charAt(0)) {
+    // for each path
+    this.paths.forEach((path, i) => {
 
-      pathsObject[`${this.paths[2]}`] = [testAttack1];
-      
-    }
-      
-    //right
-    let attkX2 = this.x + this.paths[3][0];
-    let attkY2 = this.y + this.paths[3][1];
-    let testAttack2 = `${attkX2},${attkY2}`;
-    if(occupiedObject[testAttack2] && occupiedObject[testAttack2][0].charAt(0) !== this.name.charAt(0)) {
+      // refer to coordinates in game ledger to determine if cell(s) are occupied
+      let cellString = `${path[0] + this.x},${path[1] + this.y}`;
+      if(occupiedObject[cellString]){
+        let testedCell = occupiedObject[cellString];
 
-      pathsObject[`${this.paths[3]}`] = [testAttack2];
+        // if enemy in cell
+        if(testedCell.charAt(0) !== this.name.charAt(0)){
 
-    } 
-
-    //SECOND: test cell ahead for movement
-    let moveX1 = this.x + this.paths[0][0];
-    let moveY1 = this.y + this.paths[0][1];
-    let testMove1 = `${moveX1},${moveY1}`;
-    if(!occupiedObject[testMove1] && moveX1 < BOARDSIZE && moveX1 >= 0 && moveY1 < BOARDSIZE && moveY1 >=0 ) pathsObject[`${this.paths[0]}`] = [testMove1];
-
-    //THIRD: if first move, test two cells ahead as well
-    if(this.firstMove){
-      let moveX2 = this.x + this.paths[1][0];
-      let moveY2 = this.y + this.paths[1][1];
-      let testMove2 = `${moveX2},${moveY2}`;
-
-      if(!occupiedObject[testMove2] && 
-        moveX2 < BOARDSIZE && moveX2 >= 0 && 
-        moveY2 < BOARDSIZE && moveY2 >= 0){
-        
-        pathsObject[`${this.paths[0]}`].push(testMove2);
+          // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
+          if(this.attacklogic(path[0],path[1])){
+            pathsObject[cellString] = "a";
+            
+          }
+        }
       }
-    }
 
-    //FOURTH: if on 5th rank, use diagonal cell knowledge to test en passant
-    //attkX1,attkY1 and attkX2,attkY2
-    
+      // cell is empty and in move path
+      else if (!occupiedObject[cellString] && this.movelogic(path[0],path[1])){
+        pathsObject[cellString] = "m";
+      }
+      
+      // cell is empty and in attack path and piece on 5th rank 
+      // EN PASSANT
+      else if (!occupiedObject[cellString] && this.attacklogic(path[0],path[1]) && this.fifthRank === this.y){
+        
+        // if enemy pawn in cell "behind" empty cell
+        let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - this.direction}`;
+        if(occupiedObject[EPTest].charAt(0) !== this.name.charAt(0) && occupiedObject[EPTest].charAt(1) === "P"){
+          
+          // if piece just moved two spaces
+          let EPEnemy = piecesObject[occupiedObject[EPTest]];
+          if(EPEnemy.enPassant){
+
+            // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
+            pathsObject[cellString] = "e";
+            return;
+          }
+        }
+      }
+    })
+    // return "moves" object
+    this.newview = pathsObject;
+    return pathsObject;
+
   }
 
-  vision = (piecesObject, occupiedObject, pieceName) => {
+  vision = (piecesObject, occupiedObject) => {
     let pathsObject = {};
     const BOARDSIZE = 8;
     let enpassantArr = [];
@@ -112,7 +133,6 @@ export default class PawnClass extends PieceClass{
       if(!occupiedObject[testMove2] && 
         testX1 < BOARDSIZE && testX1 >= 0 && 
         testY1 < BOARDSIZE && testY1 >=0){
-        
         pathsObject[`${this.paths[0]}`].push(testMove2);
       }
     }
@@ -121,7 +141,7 @@ export default class PawnClass extends PieceClass{
     let testX3 = this.x + this.paths[2][0];
     let testY3 = this.y + this.paths[2][1];
     let testAttack1 = `${testX3},${testY3}`;
-    if(occupiedObject[testAttack1] && occupiedObject[testAttack1][0].charAt(0) !== this.name.charAt(0)) {
+    if(occupiedObject[testAttack1] && occupiedObject[testAttack1].charAt(0) !== this.name.charAt(0)) {
 
       pathsObject[`${this.paths[2]}`] = [testAttack1];
       
@@ -135,7 +155,7 @@ export default class PawnClass extends PieceClass{
     let testX4 = this.x + this.paths[3][0];
     let testY4 = this.y + this.paths[3][1];
     let testAttack2 = `${testX4},${testY4}`;
-    if(occupiedObject[testAttack2] && occupiedObject[testAttack2][0].charAt(0) !== this.name.charAt(0)) {
+    if(occupiedObject[testAttack2] && occupiedObject[testAttack2].charAt(0) !== this.name.charAt(0)) {
 
       pathsObject[`${this.paths[3]}`] = [testAttack2];
 
@@ -154,10 +174,7 @@ export default class PawnClass extends PieceClass{
         (parseInt(cell.charAt(0)) === this.x - 1 && parseInt(cell.charAt(2)) === this.y) || 
         (parseInt(cell.charAt(0)) === this.x + 1 && parseInt(cell.charAt(2)) === this.y)
       );
-      // console.log(occupiedObject);
-      // console.log(keys);
-
-
+   
       // if there's pieces there...
       if(keys.length > 0){
         //... check if they're pawns
@@ -167,20 +184,18 @@ export default class PawnClass extends PieceClass{
           }
           return;
         });
-        console.log("the pawns");
-        console.log(pawns);
+       
 
         // if they're pawns...
         if(pawns.length > 0){
           //... are they vulnerable to en passant?
           let vulnerable = pawns.filter(pawn => piecesObject[pawn].enPassant === true);
 
-          console.log("paths object");
-          console.log(pathsObject);
+        
           //if they're vulnerable... 
           if(vulnerable.length > 0){
-            console.log("ZE FRENCH, ZEY ARE ATTACKING");
-            console.log(vulnerable);
+            // console.log("ZE FRENCH, ZEY ARE ATTACKING");
+            // console.log(vulnerable);
             //...add path of empty cell behind enemy pawn to pathsObject
             vulnerable.forEach(noob => {
               let newCell = [`${piecesObject[noob[0]].x},${piecesObject[noob[0]].y + this.direction}`];
@@ -192,6 +207,7 @@ export default class PawnClass extends PieceClass{
         }
       }
     }
+    this.view = pathsObject;
 
     return pathsObject;
   }

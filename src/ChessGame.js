@@ -4,7 +4,6 @@
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
-import ChessGovernor from "./ChessGovernor";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
@@ -14,14 +13,7 @@ import {
   PIECE_OBJECTS,
   W_KING_CHECK_TEST
 } from "./CONSTANTS";
-// import {
-//   KingClass,
-//   QueenClass,
-//   RookClass,
-//   KnightClass,
-//   BishopClass,
-//   PawnClass
-// } from "./PieceClasses";
+
 import KingClass from "./pieceData/KingClass";
 import QueenClass from "./pieceData/QueenClass";
 import RookClass from "./pieceData/RookClass";
@@ -29,12 +21,9 @@ import PawnClass from "./pieceData/PawnClass";
 import BishopClass from "./pieceData/BishopClass";
 import KnightClass from "./pieceData/KnightClass";
 
-
 //This is the main component for this whole game
 //It handles clicks and selections, and maintains the list of pieces and tiles
 //I think the board will prompt selected pieces to trigger their "vision" methods
-//TODO - Move all updating stuff at the end of pieceMove and pieceKill to a separate updateAll function
-//TODO - Investigate why I made occupiedObject's values all single index arrays...
 class ChessGame extends Component{
   constructor(props){
     super(props);
@@ -48,17 +37,6 @@ class ChessGame extends Component{
       });
     });
 
-    /* 
-      PieceRules is an older method I used to handle piece logic
-      I switched to PieceClasses, as I found that using a more OOP approach made more sense
-    */
-    // Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
-    //   let rules = rulesets(piece);
-    //   let ruleKeys = Object.keys(rules);
-    //   ruleKeys.forEach(rule => PIECE_OBJECTS[piece][rule] = rules[rule]);
-    //   PIECE_OBJECTS[piece].name = piece;
-    // });
-
     //------------------------
     // PIECE CLASSES
     //-------------------------
@@ -69,26 +47,27 @@ class ChessGame extends Component{
     });
 
     /*
-      I use occupiedObject as a way to easily reference occupied cells by providing a string describing cell coordinates as an argument
-      example: if(!occupiedObject["x,y"]) then cell is empty, else, it is occupied
+      occupiedObject is used for piece name lookup by cell
+      I will eventually merge it into piecesObject and rename appropriately
     */
-    let occupiedObject = this.buildOccupiedObject(newPiecesObject);
+    let occupiedObject = this.buildCellLedger(newPiecesObject);
 
-    /*
-      read the intro to PieceClasses for a rundown on how Pieces are structured
-    */
-    let piecesObject = this.updatePieceVision(newPiecesObject, occupiedObject);
+    this.updatePieceVision(newPiecesObject, occupiedObject);
+
+    //unimplemented test
+    let gameLedger = {...newPiecesObject, findByCell: occupiedObject};
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE,
       tileBorderSize: TILEBORDERSIZE,
-      piecesObject,
+      piecesObject: newPiecesObject,
       tileArr,
       turn: true,
       selectedPiece: "",
       occupiedObject,
-      messageBoard: "no piece selected"
+      messageBoard: "no piece selected",
+      gameLedger //unused so far
     }
   }
 
@@ -106,7 +85,6 @@ class ChessGame extends Component{
 
   //HANDLE TILE CLICKS
   //only sets state if illegal move detected
-  //TODO - handle En Passant
   tileClick = (e) => {
     //Clicking a tile while no piece selected
     if(this.state.selectedPiece.length === 0){
@@ -116,12 +94,12 @@ class ChessGame extends Component{
     //Piece is selected, user wants to move here
     if(this.state.selectedPiece.length > 0){
       
-      //First, get tile coordinates
+      //First, get coordinates of the clicked cell
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
-
-      //Then perform the legality check
-      let legal = ChessGovernor.checkMoveLegality(this.state.selectedPiece, cell, this.state.piecesObject, this.state.occupiedObject);
+      
+      //testing legality with new method
+      let legal = this.state.piecesObject[this.state.selectedPiece].newview[`${cell[0]},${cell[1]}`] && this.state.piecesObject[this.state.selectedPiece].newview[`${cell[0]},${cell[1]}`] === "m";
 
       if(legal){
         this.pieceMove(cell);
@@ -137,16 +115,12 @@ class ChessGame extends Component{
   //Handle piece clicks
   //may set state on selections, but not on actions
   pieceClick = (e, name) => {
-    // console.log("occupied object");
-    // console.log(this.state.occupiedObject);
-
-    if(name.charAt(1) === "R") console.log(this.state.piecesObject[name].newVision(this.state.occupiedObject));
 
     //if selecting a piece
     if(this.state.selectedPiece.length === 0){
 
       //check turn, then confirm selection and update piece.view
-      if(ChessGovernor.checkSelectionLegality(name, this.state.turn)) {
+      if(this.state.turn && (/^w/.test(name)) || !this.state.turn && (/^b/.test(name))){
 
         this.setState({
           selectedPiece: name, 
@@ -163,63 +137,75 @@ class ChessGame extends Component{
     }
     //if attacking a piece
     else if(this.state.selectedPiece.length > 0 && name !== this.state.selectedPiece){
-      let legal = ChessGovernor.checkAttackLegality(this.state.selectedPiece, name, this.state.piecesObject, this.state.occupiedObject);
+
+      let targetCoordinates = [this.state.piecesObject[name].x, this.state.piecesObject[name].y];
+      let legal = this.state.piecesObject[this.state.selectedPiece].newview[`${targetCoordinates[0]},${targetCoordinates[1]}`] && this.state.piecesObject[this.state.selectedPiece].newview[`${targetCoordinates[0]},${targetCoordinates[1]}`] === "a";
+  
       if(legal) this.pieceKill(name);
       else this.setState({selectedPiece: "", messageBoard: "illegal attack"});
-    } else {
+    } 
+    else {
       console.log("something is wrong in pieceClick");
     }
   }
 
   //this updates the vision of every piece
   //TODO - this is mutating data... I'm only using it in game setup, but think of a better way
-  updatePieceVision = (piecesObject, occupiedObject) => {
+  updatePieceVision = (newPiecesObject, newOccupiedCells) => {
     
-    let pieceNames = Object.keys(piecesObject);
-
-    for(let i = 0; i < pieceNames.length; i++){
-      //if the piece isn't dead, update vision
-      if(piecesObject[pieceNames[i]].x >= 0){
-        let newPieceView = piecesObject[pieceNames[i]].vision(piecesObject, occupiedObject, pieceNames[i]);
-        piecesObject[pieceNames[i]].view = newPieceView;
-      }
-    }
-
-    return piecesObject;
-  }
-
-
-  //TODO - implement king checking after vision update
-  updateGame = (newPiecesObject, newOccupiedObject, ...args) => {
-
     let pieceNames = Object.keys(newPiecesObject);
 
-    //updating piece vision
     for(let i = 0; i < pieceNames.length; i++){
+      //TESTING NEW PAWN VISION
+      if( pieceNames[i].charAt(1) === "B" && pieceNames[i].charAt(0) === "b"){
+        let trialview = newPiecesObject[pieceNames[i]].pseudovision(newOccupiedCells);
+        newPiecesObject[pieceNames[i]].newview = trialview;
+      }
+
+      //if the piece isn't dead, update vision
       if(newPiecesObject[pieceNames[i]].x >= 0){
-        let newPieceView = newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedObject, pieceNames[i]);
-        newPiecesObject[pieceNames[i]].view = newPieceView;
+        // let newPieceView = newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedCells, pieceNames[i]);
+        // newPiecesObject[pieceNames[i]].view = newPieceView;
+        newPiecesObject[pieceNames[i]].pseudovision(newOccupiedCells, newPiecesObject);
+        // newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedCells, pieceNames[i]);
       }
     }
 
-    //beginning to implement "is the king in check?"
-    let kingLocations = [];
-    Object.keys(newOccupiedObject).forEach((occupiedCell, i) => {
-      if(newOccupiedObject[occupiedCell][0].charAt(1) === "K"){
-        kingLocations.push( [occupiedCell, newOccupiedObject[occupiedCell][0]]);
-      }
-    });
-    
+    return newPiecesObject;
+  }
+
+  //handles updating the cell ledger, all piece views, the message board, 
+  updateGame = (newPiecesObject, ...args) => {
+
+    let newOccupiedCells = this.buildCellLedger(newPiecesObject);
+    let pieceNames = Object.keys(newPiecesObject);  
+
+    //update piece views
+    this.updatePieceVision(newPiecesObject, newOccupiedCells);
+
     //determine if this is a piecemove or piecekill based on whether the second args variable is an array
     let messageBoard = Array.isArray(args[1]) ? `piece ${args[0]} moved to ${args[1][0]},${args[1][1]}` : `${args[0]} has successfully attacked ${args[1]}`;
 
     this.setState({
       piecesObject: newPiecesObject,
-      occupiedObject: newOccupiedObject,
+      occupiedObject: newOccupiedCells,
       turn: !this.state.turn,
       selectedPiece: "",
       messageBoard
     });
+  }
+
+  //this is called once all of the checks have approved and a move is deemed legal
+  newPieceMove = (cell) => {
+    let newPieceObject = {...this.state.piecesObject};
+    let deltas = [cell[0] - newPieceObject[this.state.selectedPiece].x, cell[1] - newPieceObject[this.state.selectedPiece].y];
+
+    newPieceObject[this.state.selectedPiece].x = cell[0];
+    newPieceObject[this.state.selectedPiece].y = cell[1];
+
+    // updateGame = (newPiecesObject, newOccupiedCells, ...args) => {
+    this.updateGame(newPieceObject);
+    
   }
 
   //moves the currently selected piece to cell
@@ -228,14 +214,11 @@ class ChessGame extends Component{
     let newPieceObject = {...this.state.piecesObject};
     let selectedpc = this.state.selectedPiece;
     let deltas = [cell[0] - newPieceObject[selectedpc].x,cell[1] - newPieceObject[selectedpc].y];
-    // console.log("the deltas");
-    // console.log(deltas);
-    // console.log("the cell");
-    // console.log(cell);
 
     //REMOVES ENPASSANT FLAG
     if(newPieceObject[selectedpc].hasOwnProperty("enPassant") && newPieceObject[selectedpc].enPassant) newPieceObject[selectedpc].enPassant = false;
 
+    //if this is the pieces first move
     if(newPieceObject[selectedpc].firstMove){
       newPieceObject[selectedpc].firstMove = false;
 
@@ -249,11 +232,11 @@ class ChessGame extends Component{
         ){
           newPieceObject[selectedpc].enPassant = true;
       }
-    } else if(newPieceObject[selectedpc].enPassant){
+    } 
+    else if(newPieceObject[selectedpc].enPassant){
       newPieceObject[selectedpc].enPassant = false;
     }
 
-    // debugger;
     //if this is enpassant attack
     //RESUME WORK HERE
     if(selectedpc.charAt(1) === "P"){
@@ -265,13 +248,10 @@ class ChessGame extends Component{
       }
     }
 
-
     newPieceObject[selectedpc].x = cell[0];
     newPieceObject[selectedpc].y = cell[1];
-    
-    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
 
-    this.updateGame(newPieceObject, newOccupiedObject, selectedpc, cell);
+    this.updateGame(newPieceObject, selectedpc, cell);
   }
 
   //moves a piece to kill another piece
@@ -286,40 +266,18 @@ class ChessGame extends Component{
     newPieceObject[target].y = -1;
     newPieceObject[target].dead = true;
 
-    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
+    // let newOccupiedObject = this.buildCellLedger(newPieceObject);
 
-    this.updateGame(newPieceObject, newOccupiedObject, selectedpc, target);
+    this.updateGame(newPieceObject, selectedpc, target);
   }
 
-  //enpassant method
-  enPassant(attackPlan, occupiedObject = this.state.occupiedObject){
-    // debugger;
-    let newPieceObject = {...this.state.piecesObject};
-    let selectedpc = this.state.selectedPiece;
-
-    //move selected piece to empty tile
-    newPieceObject[selectedpc].x = attackPlan[0][0];
-    newPieceObject[selectedpc].y = attackPlan[0][1];
-
-    //kill opponents pawn
-    newPieceObject[occupiedObject[attackPlan[1]]].x = -1;
-    newPieceObject[occupiedObject[attackPlan[1]]].y = -1;
-    newPieceObject[occupiedObject[attackPlan[1]]].dead = true;
-
-    let newOccupiedObject = this.buildOccupiedObject(newPieceObject);
-
-    this.updateGame(newPieceObject, newOccupiedObject, selectedpc, attackPlan[1]);
-  }
-
-  //this returns an object with a list of coordinates of each piece, the key being the coordinate and the value being the piece name
-  //TODO - re-evaluate efficacy of this
-  buildOccupiedObject = (piecesObject) => {
+  //updated occupiedObject builder
+  buildCellLedger = (piecesObject) => {
     let grid = {};
     let piecenames = Object.keys(piecesObject);
     piecenames.forEach((piece, i) => {
       let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
-      if(!grid[coordinates]) grid[coordinates] = [piece];
-      else if(grid[coordinates]) grid[coordinates].push(piece);
+      grid[coordinates] = piece;
     }) ;
     return grid;
   }
@@ -386,6 +344,26 @@ class ChessGame extends Component{
       </div>
     )
   }
+
+  //TODO - this mutates data, not sure if this is ok..
+  // oldUpdatePieceVision = (newPiecesObject, newOccupiedCells) => {
+    
+  //   let pieceNames = Object.keys(newPiecesObject);
+
+  //   for(let i = 0; i < pieceNames.length; i++){
+  //     //TESTING NEW PAWN VISION
+  //     if( pieceNames[i].charAt(1) === "B" && pieceNames[i].charAt(0) === "b"){
+  //       let trialview = newPiecesObject[pieceNames[i]].pseudovision(newOccupiedCells);
+  //       newPiecesObject[pieceNames[i]].newview = trialview;
+  //     }
+
+  //     //if the piece isn't dead, update vision
+  //     if(newPiecesObject[pieceNames[i]].x >= 0){
+  //       let newPieceView = newPiecesObject[pieceNames[i]].vision(newPiecesObject, newOccupiedCells, pieceNames[i]);
+  //       newPiecesObject[pieceNames[i]].view = newPieceView;
+  //     }
+  //   }
+  // }
 
   //makes the tiles for the game
   makeTiles = () => {

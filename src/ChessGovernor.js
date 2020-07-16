@@ -40,10 +40,19 @@ class ChessGovernor{
     }
   }
   
-  //checks the legality of moving to an empty space
+  static newCheckMoveLegality = (selectedPieceName, target, piecesObject, occupiedObject) => {
+    if(piecesObject[selectedPieceName].newview[target]){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+    //checks the legality of moving to an empty space
   //returns bool
   //selectedPieceName = string, target = int array, piecesObject = object
   static checkMoveLegality = (selectedPieceName, target, piecesObject, occupiedObject) => {
+    // debugger;
     let isLegal = false;
     let moveDelta = [target[0] - piecesObject[selectedPieceName].x, target[1] - piecesObject[selectedPieceName].y];
     

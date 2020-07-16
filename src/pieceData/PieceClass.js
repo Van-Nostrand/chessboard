@@ -4,7 +4,7 @@ This class defines all the basic properties of a chesspiece
 pngPos - an array that describes where on the source png file their image is
 x and y - cell coordinates of the piece
 paths - this will be an array of arrays; each sub-array describes a direction that piece can move in
-pathsRepeat - if true, signals that pieces paths are applied repeatedly, relative to current position (rooks, bishops, queens). if false, signals that pieces paths are signular and absolute (knights, kings, pawns)
+pathsIterate - if true, signals that pieces paths are applied repeatedly, relative to current position (rooks, bishops, queens). if false, signals that pieces paths are signular and absolute (knights, kings, pawns)
 
 name is of this form: "cT#""
   where c = w or b, to reference black and white
@@ -22,17 +22,19 @@ movelogic() - used to determine if moves are legal. x and y delta values are giv
     
 */
 export default class PieceClass{
-  constructor(name, x, y, pngPos, paths, pathsRepeat){
+  constructor(name, x, y, pngPos, paths, pathsIterate){
     this.name = name;
     this.x = x;
     this.y = y;
     this.pngPos = pngPos;
+    this.view = {};
+    this.newview = {};
 
     this.dead = false;
     this.clicked = false;
     this.dragging = false;
     this.paths = paths;
-    this.pathsRepeat = pathsRepeat;
+    this.pathsIterate = pathsIterate;
   }
 
   movelogic = (x,y) => {};
@@ -60,6 +62,11 @@ export default class PieceClass{
     this.dead = true;
   }
 
+  vision = () => {
+    let pathsObject = {};
+    return pathsObject;
+  }
+
   //Currently I've only tested this on rooks
   //It should work for bishops and queens as well
   //it will not work for knights, pawns, or kings, but maybe I can make it happen
@@ -77,7 +84,7 @@ export default class PieceClass{
         //if this is an empty cell
         if(!occupiedObject[cellCheck]){
           pathArr.push([cellCheck, "move"]);
-        } else if (occupiedObject[cellCheck] && occupiedObject[cellCheck][0].charAt(0) !== this.name.charAt(0)){
+        } else if (occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== this.name.charAt(0)){
           pathArr.push([cellCheck, "attack"]);
         }
       }
