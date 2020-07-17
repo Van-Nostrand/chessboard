@@ -9,7 +9,8 @@ import {
   TILEBORDERSIZE, 
   LIGHT_TILE, 
   DARK_TILE,
-  PIECE_OBJECTS
+  PIECE_OBJECTS,
+  PIECEPATHS
 } from "./CONSTANTS";
 
 import KingClass from "./pieceData/KingClass";
@@ -40,13 +41,12 @@ class ChessGame extends Component{
     Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
       newPiecesObject[piece] = this.imbueClass(piece, PIECE_OBJECTS[piece]);
     });
-
     
     //cellMap is used for piece name lookup by cell
     //I will eventually merge it and the piecesObject into gameLedger below
     let cellMap = this.buildCellLedger(newPiecesObject);
 
-    this.updatePieceVision(newPiecesObject, cellMap);
+    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
     //unimplemented test
     let gameLedger = {...newPiecesObject, findByCell: cellMap};
@@ -91,7 +91,7 @@ class ChessGame extends Component{
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
       
-      let legal = this.state.piecesObject[this.state.selectedPiece].newview[`${cell[0]},${cell[1]}`] && this.state.piecesObject[this.state.selectedPiece].newview[`${cell[0]},${cell[1]}`] === "m";
+      let legal = this.state.piecesObject[this.state.selectedPiece].view[`${cell[0]},${cell[1]}`] && this.state.piecesObject[this.state.selectedPiece].view[`${cell[0]},${cell[1]}`] === "m";
 
       //IF KING ALREADY IN CHECK
         //TEST KING NO LONGER IN CHECK
@@ -134,7 +134,7 @@ class ChessGame extends Component{
     else if(this.state.selectedPiece.length > 0 && name !== this.state.selectedPiece){
 
       let targetCoordinates = [this.state.piecesObject[name].x, this.state.piecesObject[name].y];
-      let legal = this.state.piecesObject[this.state.selectedPiece].newview[`${targetCoordinates[0]},${targetCoordinates[1]}`] && this.state.piecesObject[this.state.selectedPiece].newview[`${targetCoordinates[0]},${targetCoordinates[1]}`] === "a";
+      let legal = this.state.piecesObject[this.state.selectedPiece].view[`${targetCoordinates[0]},${targetCoordinates[1]}`] && this.state.piecesObject[this.state.selectedPiece].view[`${targetCoordinates[0]},${targetCoordinates[1]}`] === "a";
   
       if(legal){ 
         this.ownKingNotInCheck("a",name);
@@ -149,35 +149,55 @@ class ChessGame extends Component{
   }
 
   ownKingNotInCheck = (action, arg) => {
-    // let proposedNewPieces = {...this.state.piecesObject, ...this.state.piecesObject[this.state.selectedPiece]};
 
-    // let selectedpc = this.state.selectedPiece;
+    //testing better state management
+    let proposedNewPieces = {...this.state.piecesObject};
+    let firstlevelkeys = Object.keys(proposedNewPieces);
+    firstlevelkeys.forEach(piecename => {
+      let secondlevelkeys = Object.keys(proposedNewPieces[piecename]);
+      secondlevelkeys.forEach(pieceprop => {
+        if(Array.isArray(proposedNewPieces[piecename][pieceprop])){
+          proposedNewPieces[piecename][pieceprop] = Array.from(this.state.piecesObject[piecename][pieceprop]);
+        }
+        else if(typeof proposedNewPieces[piecename][pieceprop] === "object"){
+          proposedNewPieces[piecename][pieceprop] = {...this.state.piecesObject[piecename][pieceprop]};
+        }
+        else if(typeof proposedNewPieces[piecename][pieceprop] === "function"){
+          proposedNewPieces[piecename][pieceprop] = this.state.piecesObject[piecename][pieceprop];
+        }
+        else if(typeof proposedNewPieces[piecename][pieceprop] === "string"){
+          proposedNewPieces[piecename][pieceprop] = `${this.state.piecesObject[piecename][pieceprop]}`;
+        }
+        else if(typeof proposedNewPieces[piecename][pieceprop] === "boolean" || typeof proposedNewPieces[piecename][pieceprop] === "number"){
+          proposedNewPieces[piecename][pieceprop] = this.state.piecesObject[piecename][pieceprop];
+        }
+      })
+    });
 
+    debugger;
     //IF THIS IS A MOVE
     if(action === "m"){
-      let proposedNewPiece = Object.assign({}, this.state.piecesObject[this.state.selectedPiece]);
-      let originalState 
-      proposedNewPiece.testVar = true;
       
       //in this case, arg is an array describing a cell
-      proposedNewPiece.x = arg[0];
-      proposedNewPiece.y = arg[1];
-      
-      let proposedNewPieces = {...this.state.piecesObject, [this.state.selectedPiece]: proposedNewPiece};
-      
+      proposedNewPieces[this.state.selectedPiece].x = arg[0];
+      proposedNewPieces[this.state.selectedPiece].y = arg[1];
+
       let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
       let teamKing = this.state.turn ? "wK" : "bK";
 
       //special case for when the currently moved piece is the king
       if(this.state.selectedPiece === teamKing){
-        proposedNewPieces[teamKing].amIChecked(proposedNewCellMap,[proposedNewPiece.x,proposedNewPiece.y]);
+        let x = proposedNewPieces[this.state.selectedPiece].x;
+        let y = proposedNewPieces[this.state.selectedPiece].y;
+        proposedNewPieces[teamKing].checkView = proposedNewPieces[teamKing].amIChecked(proposedNewCellMap,[x,y]);
       }
       else {
-        proposedNewPieces[teamKing].amIChecked(proposedNewCellMap);
+        proposedNewPieces[teamKing].checkView = proposedNewPieces[teamKing].amIChecked(proposedNewCellMap);
       }
       //if this teams king has a checkView property with ANY key/value pairs, the king is in check and the move cannot continue
-      
-      debugger;
+      console.log(this.state.piecesObject);
+      console.log(proposedNewPieces);
+      // debugger;
       if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
         console.log("the king is in check")
         this.setState(prevState => {
@@ -190,6 +210,7 @@ class ChessGame extends Component{
         this.pieceMove(arg, proposedNewPieces, proposedNewCellMap);
       }
     }
+    //not implemented yet
     else if(action === "a"){
 
     }
@@ -201,13 +222,22 @@ class ChessGame extends Component{
     let pieceNames = Object.keys(piecesObject);
 
     for(let i = 0; i < pieceNames.length; i++){
-      if(/^(w|b)K/.test(pieceNames[i])){
-        piecesObject[pieceNames[i]].amIChecked(cellMap);
-      }
-
-      //if the piece isn't dead, update vision
-      if(piecesObject[pieceNames[i]].x >= 0){
-        piecesObject[pieceNames[i]].vision(cellMap, piecesObject);
+      if(!piecesObject[pieceNames[i]].dead){
+        switch(pieceNames[i]){
+          case /^(w|b)Q/: piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, name);
+            break;
+          case /^(w|b)K/: piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, name);
+            break;
+          case /^(w|b)B/: piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, name);
+            break;
+          case /^(w|b)N/: piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, name);
+            break;
+          case /^(w|b)R/: piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, name);
+            break;
+          case /^(w|b)P/: piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          default: console.log("something went wrong in updatepiecevision");
+        }
       }
     }
 
@@ -216,7 +246,7 @@ class ChessGame extends Component{
 
   //handles updating the cell ledger, all piece views, the message board, 
   updateGame = (newPiecesObject, ...args) => {
-    let pieceNames = Object.keys(newPiecesObject);  
+    // let pieceNames = Object.keys(newPiecesObject);  
 
     //update piece views
     this.updatePieceVision(newPiecesObject, args[2]);

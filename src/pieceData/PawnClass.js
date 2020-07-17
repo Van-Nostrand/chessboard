@@ -4,79 +4,63 @@ direction - a property set by this.name.charAt(0) which determines the direction
 promotion - an unimplemented property to determine if the piece has promoted or not, however this will likely not be used. 
 fifthRank - an integer which represents the pawns 5th rank. Used to track en passant checks. 
 */
-import PieceClass from "./PieceClass";
-
-export default class PawnClass extends PieceClass{
-  constructor(name, x, y, pngPos, direction){
-    super(name, x, y, pngPos, [[0,direction],[0,direction + direction],[-1,direction], [1,direction]], false);
-    
-    this.firstMove = true;
-    this.justHadFirstMove = false;
-    this.enPassant = false;
-    this.enPassantTurn = 0;
-    this.promotion = false; 
-    this.direction = direction;
-    this.fifthRank = direction === -1 ? 3 : 4;
-  }
+export default class PawnClass{
   
-  attacklogic = (x,y) => (x === 1 || x === -1) && (y === 1 * this.direction);
+  static attacklogic = (x,y, direction) => (x === 1 || x === -1) && (y === 1 * this.direction);
 
-  movelogic = (x, y) => {
+  static movelogic = (x, y, direction, firstMove, justHadFirstMove) => {
     let success = false;
-    if(this.firstMove) {
-
-      success = x === 0 && (y === 1 * this.direction || y === 2 * this.direction);
-    } else if(!this.firstMove) {
-      success = x === 0 && y === 1 * this.direction ;
+    let enPassant;
+    if(firstMove) {
+      success = x === 0 && (y === 1 * direction || y === 2 * direction);
+    } else if(!firstMove) {
+      success = x === 0 && y === 1 * direction ;
     }
     //if the move is ok and it's a double move, flag for enpassant and "just had first move"
     if(success && (y === 2 || y === -2)){
-      this.enPassant = true;
-      this.justHadFirstMove = true;
-      return success;
+      enPassant = true;
+      justHadFirstMove = true;
+      return [success, enPassant, justHadFirstMove];
     }
     //if the move is ok and the "just had first move" flag is set, it needs to be cleared
-    else if (success && this.justHadFirstMove){
-      this.justHadFirstMove = false;
-      this.enPassant = false;
-      return success;
+    else if (success && justHadFirstMove){
+      justHadFirstMove = false;
+      enPassant = false;
+      return [success, enPassant, justHadFirstMove];
     }
     else{
-      return success;
+      return [success, enPassant, justHadFirstMove];
     }
   };
 
-  flagInPassing = (turnNumber) => {
-    this.enPassant = true;
-    this.enPassantTurn = turnNumber;
-  }
-
   //not needed?
-  enpassantlogic = (x,y,targetcell,victim) => {
+  static enpassantlogic = (x,y,targetcell,victim) => {
     return (
       targetcell[0] === victim[0] && 
       (targetcell[1] === victim[1] + 1 || 
         targetcell[1] === victim[1] - 1));
   };
 
-  vision = (cellMap, piecesObject) => {
+  static vision = (cellMap, piecesObject, name) => {
+    let {x, y, fifthRank, paths} = piecesObject[name];
    
     // create an empty object that will store potential moves
     let pathsObject = {};
+    let direction = name.charAt(0) === "w" ? -1 : 1;
 
     // for each path
-    this.paths.forEach((path, i) => {
+    paths.forEach((path, i) => {
 
       // refer to coordinates in game ledger to determine if cell(s) are occupied
-      let cellString = `${path[0] + this.x},${path[1] + this.y}`;
+      let cellString = `${path[0] + x},${path[1] + y}`;
       if(cellMap[cellString]){
         let testedCell = cellMap[cellString];
 
         // if enemy in cell
-        if(testedCell.charAt(0) !== this.name.charAt(0)){
+        if(testedCell.charAt(0) !== name.charAt(0)){
 
           // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
-          if(this.attacklogic(path[0],path[1])){
+          if(PawnClass.attacklogic(path[0],path[1])){
             pathsObject[cellString] = "a";
             
           }
@@ -84,17 +68,17 @@ export default class PawnClass extends PieceClass{
       }
 
       // cell is empty and in move path
-      else if (!cellMap[cellString] && this.movelogic(path[0],path[1])){
+      else if (!cellMap[cellString] && PawnClass.movelogic(path[0],path[1])){
         pathsObject[cellString] = "m";
       }
       
       // cell is empty and in attack path and piece on 5th rank 
       // EN PASSANT
-      else if (!cellMap[cellString] && this.attacklogic(path[0],path[1]) && this.fifthRank === this.y){
+      else if (!cellMap[cellString] && PawnClass.attacklogic(path[0],path[1]) && fifthRank === y){
         
         // if enemy pawn in cell "behind" empty cell
-        let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - this.direction}`;
-        if(cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
+        let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`;
+        if(cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
           
           // if piece just moved two spaces
           let EPEnemy = piecesObject[cellMap[EPTest]];
@@ -106,9 +90,7 @@ export default class PawnClass extends PieceClass{
           }
         }
       }
-    })
-    // return "moves" object
-    this.newview = pathsObject;
+    });
     return pathsObject;
 
   }

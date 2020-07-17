@@ -8,10 +8,11 @@ export default class KingClass extends PieceClass{
   constructor(name, x, y, pngPos){
     super(name, x, y, pngPos, [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]], false);
     
-    this.view = {};
+    // this.view = {};
     this.inCheck = false;
     this.firstMove = false;
     this.castleing = true;
+    this.amIChecked = this.amIChecked.bind(this);
     this.checkView = {};
   }
 
@@ -22,13 +23,15 @@ export default class KingClass extends PieceClass{
       return true;
   };
 
-  vision = (cellMap) => {
+  vision = (cellMap, piecesObject, name) => {
+    let {x, y, paths} = piecesObject[name];
+    
     let pathsObject = {};
     const BOARDSIZE = 8;
 
-    this.paths.forEach((path, i) => {
-      let testX = this.x + path[0];
-      let testY = this.y + path[1];
+    paths.forEach((path, i) => {
+      let testX = x + path[0];
+      let testY = y + path[1];
       let cellCheck = `${testX},${testY}`;
 
       if (
@@ -38,15 +41,15 @@ export default class KingClass extends PieceClass{
       ){
         pathsObject[cellCheck] = "m";
       }
-      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== this.name.charAt(0)){
+      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== name.charAt(0)){
         pathsObject[cellCheck] = "a";
       }
-      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === this.name.charAt(0)){
+      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === name.charAt(0)){
         pathsObject[cellCheck] = "b";
       }
     });
 
-    this.newview = pathsObject;
+    // this.newview = pathsObject;
     return pathsObject;
   }
 
@@ -67,7 +70,7 @@ export default class KingClass extends PieceClass{
     let knightRegex = new RegExp("^" + enemyChar + "N");
 
     let testX, testY;
-    if(arr){
+    if(arr && arr.length === 2){
       testX = arr[0];
       testY = arr[1];
     }
@@ -143,9 +146,12 @@ export default class KingClass extends PieceClass{
     });
 
     // return object
-    this.checkView = pathsObject;
+    // this.checkView = pathsObject;
     console.log(`${this.name.charAt(0)} king check test`);
     console.log(pathsObject);
+    // console.log(this.checkView);
+    return pathsObject;
+    // debugger;
   }
 
 }

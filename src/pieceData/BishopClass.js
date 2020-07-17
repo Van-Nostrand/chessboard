@@ -1,23 +1,18 @@
-import PieceClass from "./PieceClass";
+export default class BishopClass{
 
-export default class BishopClass extends PieceClass{
-  constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos, [[1,-1],[1,1],[-1,1],[-1,-1]], true);
+  static movelogic = (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1);
+
+  static vision = (cellMap, piecesObject, name) => {
+    let {x, y, paths} = piecesObject[name];
     
-  }
-
-  movelogic = (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1);
-
-  vision = (cellMap) => {
-   
     let pathsObject = {};
     const BOARDSIZE = 8;
 
-    this.paths.forEach((path, i) => {
+    paths.forEach((path, i) => {
 
       //set boundaries for this path
-      let startX = this.x + path[0];
-      let startY = this.y + path[1];
+      let startX = x + path[0];
+      let startY = y + path[1];
       let blockedFlag = false;
 
       for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
@@ -25,7 +20,7 @@ export default class BishopClass extends PieceClass{
 
         if (cellMap[cellTest]){
 
-          if(cellMap[cellTest].charAt(0) !== this.name.charAt(0)){
+          if(cellMap[cellTest].charAt(0) !== name.charAt(0)){
 
             if(!blockedFlag){
 
@@ -54,8 +49,6 @@ export default class BishopClass extends PieceClass{
       }
 
     })
-    // return object
-    this.newview = pathsObject;
     return pathsObject;
   }
 

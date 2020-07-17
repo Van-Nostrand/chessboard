@@ -1,16 +1,10 @@
 /*
 ==== KNIGHTS ====
 */
-import PieceClass from "./PieceClass";
 
-export default class KnightClass extends PieceClass{
-  constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos, [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]], false);
-    
-    this.jump = true; //likely won't be using this property much longer...
-  }
-
-  movelogic = (x,y) => 
+export default class KnightClass{
+  
+  static movelogic = (x,y) => 
       x !== 0 !== y && 
       x !== y &&
       x < 3 && x > -3 && 
@@ -18,13 +12,15 @@ export default class KnightClass extends PieceClass{
         x%2 === 0 ^ y%2 === 0 
       );
 
-  vision = (cellMap) => {
+  static vision = (cellMap, piecesObject, name) => {
+    let {x, y, paths} = piecesObject[name];
+    
     let pathsObject = {};
     const BOARDSIZE = 8;
 
-    this.paths.forEach((path, i) => {
-      let testX = this.x + path[0];
-      let testY = this.y + path[1];
+    paths.forEach((path, i) => {
+      let testX = x + path[0];
+      let testY = y + path[1];
       let cellCheck = `${testX},${testY}`;
 
       if (
@@ -34,14 +30,13 @@ export default class KnightClass extends PieceClass{
       ){
         pathsObject[cellCheck] = "m";
       }
-      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== this.name.charAt(0)){
+      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== name.charAt(0)){
         pathsObject[cellCheck] = "a";
       }
-      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === this.name.charAt(0)){
+      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === name.charAt(0)){
         pathsObject[cellCheck] = "b";
       }
     });
-    this.newview = pathsObject;
     return pathsObject;
   }
   

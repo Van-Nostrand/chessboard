@@ -1,33 +1,27 @@
 /*
 Rooks
 */
-import PieceClass from "./PieceClass";
 
 export default class RookClass extends PieceClass{
-  constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos, [[0,-1],[1,0],[0,1],[-1,0]], true);
-    
-    // this.view = {};
-    this.castleing = true;
-    this.firstMove = false;
-  }
 
   movelogic = (x,y) => x === 0 ^ y === 0;
 
   castlelogic = (king, rook) => {
     return true;
   };
-  vision = (cellMap) => {
+  vision = (cellMap, piecesObject, name) => {
+    let {x, y, paths} = piecesObject[name];
+
     // get array of paths
     // create an object to store cells
     let pathsObject = {};
     const BOARDSIZE = 8;
     // for each path: iterate over all cells
-    this.paths.forEach((path, i) => {
+    paths.forEach((path, i) => {
 
       //set variables for this path
-      let startX = this.x + path[0];
-      let startY = this.y + path[1];
+      let startX = x + path[0];
+      let startY = y + path[1];
       let blockedFlag = false;
 
       for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
@@ -74,7 +68,7 @@ export default class RookClass extends PieceClass{
       }
     })
     // return object
-    this.newview = pathsObject;
+    // this.newview = pathsObject;
     return pathsObject;
   }
 

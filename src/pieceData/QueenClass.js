@@ -14,17 +14,16 @@ export default class QueenClass extends PieceClass{
     else return result;
   };
 
-  vision = (cellMap) => {
-    // get array of paths
-    // create an object to store cells
+  vision = (cellMap, piecesObject, name) => {
+    let {x, y, paths} = piecesObject[name];
     let pathsObject = {};
     const BOARDSIZE = 8;
     // for each path: iterate over all cells
-    this.paths.forEach((path, i) => {
+    paths.forEach((path, i) => {
 
       //set boundaries for this path
-      let startX = this.x + path[0];
-      let startY = this.y + path[1];
+      let startX = x + path[0];
+      let startY = y + path[1];
       let blockedFlag = false;
       for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
         // debugger;
@@ -32,7 +31,7 @@ export default class QueenClass extends PieceClass{
         // if cell in path contains piece
         if (cellMap[cellTest]){
           // if piece is enemy
-          if(cellMap[cellTest].charAt(0) !== this.name.charAt(0)){
+          if(cellMap[cellTest].charAt(0) !== name.charAt(0)){
             // if enemy has not been found in this path yet
             if(!blockedFlag){
               // create key/value "coordinates": "a"
@@ -73,7 +72,7 @@ export default class QueenClass extends PieceClass{
 
     })
     // return object
-    this.newview = pathsObject;
+    // this.newview = pathsObject;
     return pathsObject;
   }
 
