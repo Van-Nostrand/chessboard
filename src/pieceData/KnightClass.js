@@ -1,6 +1,5 @@
-/*==== KNIGHTS ====
-  jump - this allows them to jump other pieces. might be phased out by a simple class check
-  note that because knights move in an "L" shape, their paths property and movelogic function and external legality checks work a bit differently than other pieces
+/*
+==== KNIGHTS ====
 */
 import PieceClass from "./PieceClass";
 
@@ -8,8 +7,7 @@ export default class KnightClass extends PieceClass{
   constructor(name, x, y, pngPos){
     super(name, x, y, pngPos, [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]], false);
     
-    // this.view = {};
-    this.jump = true;
+    this.jump = true; //likely won't be using this property much longer...
   }
 
   movelogic = (x,y) => 
@@ -20,7 +18,7 @@ export default class KnightClass extends PieceClass{
         x%2 === 0 ^ y%2 === 0 
       );
 
-  pseudovision = (occupiedObject) => {
+  vision = (cellMap) => {
     let pathsObject = {};
     const BOARDSIZE = 8;
 
@@ -30,16 +28,16 @@ export default class KnightClass extends PieceClass{
       let cellCheck = `${testX},${testY}`;
 
       if (
-        !occupiedObject[cellCheck] && 
+        !cellMap[cellCheck] && 
         testX >= 0 && testX < BOARDSIZE && 
         testY >= 0 && testY < BOARDSIZE
       ){
         pathsObject[cellCheck] = "m";
       }
-      else if(occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== this.name.charAt(0)){
+      else if(cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== this.name.charAt(0)){
         pathsObject[cellCheck] = "a";
       }
-      else if (occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) === this.name.charAt(0)){
+      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === this.name.charAt(0)){
         pathsObject[cellCheck] = "b";
       }
     });

@@ -14,12 +14,11 @@ export default class QueenClass extends PieceClass{
     else return result;
   };
 
-  pseudovision = (occupiedObject) => {
+  vision = (cellMap) => {
     // get array of paths
     // create an object to store cells
     let pathsObject = {};
     const BOARDSIZE = 8;
-    console.log(this.name);
     // for each path: iterate over all cells
     this.paths.forEach((path, i) => {
 
@@ -31,9 +30,9 @@ export default class QueenClass extends PieceClass{
         // debugger;
         let cellTest = `${i},${j}`;
         // if cell in path contains piece
-        if (occupiedObject[cellTest]){
+        if (cellMap[cellTest]){
           // if piece is enemy
-          if(occupiedObject[cellTest].charAt(0) !== this.name.charAt(0)){
+          if(cellMap[cellTest].charAt(0) !== this.name.charAt(0)){
             // if enemy has not been found in this path yet
             if(!blockedFlag){
               // create key/value "coordinates": "a"

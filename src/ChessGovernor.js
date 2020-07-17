@@ -1,5 +1,6 @@
 //This class exists entirely to house some static functions
 //These functions compare piece coordinates to a grid and decide if a move is legal or not
+//I'm in the process of re-evaluating this, and I think it's going to be phased out
 class ChessGovernor{
   
   static checkPath = (selectedPieceName, targetCoordinates, piecesObject) => {

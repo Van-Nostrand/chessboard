@@ -12,11 +12,16 @@ name is of this form: "cT#""
   where # = is an integer to differentiate between pieces of same type (except king and queen don't have a number)
   
 vision() - pieces are in charge of tracking their possible moves. They do this with their vision() method and view property
-  currently this is implemented individually in each pieces subclass
-  newVision(), below, will be edited to work on all pieces
-  view is an object that contains a series of arrays
-  Each array is named after each path array they have 
-  vision() checks all possible moves and attacks on the board and returns a new view
+  this is implemented individually in each pieces subclass
+  view is an object that contains information about where the piece can move
+  the format is: {"CELL-COORDINATES": "ACTION"}
+    where CELL-COORDINATES is an array describing x,y coordinates
+    where ACTION is either:
+      "a" for attack
+      "m" for move
+      "b" for blocked (either a teammate or a piece beyond another piece)
+      and in the case of pawns, "e" for the ever-elusive en passant
+  vision() checks all possible moves and attacks for the piece and returns a new view
   
 movelogic() - used to determine if moves are legal. x and y delta values are given as arguments, and a boolean is returned indicating whether those values describe a legal move for the current piece
     
@@ -70,7 +75,7 @@ export default class PieceClass{
   //Currently I've only tested this on rooks
   //It should work for bishops and queens as well
   //it will not work for knights, pawns, or kings, but maybe I can make it happen
-  newVision = (occupiedObject) => {
+  newVision = (cellMap) => {
     let pathsObject = {};
     const BOARDSIZE = 8;
 
@@ -82,9 +87,9 @@ export default class PieceClass{
         let cellCheck = `${i},${j}`;
         
         //if this is an empty cell
-        if(!occupiedObject[cellCheck]){
+        if(!cellMap[cellCheck]){
           pathArr.push([cellCheck, "move"]);
-        } else if (occupiedObject[cellCheck] && occupiedObject[cellCheck].charAt(0) !== this.name.charAt(0)){
+        } else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== this.name.charAt(0)){
           pathArr.push([cellCheck, "attack"]);
         }
       }

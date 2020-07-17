@@ -59,7 +59,7 @@ export default class PawnClass extends PieceClass{
         targetcell[1] === victim[1] - 1));
   };
 
-  pseudovision = (occupiedObject, piecesObject) => {
+  vision = (cellMap, piecesObject) => {
    
     // create an empty object that will store potential moves
     let pathsObject = {};
@@ -69,8 +69,8 @@ export default class PawnClass extends PieceClass{
 
       // refer to coordinates in game ledger to determine if cell(s) are occupied
       let cellString = `${path[0] + this.x},${path[1] + this.y}`;
-      if(occupiedObject[cellString]){
-        let testedCell = occupiedObject[cellString];
+      if(cellMap[cellString]){
+        let testedCell = cellMap[cellString];
 
         // if enemy in cell
         if(testedCell.charAt(0) !== this.name.charAt(0)){
@@ -84,20 +84,20 @@ export default class PawnClass extends PieceClass{
       }
 
       // cell is empty and in move path
-      else if (!occupiedObject[cellString] && this.movelogic(path[0],path[1])){
+      else if (!cellMap[cellString] && this.movelogic(path[0],path[1])){
         pathsObject[cellString] = "m";
       }
       
       // cell is empty and in attack path and piece on 5th rank 
       // EN PASSANT
-      else if (!occupiedObject[cellString] && this.attacklogic(path[0],path[1]) && this.fifthRank === this.y){
+      else if (!cellMap[cellString] && this.attacklogic(path[0],path[1]) && this.fifthRank === this.y){
         
         // if enemy pawn in cell "behind" empty cell
         let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - this.direction}`;
-        if(occupiedObject[EPTest].charAt(0) !== this.name.charAt(0) && occupiedObject[EPTest].charAt(1) === "P"){
+        if(cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
           
           // if piece just moved two spaces
-          let EPEnemy = piecesObject[occupiedObject[EPTest]];
+          let EPEnemy = piecesObject[cellMap[EPTest]];
           if(EPEnemy.enPassant){
 
             // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
