@@ -2,28 +2,17 @@
 ==== KINGS ====
 amIChecked() - this looks for attackers and reports them back
 */
-import PieceClass from "./PieceClass";
+export default class KingClass{
+  
 
-export default class KingClass extends PieceClass{
-  constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos, [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]], false);
-    
-    // this.view = {};
-    this.inCheck = false;
-    this.firstMove = false;
-    this.castleing = true;
-    this.amIChecked = this.amIChecked.bind(this);
-    this.checkView = {};
-  }
-
-  movelogic = (x,y) => x < 2 && x > -2 && y < 2 && y > -2;
+  static movelogic = (x,y) => x < 2 && x > -2 && y < 2 && y > -2;
   
   //not implemented yet
-  castlelogic = (king, rook) => {
+  static castlelogic = (king, rook) => {
       return true;
   };
 
-  vision = (cellMap, piecesObject, name) => {
+  static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
     
     let pathsObject = {};
@@ -53,10 +42,11 @@ export default class KingClass extends PieceClass{
     return pathsObject;
   }
 
-  amIChecked = (cellMap, arr) => {
+  static amIChecked = (cellMap, piecesObject, name) => {
+    
     let pathsObject = {};
     const BOARDSIZE = 8;
-    let enemyChar = this.name.charAt(0) === "w" ? "b" : "w";
+    let enemyChar = name.charAt(0) === "w" ? "b" : "w";
     
     let bishopPaths = [[1,-1], [1,1], [-1,1], [-1,-1]];
     let rookPaths = [[0,-1], [1,0], [0,1], [-1,0]];
@@ -69,19 +59,9 @@ export default class KingClass extends PieceClass{
     let pawnRegex = new RegExp("^" + enemyChar + "P");
     let knightRegex = new RegExp("^" + enemyChar + "N");
 
-    let testX, testY;
-    if(arr && arr.length === 2){
-      testX = arr[0];
-      testY = arr[1];
-    }
-    else{
-      testX = this.x;
-      testY = this.y;
-    }
+    let testX = piecesObject[name].x;
+    let testY = piecesObject[name].y;
     
-    console.log(`${this.name} cellmap`);
-    console.log(cellMap);
-
     // test queen bishop attacks
     bishopPaths.forEach((path, i) => {
 
@@ -145,13 +125,7 @@ export default class KingClass extends PieceClass{
       }
     });
 
-    // return object
-    // this.checkView = pathsObject;
-    console.log(`${this.name.charAt(0)} king check test`);
-    console.log(pathsObject);
-    // console.log(this.checkView);
     return pathsObject;
-    // debugger;
   }
 
 }

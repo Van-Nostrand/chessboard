@@ -37,9 +37,26 @@ class ChessGame extends Component{
     });
 
     //declare pieces
-    let newPiecesObject = {};
-    Object.keys(PIECE_OBJECTS).forEach((piece, i) => {
-      newPiecesObject[piece] = this.imbueClass(piece, PIECE_OBJECTS[piece]);
+    let newPiecesObject = PIECE_OBJECTS;
+    Object.keys(newPiecesObject).forEach((piece, i) => {
+
+      switch(true){
+        case /^(w|b)Q/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["Q"];
+          break;
+        case /^(w|b)K/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["K"]; 
+          break;
+        case /^(w|b)B/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["B"];
+          break;
+        case /^(w|b)R/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["R"];
+          break;
+        case /^wP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["wP"];
+          break;
+        case /^bP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["bP"];
+          break; 
+        case /^(w|b)N/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["N"];
+          break;
+        default: console.log("something went wrong while assigning paths");
+      }
     });
     
     //cellMap is used for piece name lookup by cell
@@ -50,6 +67,7 @@ class ChessGame extends Component{
 
     //unimplemented test
     let gameLedger = {...newPiecesObject, findByCell: cellMap};
+    console.log(newPiecesObject);
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -174,7 +192,6 @@ class ChessGame extends Component{
       })
     });
 
-    debugger;
     //IF THIS IS A MOVE
     if(action === "m"){
       
@@ -185,19 +202,8 @@ class ChessGame extends Component{
       let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
       let teamKing = this.state.turn ? "wK" : "bK";
 
-      //special case for when the currently moved piece is the king
-      if(this.state.selectedPiece === teamKing){
-        let x = proposedNewPieces[this.state.selectedPiece].x;
-        let y = proposedNewPieces[this.state.selectedPiece].y;
-        proposedNewPieces[teamKing].checkView = proposedNewPieces[teamKing].amIChecked(proposedNewCellMap,[x,y]);
-      }
-      else {
-        proposedNewPieces[teamKing].checkView = proposedNewPieces[teamKing].amIChecked(proposedNewCellMap);
-      }
+      proposedNewPieces[teamKing].checkView = KingClass.amIChecked(proposedNewCellMap,proposedNewPieces, teamKing );
       //if this teams king has a checkView property with ANY key/value pairs, the king is in check and the move cannot continue
-      console.log(this.state.piecesObject);
-      console.log(proposedNewPieces);
-      // debugger;
       if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
         console.log("the king is in check")
         this.setState(prevState => {
@@ -223,18 +229,18 @@ class ChessGame extends Component{
 
     for(let i = 0; i < pieceNames.length; i++){
       if(!piecesObject[pieceNames[i]].dead){
-        switch(pieceNames[i]){
-          case /^(w|b)Q/: piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, name);
+        switch(true){
+          case /^(w|b)Q/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)K/: piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, name);
+          case /^(w|b)K/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)B/: piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, name);
+          case /^(w|b)B/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)N/: piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, name);
+          case /^(w|b)N/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)R/: piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, name);
+          case /^(w|b)R/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)P/: piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i]);
+          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
           default: console.log("something went wrong in updatepiecevision");
         }

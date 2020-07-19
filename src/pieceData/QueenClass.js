@@ -1,20 +1,14 @@
-import PieceClass from "./PieceClass";
+export default class QueenClass{
+  
 
-export default class QueenClass extends PieceClass{
-  constructor(name, x, y, pngPos){
-    super(name, x, y, pngPos, [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]], true);
-    
-    // this.view = {};
-  } 
-
-  movelogic = (x,y) => {
+  static movelogic = (x,y) => {
     let result = (x === 0 ^ y === 0) ^ x/y === 1 || x/y === -1 ;
     if (result === 1) return true;
     else if(result === 0) return false;
     else return result;
   };
 
-  vision = (cellMap, piecesObject, name) => {
+  static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
     let pathsObject = {};
     const BOARDSIZE = 8;

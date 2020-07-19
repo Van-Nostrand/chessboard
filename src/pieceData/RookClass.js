@@ -2,74 +2,60 @@
 Rooks
 */
 
-export default class RookClass extends PieceClass{
+export default class RookClass{
 
-  movelogic = (x,y) => x === 0 ^ y === 0;
+  static movelogic = (x,y) => x === 0 ^ y === 0;
 
-  castlelogic = (king, rook) => {
+  static castlelogic = (king, rook) => {
     return true;
   };
-  vision = (cellMap, piecesObject, name) => {
+  static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
 
-    // get array of paths
-    // create an object to store cells
     let pathsObject = {};
     const BOARDSIZE = 8;
-    // for each path: iterate over all cells
-    paths.forEach((path, i) => {
 
-      //set variables for this path
+    paths.forEach((path, i) => {
       let startX = x + path[0];
       let startY = y + path[1];
       let blockedFlag = false;
 
       for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
-        // debugger;
         let cellTest = `${i},${j}`;
+
         // if cell in path contains piece
         if (cellMap[cellTest]){
           // if piece is enemy
           if(cellMap[cellTest].charAt(0) !== this.name.charAt(0)){
-            // if enemy has not been found in this path yet
+            // if enemy has not been found in this path yet then the path is clear and cell can be attacked
             if(!blockedFlag){
-              // create key/value "coordinates": "a"
-              // set blockedFlag to true
               pathsObject[cellTest] = "a";
               blockedFlag = true;
             }
-            // else, enemy has been found in path
+            // else, enemy has been found in path and this tile is blocked
             else {
-              // create key/value "coordinates": "b" (for blocked)
               pathsObject[cellTest] = "b";
             }
           }
-          // else piece must be ally
+          // else piece must be ally and the cell is blocked
           else {
-            // create key/value "coordinates": "b"
-            // set blockedFlag to true
             pathsObject[cellTest] = "b";
             blockedFlag = true;
           }
         }
         // else cell is empty
         else {
-          // if blockedFlag is false
+          // if cell not blocked, can move to tile
           if(!blockedFlag){
-            // create key/value "coordinates": "m"
             pathsObject[cellTest] = "m";
           }
-          // else this cell must be blocked by something
+          // else cell is blocked by something prior
           else {
-            // create key/value "coordinates": "b"
             pathsObject[cellTest] = "b";
           }
         }
       }
     })
-    // return object
-    // this.newview = pathsObject;
     return pathsObject;
   }
-
 }
