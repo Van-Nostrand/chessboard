@@ -66,7 +66,7 @@ class ChessGame extends Component{
     newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
     //unimplemented test
-    let gameLedger = {...newPiecesObject, findByCell: cellMap};
+    // let gameLedger = {...newPiecesObject, findByCell: cellMap};
     // console.log(newPiecesObject);
 
     this.state = {
@@ -79,7 +79,6 @@ class ChessGame extends Component{
       selectedPiece: "",
       cellMap,
       messageBoard: "no piece selected",
-      gameLedger,                 //unused so far
       whiteKingWasInCheck: false, //unused so far
       blackKingWasInCheck: false  //unused so far
     }
@@ -266,7 +265,7 @@ class ChessGame extends Component{
     // let pieceNames = Object.keys(newPiecesObject);  
 
     //update piece views
-    this.updatePieceVision(newPiecesObject, args[2]);
+    this.updatePieceVision(newPiecesObject, newCellMap);
 
     //determine if this is a piecemove or piecekill based on whether the second args variable is an array
     let messageBoard = Array.isArray(args[1]) ? `piece ${args[0]} moved to ${args[1][0]},${args[1][1]}` : `${args[0]} has successfully attacked ${args[1]}`;
@@ -293,22 +292,6 @@ class ChessGame extends Component{
     this.updateGame(newPieceObject, newCellMap, selectedpc, cell);
   }
 
-  // //moves a piece to kill another piece
-  // pieceKill = (target) => {
-    
-  //   let newPieceObject = {...this.state.piecesObject};
-  //   let selectedpc = this.state.selectedPiece;
-
-  //   newPieceObject[selectedpc].x = newPieceObject[target].x;
-  //   newPieceObject[selectedpc].y = newPieceObject[target].y;
-  //   newPieceObject[target].x = -1;
-  //   newPieceObject[target].y = -1;
-  //   newPieceObject[target].dead = true;
-
-  //   this.updateGame(newPieceObject, selectedpc, target);
-  // }
-
-  //updated cellMap builder
   buildCellLedger = (piecesObject) => {
     let cellMap = {};
     let piecenames = Object.keys(piecesObject);
