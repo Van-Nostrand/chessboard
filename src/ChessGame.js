@@ -67,7 +67,7 @@ class ChessGame extends Component{
 
     //unimplemented test
     let gameLedger = {...newPiecesObject, findByCell: cellMap};
-    console.log(newPiecesObject);
+    // console.log(newPiecesObject);
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -85,17 +85,17 @@ class ChessGame extends Component{
     }
   }
 
-  imbueClass = (name, pieceData) => {
-    switch(name.charAt(1)) {
-      case "P": return new PawnClass(name, pieceData.x, pieceData.y, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
-      case "K": return new KingClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
-      case "N": return new KnightClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
-      case "Q": return new QueenClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
-      case "R": return new RookClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
-      case "B": return new BishopClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
-      default: console.log("error imbueing classes");
-    }
-  }
+  // imbueClass = (name, pieceData) => {
+  //   switch(name.charAt(1)) {
+  //     case "P": return new PawnClass(name, pieceData.x, pieceData.y, pieceData.pngPos, name.charAt(0) === "w" ? -1 : 1);
+  //     case "K": return new KingClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+  //     case "N": return new KnightClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+  //     case "Q": return new QueenClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+  //     case "R": return new RookClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+  //     case "B": return new BishopClass(name, pieceData.x, pieceData.y, pieceData.pngPos);
+  //     default: console.log("error imbueing classes");
+  //   }
+  // }
 
   tileClick = (e) => {
     //Clicking a tile while no piece selected
@@ -166,58 +166,69 @@ class ChessGame extends Component{
     }
   }
 
+  properCopyState = (oldstate) => {
+    let newState = {};
+    let oldstateKeys = Object.keys(oldstate);
+    oldstateKeys.forEach(key => {
+      let secondLevelKeys = Object.keys(oldstate[key]);
+      let subState = {};
+      secondLevelKeys.forEach(property => {
+        subState[property] = oldstate[key][property];
+      });
+      newState[key] = subState;
+    });
+
+    return newState;
+  }
+
   ownKingNotInCheck = (action, arg) => {
 
     //testing better state management
-    let proposedNewPieces = {...this.state.piecesObject};
-    let firstlevelkeys = Object.keys(proposedNewPieces);
-    firstlevelkeys.forEach(piecename => {
-      let secondlevelkeys = Object.keys(proposedNewPieces[piecename]);
-      secondlevelkeys.forEach(pieceprop => {
-        if(Array.isArray(proposedNewPieces[piecename][pieceprop])){
-          proposedNewPieces[piecename][pieceprop] = Array.from(this.state.piecesObject[piecename][pieceprop]);
-        }
-        else if(typeof proposedNewPieces[piecename][pieceprop] === "object"){
-          proposedNewPieces[piecename][pieceprop] = {...this.state.piecesObject[piecename][pieceprop]};
-        }
-        else if(typeof proposedNewPieces[piecename][pieceprop] === "function"){
-          proposedNewPieces[piecename][pieceprop] = this.state.piecesObject[piecename][pieceprop];
-        }
-        else if(typeof proposedNewPieces[piecename][pieceprop] === "string"){
-          proposedNewPieces[piecename][pieceprop] = `${this.state.piecesObject[piecename][pieceprop]}`;
-        }
-        else if(typeof proposedNewPieces[piecename][pieceprop] === "boolean" || typeof proposedNewPieces[piecename][pieceprop] === "number"){
-          proposedNewPieces[piecename][pieceprop] = this.state.piecesObject[piecename][pieceprop];
-        }
-      })
-    });
-
+    let proposedNewPieces = this.properCopyState(this.state.piecesObject);
+    let teamKing = this.state.turn ? "wK" : "bK";
+    
     //IF THIS IS A MOVE
     if(action === "m"){
       
-      //in this case, arg is an array describing a cell
+      //in this case, arg is an array describing a cell, so assign arg to x y values
       proposedNewPieces[this.state.selectedPiece].x = arg[0];
       proposedNewPieces[this.state.selectedPiece].y = arg[1];
-
       let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
-      let teamKing = this.state.turn ? "wK" : "bK";
 
       proposedNewPieces[teamKing].checkView = KingClass.amIChecked(proposedNewCellMap,proposedNewPieces, teamKing );
+
       //if this teams king has a checkView property with ANY key/value pairs, the king is in check and the move cannot continue
       if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
-        console.log("the king is in check")
+        console.log(`this move puts ${teamKing} in check`);
         this.setState(prevState => {
           return {...prevState, selectedPiece: "", messageBoard: "this puts your king in check, try again"};
         });
       }
       //else the move is safe and can continue
       else{
-        console.log("the king is not in check")
+        console.log(`${teamKing} is not in check`);
         this.pieceMove(arg, proposedNewPieces, proposedNewCellMap);
       }
     }
     //not implemented yet
     else if(action === "a"){
+
+      // in this case, arg will be an array describing another pieces position on the board, so kill that piece and move selectedPiece there
+      let victimPiece = this.state.cellMap(`${arg[0]},${arg[1]}`);
+      proposedNewPieces[victimPiece].dead = true;
+      proposedNewPieces[this.state.selectedPiece].x = arg[0];
+      proposedNewPieces[this.state.selectedPiece].y = arg[1];
+
+      let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
+      proposedNewPieces[teamKing].checkView = KingClass.amIChecked(proposedNewCellMap, proposedNewPieces, teamKing);
+
+      if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
+        console.log(`this attack puts ${teamKing} in check`);
+      }
+      else {
+        console.log(`${teamKing} is not in check`);
+        this.updateGame(proposedNewPieces, proposedNewCellMap, this.state.selectedPiece, victimPiece);
+      }
 
     }
   }
@@ -251,7 +262,7 @@ class ChessGame extends Component{
   }
 
   //handles updating the cell ledger, all piece views, the message board, 
-  updateGame = (newPiecesObject, ...args) => {
+  updateGame = (newPiecesObject, newCellMap, ...args) => {
     // let pieceNames = Object.keys(newPiecesObject);  
 
     //update piece views
@@ -262,7 +273,7 @@ class ChessGame extends Component{
 
     this.setState({
       piecesObject: newPiecesObject,
-      cellMap: args[2],
+      cellMap: newCellMap,
       turn: !this.state.turn,
       selectedPiece: "",
       messageBoard
@@ -279,23 +290,23 @@ class ChessGame extends Component{
       newPieceObject[selectedpc].firstMove = false;
     } 
 
-    this.updateGame(newPieceObject, selectedpc, cell, newCellMap);
+    this.updateGame(newPieceObject, newCellMap, selectedpc, cell);
   }
 
-  //moves a piece to kill another piece
-  pieceKill = (target) => {
+  // //moves a piece to kill another piece
+  // pieceKill = (target) => {
     
-    let newPieceObject = {...this.state.piecesObject};
-    let selectedpc = this.state.selectedPiece;
+  //   let newPieceObject = {...this.state.piecesObject};
+  //   let selectedpc = this.state.selectedPiece;
 
-    newPieceObject[selectedpc].x = newPieceObject[target].x;
-    newPieceObject[selectedpc].y = newPieceObject[target].y;
-    newPieceObject[target].x = -1;
-    newPieceObject[target].y = -1;
-    newPieceObject[target].dead = true;
+  //   newPieceObject[selectedpc].x = newPieceObject[target].x;
+  //   newPieceObject[selectedpc].y = newPieceObject[target].y;
+  //   newPieceObject[target].x = -1;
+  //   newPieceObject[target].y = -1;
+  //   newPieceObject[target].dead = true;
 
-    this.updateGame(newPieceObject, selectedpc, target);
-  }
+  //   this.updateGame(newPieceObject, selectedpc, target);
+  // }
 
   //updated cellMap builder
   buildCellLedger = (piecesObject) => {
