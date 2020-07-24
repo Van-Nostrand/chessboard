@@ -85,13 +85,14 @@ export default class PawnClass{
             }
           }
           else if (fifthRank === y ){
+            debugger;
             // if enemy pawn in cell "behind" empty cell
             let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`;
             if(cellMap[EPTest] && cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
             
               // if piece just moved two spaces
               let EPEnemy = piecesObject[cellMap[EPTest]];
-              if(EPEnemy === enPassantPiece){ 
+              if(EPEnemy.name === enPassantPiece){ 
     
                 // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
                 pathsObject[cellString] = "e";

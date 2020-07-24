@@ -63,7 +63,7 @@ class ChessGame extends Component{
     //I will eventually merge it and the piecesObject into gameLedger below
     let cellMap = this.buildCellLedger(newPiecesObject);
 
-    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap, this.state.enPassantPiece);
+    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
     //unimplemented test
 
@@ -192,7 +192,7 @@ class ChessGame extends Component{
       }
       //else the move is safe and can continue
       else{
-        this.turnMaintenance(arg, proposedNewPieces, proposedNewCellMap);
+        this.turnMaintenance(proposedNewPieces, proposedNewCellMap, arg);
       }
     }
     //not implemented yet
@@ -213,7 +213,7 @@ class ChessGame extends Component{
       }
       else {
         console.log(`${teamKing} is not in check`);
-        this.updateGame(proposedNewPieces, proposedNewCellMap, this.state.selectedPiece, arg);
+        // this.updateGame(proposedNewPieces, proposedNewCellMap, this.state.selectedPiece, arg);
       }
 
     }
@@ -251,8 +251,10 @@ class ChessGame extends Component{
   updateGame = (newPiecesObject, newCellMap, ...args) => {
 
     //update piece views
-    newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, this.state.enPassantPiece);
+    console.log(args);
+    newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, args[2] ? args[2] : "");
     console.log("vision update done");
+    console.log(newPiecesObject);
     //determine if this is a piecemove or piecekill based on whether the second args variable is an array
     let messageBoard = Array.isArray(args[1]) ? `piece ${args[0]} moved to ${args[1][0]},${args[1][1]}` : `${args[0]} has successfully attacked ${args[1]}`;
 
@@ -266,7 +268,7 @@ class ChessGame extends Component{
     });
   }
 
-  turnMaintenance = (cell, newPieceObject, newCellMap) => {
+  turnMaintenance = (newPieceObject, newCellMap, cell) => {
     let enPassantPiece = "";
     // debugger;
     //if the piece has a firstMove prop, flip it
