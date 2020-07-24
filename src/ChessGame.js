@@ -63,11 +63,9 @@ class ChessGame extends Component{
     //I will eventually merge it and the piecesObject into gameLedger below
     let cellMap = this.buildCellLedger(newPiecesObject);
 
-    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
+    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap, this.state.enPassantPiece);
 
     //unimplemented test
-    // let gameLedger = {...newPiecesObject, findByCell: cellMap};
-    // console.log(newPiecesObject);
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -77,6 +75,7 @@ class ChessGame extends Component{
       tileArr,
       turn: true,
       selectedPiece: "",
+      enPassantPiece: "",
       cellMap,
       messageBoard: "no piece selected",
       whiteKingWasInCheck: false, //unused so far
@@ -95,15 +94,18 @@ class ChessGame extends Component{
       
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
       let cell = [Math.floor((e.clientX - rect.left) / TILESIZE),Math.floor((e.clientY - rect.top) / TILESIZE)];
+      let cellString = `${cell[0]},${cell[1]}`;
       
-      let legal = this.state.piecesObject[this.state.selectedPiece].view[`${cell[0]},${cell[1]}`] && this.state.piecesObject[this.state.selectedPiece].view[`${cell[0]},${cell[1]}`] === "m";
+      let legal = this.state.piecesObject[this.state.selectedPiece].view[cellString] && this.state.piecesObject[this.state.selectedPiece].view[cellString] === "m";
 
       if(legal){
         this.ownKingNotInCheck("m", cell);
-      } else if(!legal){
+      } 
+      else if(!legal){
         console.log("ILLEGAL!");
         this.setState({selectedPiece: "", messageBoard: "Not legal"});
-      } else {
+      } 
+      else {
         console.log("move is neither legal nor illegal. debug now!");
       }
     } 
@@ -164,41 +166,44 @@ class ChessGame extends Component{
   }
 
   ownKingNotInCheck = (action, arg) => {
-
+    // debugger;
     //testing better state management
     let proposedNewPieces = this.properCopyState(this.state.piecesObject);
     let teamKing = this.state.turn ? "wK" : "bK";
     
     //IF THIS IS A MOVE
     if(action === "m"){
+
+      let [ cellX, cellY ] = arg;
       
       //in this case, arg is an array describing a cell, so assign arg to x y values
-      proposedNewPieces[this.state.selectedPiece].x = arg[0];
-      proposedNewPieces[this.state.selectedPiece].y = arg[1];
+      proposedNewPieces[this.state.selectedPiece].x = cellX;
+      proposedNewPieces[this.state.selectedPiece].y = cellY;
       let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
 
       proposedNewPieces[teamKing].checkView = KingClass.amIChecked(proposedNewCellMap, proposedNewPieces, teamKing);
 
       //if this teams king has a checkView property with ANY key/value pairs, the king is in check and the move cannot continue
       if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
-        console.log(`this move puts ${teamKing} in check`);
+        console.log(`${teamKing} is in check`);
         this.setState(prevState => {
-          return {...prevState, selectedPiece: "", messageBoard: "this puts your king in check, try again"};
+          return {...prevState, selectedPiece: "", messageBoard: `${teamKing} is in check`};
         });
       }
       //else the move is safe and can continue
       else{
-        console.log(`${teamKing} is not in check`);
         this.turnMaintenance(arg, proposedNewPieces, proposedNewCellMap);
       }
     }
     //not implemented yet
     else if(action === "a"){
 
+      let targetPiece = arg;
+
       // in this case, arg is a string representing the NAME of the target
-      proposedNewPieces[arg].dead = true;
-      proposedNewPieces[this.state.selectedPiece].x = proposedNewPieces[arg].x;
-      proposedNewPieces[this.state.selectedPiece].y = proposedNewPieces[arg].y;
+      proposedNewPieces[targetPiece].dead = true;
+      proposedNewPieces[this.state.selectedPiece].x = proposedNewPieces[targetPiece].x;
+      proposedNewPieces[this.state.selectedPiece].y = proposedNewPieces[targetPiece].y;
 
       let proposedNewCellMap = this.buildCellLedger(proposedNewPieces);
       proposedNewPieces[teamKing].checkView = KingClass.amIChecked(proposedNewCellMap, proposedNewPieces, teamKing);
@@ -215,7 +220,7 @@ class ChessGame extends Component{
   }
 
   //this calls a function on each piece that updates their own view property
-  updatePieceVision = (piecesObject, cellMap) => {
+  updatePieceVision = (piecesObject, cellMap, enPassantPiece) => {
     
     let pieceNames = Object.keys(piecesObject);
 
@@ -232,7 +237,7 @@ class ChessGame extends Component{
             break;
           case /^(w|b)R/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, pieceNames[i]);
             break;
-          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i]);
+          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i], enPassantPiece);
             break;
           default: console.log("something went wrong in updatepiecevision");
         }
@@ -246,12 +251,10 @@ class ChessGame extends Component{
   updateGame = (newPiecesObject, newCellMap, ...args) => {
 
     //update piece views
-    this.updatePieceVision(newPiecesObject, newCellMap);
-
+    newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, this.state.enPassantPiece);
+    console.log("vision update done");
     //determine if this is a piecemove or piecekill based on whether the second args variable is an array
     let messageBoard = Array.isArray(args[1]) ? `piece ${args[0]} moved to ${args[1][0]},${args[1][1]}` : `${args[0]} has successfully attacked ${args[1]}`;
-
-
 
     this.setState({
       piecesObject: newPiecesObject,
@@ -265,19 +268,18 @@ class ChessGame extends Component{
 
   turnMaintenance = (cell, newPieceObject, newCellMap) => {
     let enPassantPiece = "";
-
-    //if this is the pieces first move
+    // debugger;
+    //if the piece has a firstMove prop, flip it
     if(newPieceObject[this.state.selectedPiece].firstMove){
       newPieceObject[this.state.selectedPiece].firstMove = false;
-
       //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if(/^(w|b)P/.test(this.state.selectedPiece) && ((cell[1] - this.state.piecesObject[selectedPiece].y) === 2)||((cell[1] - this.state.piecesObject[selectedPiece].y) === -2)){
+      if(/^(w|b)P/.test(this.state.selectedPiece) && ((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === 2)||((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === -2)){
         enPassantPiece = this.state.selectedPiece;
       }
     }
     
-
-    this.updateGame(newPieceObject, newCellMap, selectedpc, cell, enPassantPiece);
+  
+    this.updateGame(newPieceObject, newCellMap, this.state.selectedPiece, cell, enPassantPiece);
   }
 
   buildCellLedger = (piecesObject) => {

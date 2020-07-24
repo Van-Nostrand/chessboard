@@ -6,31 +6,29 @@ fifthRank - an integer which represents the pawns 5th rank. Used to track en pas
 */
 export default class PawnClass{
   
-  static attacklogic = (x,y, direction) => (x === 1 || x === -1) && (y === 1 * this.direction);
+  static attacklogic = (x,y, direction) => (x === 1 || x === -1) && (y === 1 * direction);
 
-  static movelogic = (x, y, direction, firstMove, justHadFirstMove) => {
+  
+  static movelogic = (x, y, direction, firstMove) => {
+
     let success = false;
-    let enPassant;
-    if(firstMove) {
-      success = x === 0 && (y === 1 * direction || y === 2 * direction);
-    } else if(!firstMove) {
-      success = x === 0 && y === 1 * direction ;
+    if(direction > 0){
+      if(firstMove) {
+        success = x === 0 && (y === 1 || y === 2);
+      } 
+      else if(!firstMove) {
+        success = x === 0 && y === 1;
+      }
     }
-    //if the move is ok and it's a double move, flag for enpassant and "just had first move"
-    if(success && (y === 2 || y === -2)){
-      enPassant = true;
-      justHadFirstMove = true;
-      return [success, enPassant, justHadFirstMove];
+    else if(direction < 0){
+      if(firstMove) {
+        success = x === 0 && (y === -1 || y === -2);
+      } 
+      else if(!firstMove) {
+        success = x === 0 && y === -1;
+      }
     }
-    //if the move is ok and the "just had first move" flag is set, it needs to be cleared
-    else if (success && justHadFirstMove){
-      justHadFirstMove = false;
-      enPassant = false;
-      return [success, enPassant, justHadFirstMove];
-    }
-    else{
-      return [success, enPassant, justHadFirstMove];
-    }
+    return success;
   };
 
   //not needed?
@@ -41,8 +39,9 @@ export default class PawnClass{
         targetcell[1] === victim[1] - 1));
   };
 
-  static vision = (cellMap, piecesObject, name) => {
-    let {x, y, fifthRank, paths} = piecesObject[name];
+  static vision = (cellMap, piecesObject, name, enPassantPiece) => {
+    let {x, y, fifthRank, paths, firstMove} = piecesObject[name];
+    let BOARDSIZE = 8;
    
     // create an empty object that will store potential moves
     let pathsObject = {};
@@ -51,45 +50,76 @@ export default class PawnClass{
     // for each path
     paths.forEach((path, i) => {
 
-      // refer to coordinates in game ledger to determine if cell(s) are occupied
-      let cellString = `${path[0] + x},${path[1] + y}`;
-      if(cellMap[cellString]){
-        let testedCell = cellMap[cellString];
+      let checkX = path[0] + x;
+      let checkY = path[1] + y;
 
-        // if enemy in cell
-        if(testedCell.charAt(0) !== name.charAt(0)){
+      // if the cell is within the board
+      if(checkX >= 0 && checkX < BOARDSIZE && checkY >= 0 && checkY < BOARDSIZE){
 
-          // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
-          if(PawnClass.attacklogic(path[0],path[1])){
-            pathsObject[cellString] = "a";
+        let cellString = `${path[0] + x},${path[1] + y}`;
+
+        //cell contains a piece
+        if(cellMap[cellString]){
+          let testedCell = cellMap[cellString];
+  
+          // piece is an enemy
+          if(testedCell.charAt(0) !== name.charAt(0)){
+  
+            // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
+            if(PawnClass.attacklogic(path[0],path[1])){
+              pathsObject[cellString] = "a";
+              
+            }
+          }
+        }
+        // cell is empty
+        else {
+          //cell in move path
+          if (checkX === x){
+            if(firstMove){
+              pathsObject[cellString] = "m";
+
+            }
+            else if(!firstMove && Math.abs(path[1]) === 1){
+              pathsObject[cellString] = "m";
+            }
+          }
+          else if (fifthRank === y ){
+            // if enemy pawn in cell "behind" empty cell
+            let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`;
+            if(cellMap[EPTest] && cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
             
+              // if piece just moved two spaces
+              let EPEnemy = piecesObject[cellMap[EPTest]];
+              if(EPEnemy === enPassantPiece){ 
+    
+                // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
+                pathsObject[cellString] = "e";
+                return;
+              }
+            }
           }
         }
-      }
-
-      // cell is empty and in move path
-      else if (!cellMap[cellString] && PawnClass.movelogic(path[0],path[1])){
-        pathsObject[cellString] = "m";
-      }
-      
-      // cell is empty and in attack path and piece on 5th rank 
-      // EN PASSANT
-      else if (!cellMap[cellString] && PawnClass.attacklogic(path[0],path[1]) && fifthRank === y){
         
-        // if enemy pawn in cell "behind" empty cell
-        let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`;
-        if(cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
+        // cell is empty and in attack path and piece on 5th rank 
+        // EN PASSANT
+        // else if (fifthRank === y && !cellMap[cellString] && PawnClass.attacklogic(path[0],path[1])){
           
-          // if piece just moved two spaces
-          let EPEnemy = piecesObject[cellMap[EPTest]];
-          if(EPEnemy.enPassant){
-
-            // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
-            pathsObject[cellString] = "e";
-            return;
-          }
-        }
+          // if enemy pawn in cell "behind" empty cell
+          // let EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`;
+          // if(cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === "P"){
+            
+          //   // if piece just moved two spaces
+          //   let EPEnemy = piecesObject[cellMap[EPTest]];
+          //   if(EPEnemy === this.state.enPassantPiece){ 
+  
+          //     // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
+          //     pathsObject[cellString] = "e";
+          //     return;
+          //   }
+          // }
       }
+
     });
     return pathsObject;
 
