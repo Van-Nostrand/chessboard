@@ -36,7 +36,7 @@ class ChessGame extends Component{
       });
     });
 
-    //declare pieces
+    //declare pieces, give them their paths
     let newPiecesObject = PIECE_OBJECTS;
     Object.keys(newPiecesObject).forEach((piece, i) => {
 
@@ -60,12 +60,10 @@ class ChessGame extends Component{
     });
     
     //cellMap is used for piece name lookup by cell
-    //I will eventually merge it and the piecesObject into gameLedger below
     let cellMap = this.buildCellLedger(newPiecesObject);
 
+    //build the view properties of each piece
     newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
-
-    //unimplemented test
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -81,6 +79,62 @@ class ChessGame extends Component{
       whiteKingWasInCheck: false, //unused so far
       blackKingWasInCheck: false  //unused so far
     }
+  }
+
+  buildCellLedger = (piecesObject) => {
+    let cellMap = {};
+    let piecenames = Object.keys(piecesObject);
+    piecenames.forEach((piece, i) => {
+      if(!piecesObject[piece].dead){
+
+        let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
+        cellMap[coordinates] = piece;
+      }
+    }) ;
+    return cellMap;
+  }
+
+  properCopyState = (oldstate) => {
+    let newState = {};
+    let oldstateKeys = Object.keys(oldstate);
+    oldstateKeys.forEach(key => {
+      let secondLevelKeys = Object.keys(oldstate[key]);
+      let subState = {};
+      secondLevelKeys.forEach(property => {
+        subState[property] = oldstate[key][property];
+      });
+      newState[key] = subState;
+    });
+
+    return newState;
+  }
+
+  //this calls a function on each piece that updates their own view property
+  updatePieceVision = (piecesObject, cellMap, enPassantPiece) => {
+    
+    let pieceNames = Object.keys(piecesObject);
+
+    for(let i = 0; i < pieceNames.length; i++){
+      if(!piecesObject[pieceNames[i]].dead){
+        switch(true){
+          case /^(w|b)Q/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          case /^(w|b)K/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          case /^(w|b)B/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          case /^(w|b)N/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          case /^(w|b)R/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, pieceNames[i]);
+            break;
+          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i], enPassantPiece);
+            break;
+          default: console.log("something went wrong in updatepiecevision");
+        }
+      }
+    }
+
+    return piecesObject;
   }
 
   tileClick = (e) => {
@@ -150,19 +204,15 @@ class ChessGame extends Component{
     }
   }
 
-  properCopyState = (oldstate) => {
-    let newState = {};
-    let oldstateKeys = Object.keys(oldstate);
-    oldstateKeys.forEach(key => {
-      let secondLevelKeys = Object.keys(oldstate[key]);
-      let subState = {};
-      secondLevelKeys.forEach(property => {
-        subState[property] = oldstate[key][property];
-      });
-      newState[key] = subState;
-    });
-
-    return newState;
+  //this will be hard coded in so that I don't go insane thinking about it
+  castlingCheck = (kingPiece, rookPiece) => {
+    //king is rank E (x = 4)
+    //rook is rank A or H (x = 0 or 7)
+    //if the king has never moved and the rook has never moved
+      //check the tiles between rook and king for other pieces
+        //run a checkmate test on those tiles
+          //proceed
+    
   }
 
   ownKingNotInCheck = (action, arg) => {
@@ -186,9 +236,7 @@ class ChessGame extends Component{
       //if this teams king has a checkView property with ANY key/value pairs, the king is in check and the move cannot continue
       if(Object.keys(proposedNewPieces[teamKing].checkView).length > 0){
         console.log(`${teamKing} is in check`);
-        this.setState(prevState => {
-          return {...prevState, selectedPiece: "", messageBoard: `${teamKing} is in check`};
-        });
+        this.setState({selectedPiece: "", messageBoard: `${teamKing} is in check`});
       }
       //else the move is safe and can continue
       else{
@@ -219,32 +267,18 @@ class ChessGame extends Component{
     }
   }
 
-  //this calls a function on each piece that updates their own view property
-  updatePieceVision = (piecesObject, cellMap, enPassantPiece) => {
-    
-    let pieceNames = Object.keys(piecesObject);
-
-    for(let i = 0; i < pieceNames.length; i++){
-      if(!piecesObject[pieceNames[i]].dead){
-        switch(true){
-          case /^(w|b)Q/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)K/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)B/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)N/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)R/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i], enPassantPiece);
-            break;
-          default: console.log("something went wrong in updatepiecevision");
-        }
+  turnMaintenance = (newPieceObject, newCellMap, cell) => {
+    let enPassantPiece = "";
+    // debugger;
+    //if the piece has a firstMove prop, flip it
+    if(newPieceObject[this.state.selectedPiece].firstMove){
+      newPieceObject[this.state.selectedPiece].firstMove = false;
+      //if it's a pawn and it just had a double move, flag for enpassant attacks
+      if(/^(w|b)P/.test(this.state.selectedPiece) && ((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === 2)||((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === -2)){
+        enPassantPiece = this.state.selectedPiece;
       }
     }
-
-    return piecesObject;
+    this.updateGame(newPieceObject, newCellMap, this.state.selectedPiece, cell, enPassantPiece);
   }
 
   //handles updating the cell ledger, all piece views, the message board, 
@@ -266,35 +300,6 @@ class ChessGame extends Component{
       messageBoard,
       enPassantPiece: args[2] ? args[2] : ""
     });
-  }
-
-  turnMaintenance = (newPieceObject, newCellMap, cell) => {
-    let enPassantPiece = "";
-    // debugger;
-    //if the piece has a firstMove prop, flip it
-    if(newPieceObject[this.state.selectedPiece].firstMove){
-      newPieceObject[this.state.selectedPiece].firstMove = false;
-      //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if(/^(w|b)P/.test(this.state.selectedPiece) && ((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === 2)||((cell[1] - this.state.piecesObject[this.state.selectedPiece].y) === -2)){
-        enPassantPiece = this.state.selectedPiece;
-      }
-    }
-    
-  
-    this.updateGame(newPieceObject, newCellMap, this.state.selectedPiece, cell, enPassantPiece);
-  }
-
-  buildCellLedger = (piecesObject) => {
-    let cellMap = {};
-    let piecenames = Object.keys(piecesObject);
-    piecenames.forEach((piece, i) => {
-      if(!piecesObject[piece].dead){
-
-        let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
-        cellMap[coordinates] = piece;
-      }
-    }) ;
-    return cellMap;
   }
   
   render(){

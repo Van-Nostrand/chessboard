@@ -12,8 +12,10 @@ export default class KingClass{
       return true;
   };
 
+  //add in an option for castleing
+  //spaces will be labelled "c" if castling possible
   static vision = (cellMap, piecesObject, name) => {
-    let {x, y, paths} = piecesObject[name];
+    let {x, y, paths, firstMove} = piecesObject[name];
     
     let pathsObject = {};
     const BOARDSIZE = 8;
@@ -38,7 +40,40 @@ export default class KingClass{
       }
     });
 
-    // this.newview = pathsObject;
+    //CASTLING
+    if(firstMove){
+      //are 1-3,y empty?
+      if(!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]){
+        // checkmate check at 2,y and 3,y 
+        let longCheckPieces2y = {...piecesObject, [name]: {...piecesObject[name], x: 2, y}};
+        let longPieces2y = this.amIChecked(cellMap, longCheckPieces2y, name);
+        if(Object.keys(longPieces2y).length === 0){
+          pathsObject[`2,${y}`] = "c";
+        }
+
+        let longCheckPieces3y = {...piecesObject, [name]: {...piecesObject[name], x: 3, y}};
+        let longPieces3y = this.amIChecked(cellMap, longCheckPieces3y, name);
+        if(Object.keys(longPieces3y).length === 0){
+          pathsObject[`3,${y}`] = "c";
+        }
+      }
+      //are 5 and 6y empty?
+      if(!cellMap[`6,${y}`] && !cellMap[`5,${y}`]){
+        // checkmate check at 5,y and 6,y 
+        let shortCheckPieces5y = {...piecesObject, [name]: {...piecesObject[name], x: 5, y}};
+        let shortPieces5y = this.amIChecked(cellMap, shortCheckPieces5y, name);
+        if(Object.keys(shortPieces5y).length === 0){
+          pathsObject[`5,${y}`] = "c";
+        }
+
+        let shortCheckPieces6y = {...piecesObject, [name]: {...piecesObject[name], x: 6, y}};
+        let shortPieces6y = this.amIChecked(cellMap, shortCheckPieces6y, name);
+        if(Object.keys(shortPieces6y).length === 0){
+          pathsObject[`6,${y}`] = "c";
+        }
+      }
+    }
+
     return pathsObject;
   }
 
