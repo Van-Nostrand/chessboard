@@ -1,6 +1,8 @@
 /*
 ==== KINGS ====
 amIChecked() - this looks for attackers and reports them back
+
+TODO - make amIChecked a function that returns bool instead of a list of cells. not important now to know every cell that can attack, just need to know if one can
 */
 export default class KingClass{
   
@@ -19,6 +21,7 @@ export default class KingClass{
     
     let pathsObject = {};
     const BOARDSIZE = 8;
+    const TEAMCOLOUR = /^w/.test(name) ? "w" : "b";
 
     paths.forEach((path, i) => {
       let testX = x + path[0];
@@ -39,41 +42,37 @@ export default class KingClass{
         pathsObject[cellCheck] = "b";
       }
     });
-
-    //CASTLING
+    let rook1 = new RegExp("^" + TEAMCOLOUR + "R1");
+    let rook2 = new RegExp("^" + TEAMCOLOUR + "R2");
+    //CASTLING VIEW
+    //has king taken first move?
     if(firstMove){
-      //are 1-3,y empty?
-      if(!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]){
-        // checkmate check at 2,y and 3,y 
-        let longCheckPieces2y = {...piecesObject, [name]: {...piecesObject[name], x: 2, y}};
-        let longPieces2y = this.amIChecked(cellMap, longCheckPieces2y, name);
-        if(Object.keys(longPieces2y).length === 0){
-          pathsObject[`2,${y}`] = "c";
-        }
-
-        let longCheckPieces3y = {...piecesObject, [name]: {...piecesObject[name], x: 3, y}};
-        let longPieces3y = this.amIChecked(cellMap, longCheckPieces3y, name);
-        if(Object.keys(longPieces3y).length === 0){
-          pathsObject[`3,${y}`] = "c";
+      //is R1 at 0,y and has it moved yet?
+      if(cellMap[`0,${y}`] && rook1.test(cellMap[`0,${y}`]) && piecesObject[cellMap[`0,${y}`]].firstMove){
+        //are [1,y] [2,y] and [3,y] empty?
+        if(!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]){
+          // checkmate check at [2,y] and [3,y]
+          let longPieces2y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 2, y}}, name);
+          let longPieces3y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x:3, y}}, name);
+          if(Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0){
+            pathsObject[`2,${y}`] = "c";
+          }
         }
       }
-      //are 5 and 6y empty?
-      if(!cellMap[`6,${y}`] && !cellMap[`5,${y}`]){
-        // checkmate check at 5,y and 6,y 
-        let shortCheckPieces5y = {...piecesObject, [name]: {...piecesObject[name], x: 5, y}};
-        let shortPieces5y = this.amIChecked(cellMap, shortCheckPieces5y, name);
-        if(Object.keys(shortPieces5y).length === 0){
-          pathsObject[`5,${y}`] = "c";
-        }
-
-        let shortCheckPieces6y = {...piecesObject, [name]: {...piecesObject[name], x: 6, y}};
-        let shortPieces6y = this.amIChecked(cellMap, shortCheckPieces6y, name);
-        if(Object.keys(shortPieces6y).length === 0){
-          pathsObject[`6,${y}`] = "c";
+      //is R2 at 7,y and has it moved yet?
+      if(cellMap[`7,${y}`] && rook2.test(cellMap[`7,${y}`]) && piecesObject[cellMap[`7,${y}`]].firstMove){
+        //are [5,y] and [6,y] empty?
+        if(!cellMap[`6,${y}`] && !cellMap[`5,${y}`]){
+  
+          // checkmate check at [5,y] and [6,y]
+          let shortPieces5y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 5, y}}, name);
+          let shortPieces6y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 6, y}}, name);
+          if(Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0){
+            pathsObject[`6,${y}`] = "c";
+          }
         }
       }
     }
-
     return pathsObject;
   }
 
