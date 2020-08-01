@@ -1,11 +1,11 @@
 # Chess!
 This is a project that has haunted me since College. I originally tried to do it in Java but screwed it up at the time. After, I was too busy to get around to finishing it. I've thought about it many times over the years so I figured I'd try to finish it for fun.
 
-### Where it's at (July 28 2020)
-I've implemented pawn promotion, so now the game mostly works. While implementing I discovered bugs: pawns don't see kings as valid attack targets, and king inCheck methods don't correctly report on tiles which SHOULD be attacked by pawns.
+### Where it's at (August 1 2020)
+I'm building a "pawn promotion menu". It's not finished so the app currently doesn't work properly
 
 ### Todo: for now
-* fix the pawn-king attack relationship
+* add functionality that allows user to choose which piece pawns are promoted to
 * optimize code: it's a disorganized mess
 * change how dead pieces are displayed
 

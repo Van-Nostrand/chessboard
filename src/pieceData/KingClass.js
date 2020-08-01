@@ -14,6 +14,10 @@ export default class KingClass{
       return true;
   };
 
+  static getPaths = () => {
+    return [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]];
+  }
+
   //add in an option for castleing
   //spaces will be labelled "c" if castling possible
   static vision = (cellMap, piecesObject, name) => {

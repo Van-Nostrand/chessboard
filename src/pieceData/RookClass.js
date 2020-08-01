@@ -9,6 +9,11 @@ export default class RookClass{
   static castlelogic = (king, rook) => {
     return true;
   };
+
+  static getPaths = () => {
+    return [[0,-1],[1,0],[0,1],[-1,0]];
+  }
+
   static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
 

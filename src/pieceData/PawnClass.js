@@ -6,9 +6,10 @@ fifthRank - an integer which represents the pawns 5th rank. Used to track en pas
 */
 export default class PawnClass{
   
+  //necessary?
   static attacklogic = (x,y, direction) => (x === 1 || x === -1) && (y === 1 * direction);
 
-  
+  //necessary?
   static movelogic = (x, y, direction, firstMove) => {
 
     let success = false;
@@ -31,13 +32,18 @@ export default class PawnClass{
     return success;
   };
 
-  //not needed?
+  //necessary?
   static enpassantlogic = (x,y,targetcell,victim) => {
     return (
       targetcell[0] === victim[0] && 
       (targetcell[1] === victim[1] + 1 || 
         targetcell[1] === victim[1] - 1));
   };
+
+  static getPaths = (team) => {
+    if(team === "w") return [[0,-1],[0,-2],[-1,-1], [1,-1]];
+    else if (team === "b") return [[0,1],[0,2],[-1,1], [1,1]];
+  }
 
   static vision = (cellMap, piecesObject, name, enPassantPiece) => {
     let {x, y, fifthRank, paths, firstMove} = piecesObject[name];

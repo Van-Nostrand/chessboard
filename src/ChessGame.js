@@ -3,6 +3,7 @@
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
+import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
@@ -11,7 +12,8 @@ import {
   DARK_TILE,
   PIECE_OBJECTS,
   PIECEPATHS,
-  PIECE_PROTOTYPES
+  PIECE_PROTOTYPES,
+  PP_TEST
 } from "./CONSTANTS";
 
 import KingClass from "./pieceData/KingClass";
@@ -37,8 +39,26 @@ class ChessGame extends Component{
       turn: true,
       selectedPiece: "",
       enPassantPiece: "",
-      messageBoard: "no piece selected"
+      messageBoard: "no piece selected",
+      pawnPromotionFlag: false
     }
+  }
+
+  promotePawn = () => {
+    // newPieceType = "R";
+    // newPieceTeam = selectedPiece.charAt(0);
+    // newPieceNumber = 3;
+
+    // newPiece = this.createPiece(
+    //                 newPieceType,
+    //                 newPieceTeam,
+    //                 newPieceNumber,
+    //                 newPiecesObject[selectedPiece].x,
+    //                 newPiecesObject[selectedPiece].y
+    //               );
+    
+    // newPiecesObject[`${newPieceTeam}${newPieceType}${newPieceNumber}`] = newPiece;
+    // delete newPiecesObject[selectedPiece];
   }
 
   createPiece = (type, team, unitNumber, x, y) => {
@@ -56,6 +76,7 @@ class ChessGame extends Component{
     // consider this code for deleting old properties? I don't fully understand it yet.
     // const newObject = {};
     // delete Object.assign(newObject, o, {[newKey]: o[oldKey] })[oldKey];
+    // I don't think this is necessary... 
 
     return newPiece;
   }
@@ -230,7 +251,7 @@ class ChessGame extends Component{
     let isKingInCheck = this.ownKingNotInCheckBool(newPiecesObject, newCellMap, `${selectedPiece.charAt(0)}K`);
     if(!isKingInCheck){
       let message = `${selectedPiece} has successfully attacked ${targetPieceName}`;
-      this.turnMaintenance(newPiecesObject, newCellMap, targetCell, message, selectedPiece);
+      this.turnMaintenance(newPiecesObject, newCellMap, targetCell, message, selectedPiece, false);
     }
 
     else{
@@ -250,21 +271,9 @@ class ChessGame extends Component{
     let newPieceTeam, newPieceType, newPieceNumber, newPiece;
     if((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)){
       //pawn promotion here
-      pawnPromotionFlag = true;
-      newPieceType = "R";
-      newPieceTeam = selectedPiece.charAt(0);
-      newPieceNumber = 3;
 
-      newPiece = this.createPiece(
-                      newPieceType,
-                      newPieceTeam,
-                      newPieceNumber,
-                      newPiecesObject[selectedPiece].x,
-                      newPiecesObject[selectedPiece].y
-                    );
+      pawnPromotionFlag = true;
       
-      newPiecesObject[`${newPieceTeam}${newPieceType}${newPieceNumber}`] = newPiece;
-      delete newPiecesObject[selectedPiece];
     }
 
     let newCellMap = this.buildCellMap(newPiecesObject);
@@ -282,7 +291,7 @@ class ChessGame extends Component{
         message = `${selectedPiece} has successfully moved to ${cell[0]},${cell[1]}`;
       }
       console.log("calling turn maintenance");
-      this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece);
+      this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece, pawnPromotionFlag);
     }
 
     else{
@@ -318,7 +327,7 @@ class ChessGame extends Component{
     let newCellMap = this.buildCellMap(newPiecesObject);
     let message = `${selectedPiece} has castled with ${rookName}`;
 
-    this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece);
+    this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece, false);
   }
 
 
@@ -332,11 +341,12 @@ class ChessGame extends Component{
     newPiecesObject[enPassantPiece].dead = true;
     let newCellMap = this.buildCellMap(newPiecesObject);
 
-    this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece);
+    this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece, false);
 
   }
 
   ownKingNotInCheckBool = (piecesObject, cellMap, kingName) => {
+
     const BOARDSIZE = 8;
     const enemyChar = kingName.charAt(0) === "w" ? "b" : "w";
     
@@ -404,7 +414,7 @@ class ChessGame extends Component{
 
     if(!inCheckFlag){
       pawnPaths.forEach(path => {
-        let cellTest = `${kingX + path[0]},${kingY + path[1]}`;
+        let cellTest = `${kingX - path[0]},${kingY - path[1]}`;
   
         if(cellMap[cellTest] && pawnReg.test(cellMap[cellTest])){
           inCheckFlag = true;
@@ -430,7 +440,9 @@ class ChessGame extends Component{
 
 
   //might not be necessary for this to exist
-  turnMaintenance = (newPiecesObject, newCellMap, cell, message, selectedPiece) => {
+  turnMaintenance = (newPiecesObject, newCellMap, cell, message, selectedPiece, pawnPromotionFlag) => {
+    console.log(selectedPiece);
+    console.log(newPiecesObject);
 
     let enPassantPiece = "";
     //if the piece has a firstMove prop, flip it
@@ -442,22 +454,28 @@ class ChessGame extends Component{
       }
     }
 
+    if(!pawnPromotionFlag){
+      selectedPiece = "";
+    }
+
     //update piece views
     newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, enPassantPiece);
     
-    this.customSetState(newPiecesObject, newCellMap, "", message, enPassantPiece);
+    this.customSetState(newPiecesObject, newCellMap, selectedPiece, message, enPassantPiece, pawnPromotionFlag);
   }
 
 
   //separated this preemptively, might not be necessary
-  customSetState = (piecesObject, cellMap, selectedPiece, messageBoard, enPassantPiece) => {
+  customSetState = (piecesObject, cellMap, selectedPiece, messageBoard, enPassantPiece, pawnPromotionFlag) => {
+    let turn = pawnPromotionFlag ? this.state.turn : !this.state.turn;
     this.setState({
       piecesObject,
       cellMap,
-      turn: !this.state.turn,
+      turn,
       selectedPiece,
       messageBoard,
-      enPassantPiece
+      enPassantPiece,
+      pawnPromotionFlag
     });
   }
 
@@ -469,6 +487,8 @@ class ChessGame extends Component{
 
     //GENERATE PIECES
     let pieceObjects = this.makePieces();
+
+    let theMenu = this.state.pawnPromotionFlag ? <PromotionMenu selectPiece={this.promotePawn} /> : <div>NO MENU</div>;
 
     //STYLES
     let tileContainerStyle = {
@@ -512,6 +532,7 @@ class ChessGame extends Component{
 
     return(
       <div style={outerStyle}>
+        {theMenu}
         <h2 style={h2Style}>{this.state.turn ? "White turn" : "Black turn"}</h2>
         <div id="tile-container" style={tileContainerStyle}>
           {boardTiles}
@@ -568,7 +589,8 @@ class ChessGame extends Component{
     });
 
     //declare pieces, give them their paths
-    let newPiecesObject = PIECE_OBJECTS;
+    // let newPiecesObject = PIECE_OBJECTS;
+    let newPiecesObject = PP_TEST;
     Object.keys(newPiecesObject).forEach((piece, i) => {
 
       switch(true){

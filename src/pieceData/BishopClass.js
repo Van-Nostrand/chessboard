@@ -2,6 +2,10 @@ export default class BishopClass{
 
   static movelogic = (x,y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1);
 
+  static getPaths = () => {
+    return [[1,-1],[1,1],[-1,1],[-1,-1]];
+  }
+
   static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
     

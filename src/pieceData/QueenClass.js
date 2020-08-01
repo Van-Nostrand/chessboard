@@ -8,6 +8,10 @@ export default class QueenClass{
     else return result;
   };
 
+  static getPaths = () => {
+    return [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]];
+  }
+
   static vision = (cellMap, piecesObject, name) => {
     let {x, y, paths} = piecesObject[name];
     let pathsObject = {};
