@@ -19,13 +19,14 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
+          MiniCssExtractPlugin.loader,
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: 'css-loader',
             options: {
-
+              importLoaders: 1,
+              // minimize: PROD ? true : false
             }
-          },
-          "css-loader!style-loader"
+          }
         ]
       },
       {

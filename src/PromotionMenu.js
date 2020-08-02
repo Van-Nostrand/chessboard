@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 
+
 export const  PromotionMenu = (props) => {
   const [pieceSelection, setPieceSelection] = useState("");
 
@@ -10,10 +11,7 @@ export const  PromotionMenu = (props) => {
   },[pieceSelection]);
 
   return (
-    <div style={{
-      zIndex: 4,
-      
-    }}>
+    <div id="promotion-menu">
       <p>Choose a piece type</p>
       <div className="promotion-choice" onClick={() => setPieceSelection("Q")}>Queen</div>
       <div className="promotion-choice" onClick={() => setPieceSelection("N")}>Knight</div>

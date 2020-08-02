@@ -70,9 +70,9 @@ export default class PawnClass{
   
           // piece is an enemy
           if(testedCell.charAt(0) !== name.charAt(0)){
-  
+            debugger;
             // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
-            if(PawnClass.attacklogic(path[0],path[1])){
+            if(PawnClass.attacklogic(path[0],path[1],direction)){
               pathsObject[cellString] = "a";
               
             }

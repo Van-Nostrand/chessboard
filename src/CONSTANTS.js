@@ -49,6 +49,19 @@ export const PP_TEST = {
   "bK": {checkView: {}, pngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "bK", view: {}, x: 6, y: 0},
   "wK": {checkView: {}, firstMove: true, pngPos: "-4px -3px", dead: false, paths: [], name: "wK", view: {}, x: 2, y: 7},
 };
+export const EN_PASSANT_TEST = {
+  "wP1": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP1", view: {}, x: 0, y: 6},
+  "wP2": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP2", view: {}, x: 1, y: 6},
+  "wP3": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP3", view: {}, x: 2, y: 6},
+  "wP4": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP4", view: {}, x: 3, y: 6},
+  "wP7": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP7", view: {}, x: 6, y: 6},
+  "bP5": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP5", view: {}, x: 4, y: 1},
+  "bP6": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP6", view: {}, x: 5, y: 1},
+  "bP7": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP7", view: {}, x: 6, y: 1},
+  "bP8": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP8", view: {}, x: 7, y: 1},
+  "bK": {checkView: {}, pngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "bK", view: {}, x: 7, y: 0},
+  "wK": {checkView: {}, firstMove: true, pngPos: "-4px -3px", dead: false, paths: [], name: "wK", view: {}, x: 0, y: 7},
+};
 export const PIECE_PROTOTYPES = {
   "R": {WpngPos: "130px -3px", BpngPos: "130px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
   "Q": {WpngPos: "-70px -3px", BpngPos: "-70px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},

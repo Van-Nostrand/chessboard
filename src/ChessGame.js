@@ -13,8 +13,12 @@ import {
   PIECE_OBJECTS,
   PIECEPATHS,
   PIECE_PROTOTYPES,
-  PP_TEST
+  PP_TEST,
+  EN_PASSANT_TEST
 } from "./CONSTANTS";
+
+import "./ChessGame.css";
+import "./PromotionMenu.css";
 
 import KingClass from "./pieceData/KingClass";
 import QueenClass from "./pieceData/QueenClass";
@@ -27,7 +31,7 @@ class ChessGame extends Component{
   constructor(props){
     super(props);
 
-    let [tileArr, cellMap, piecesObject] = this.gameSetup();
+    let [tileArr, cellMap, piecesObject, pieceNumbering] = this.gameSetup();
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
@@ -40,43 +44,56 @@ class ChessGame extends Component{
       selectedPiece: "",
       enPassantPiece: "",
       messageBoard: "no piece selected",
-      pawnPromotionFlag: false
+      pawnPromotionFlag: false,
+      pieceNumbering
     }
   }
 
-  promotePawn = () => {
-    // newPieceType = "R";
-    // newPieceTeam = selectedPiece.charAt(0);
-    // newPieceNumber = 3;
+  promotePawn = (newPieceType) => {
+    let newPieceTeam = this.state.selectedPiece.charAt(0);
+    let newPiecesObject = this.properCopyState(this.state.piecesObject);
+    let {selectedPiece} = this.state;
+    let pieceNumbering = {...this.state.pieceNumbering};
+    pieceNumbering[`${newPieceTeam}${newPieceType}`] += 1;
 
-    // newPiece = this.createPiece(
-    //                 newPieceType,
-    //                 newPieceTeam,
-    //                 newPieceNumber,
-    //                 newPiecesObject[selectedPiece].x,
-    //                 newPiecesObject[selectedPiece].y
-    //               );
+    let newPiece = this.createPiece(
+                    newPieceType,
+                    newPieceTeam,
+                    newPiecesObject[selectedPiece].x,
+                    newPiecesObject[selectedPiece].y
+                  );
+    delete newPiecesObject[selectedPiece];
+    newPiecesObject[newPiece.name] = newPiece;
+    let cellMap = this.buildCellMap(newPiecesObject);
+    let messageBoard = `${selectedPiece} has been promoted to ${newPiece.name}`;
+
+    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
     
-    // newPiecesObject[`${newPieceTeam}${newPieceType}${newPieceNumber}`] = newPiece;
-    // delete newPiecesObject[selectedPiece];
+
+    this.setState({
+      piecesObject: newPiecesObject,
+      cellMap,
+      selectedPiece: "",
+      pawnPromotionFlag: false,
+      messageBoard,
+      pieceNumbering,
+      turn: !this.state.turn
+    });
+    
   }
 
-  createPiece = (type, team, unitNumber, x, y) => {
+  createPiece = (type, team, x, y) => {
     
     let newPiece = {...PIECE_PROTOTYPES[type]};
     newPiece.pngPos = team === "w" ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos;
     if(type === "pawn"){
       newPiece.fifthRank = team === "w" ? WfifthRank : BfifthRank;
     }
+    let unitNumber = this.state.pieceNumbering[`${team}${type}`] + 1;
     newPiece.x = x;
     newPiece.y = y;
     newPiece.name = `${team}${type}${unitNumber}`;
     newPiece.paths = PIECEPATHS[type];
-    
-    // consider this code for deleting old properties? I don't fully understand it yet.
-    // const newObject = {};
-    // delete Object.assign(newObject, o, {[newKey]: o[oldKey] })[oldKey];
-    // I don't think this is necessary... 
 
     return newPiece;
   }
@@ -113,7 +130,7 @@ class ChessGame extends Component{
 
 
   //this calls a function on each piece that updates their own view property
-  updatePieceVision = (piecesObject, cellMap, enPassantPiece) => {
+  updatePieceVision = (piecesObject, cellMap, enPassantPiece = "") => {
     
     let pieceNames = Object.keys(piecesObject);
 
@@ -238,8 +255,20 @@ class ChessGame extends Component{
   }
 
 
-  tryAttacking = (targetCell, targetPieceName) => {
+  pawnBeingPromoted = (piecesObject, cellMap) => {
     let {selectedPiece} = this.state;
+    let messageBoard = `${selectedPiece} is being promoted`;
+    this.setState({
+      piecesObject,
+      cellMap,
+      messageBoard,
+      pawnPromotionFlag: true
+    });
+  }
+
+
+  tryAttacking = (targetCell, targetPieceName) => {
+    let {selectedPiece, piecesObject, cellMap} = this.state;
     //make a copy of state and carry out the attack
     let newPiecesObject = this.properCopyState(piecesObject);
     
@@ -261,37 +290,27 @@ class ChessGame extends Component{
 
 
   tryMoving = (cell) => {
+    //setup new state
     let {selectedPiece, piecesObject} = this.state;
     let newPiecesObject = this.properCopyState(piecesObject);
     [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y] = cell;
-
-    //check for pawn promotion here
-    let pawnPromotionFlag = false;
-    let oldSelectedPiece = "";
-    let newPieceTeam, newPieceType, newPieceNumber, newPiece;
-    if((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)){
-      //pawn promotion here
-
-      pawnPromotionFlag = true;
-      
-    }
-
+    
+    //test whether move puts own king in check
     let newCellMap = this.buildCellMap(newPiecesObject);
     let isKingInCheck = this.ownKingNotInCheckBool(newPiecesObject, newCellMap, `${selectedPiece.charAt(0)}K`);
     if(!isKingInCheck){
       console.log("king not in check");
-      let message;
+    
+      //test for pawn promotion
+      if((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)){
 
-      if(pawnPromotionFlag){
-        message = `${selectedPiece} moved to ${cell[0]},${cell[1]} and was promoted to ${newPieceType}${newPieceNumber}`;
-        selectedPiece = `${newPieceTeam}${newPieceType}${newPieceNumber}`;
+        return this.pawnBeingPromoted(newPiecesObject, newCellMap);
+        
       }
-      else {
-        console.log("piece successfully moved");
-        message = `${selectedPiece} has successfully moved to ${cell[0]},${cell[1]}`;
-      }
-      console.log("calling turn maintenance");
-      this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece, pawnPromotionFlag);
+    
+      let message = `${selectedPiece} has successfully moved to ${cell[0]},${cell[1]}`;
+      
+      return this.turnMaintenance(newPiecesObject, newCellMap, cell, message, selectedPiece);
     }
 
     else{
@@ -440,42 +459,37 @@ class ChessGame extends Component{
 
 
   //might not be necessary for this to exist
-  turnMaintenance = (newPiecesObject, newCellMap, cell, message, selectedPiece, pawnPromotionFlag) => {
-    console.log(selectedPiece);
-    console.log(newPiecesObject);
+  turnMaintenance = (newPiecesObject, newCellMap, cell, message, selectedPiece) => {
 
     let enPassantPiece = "";
     //if the piece has a firstMove prop, flip it
     if(newPiecesObject[selectedPiece].firstMove){
       newPiecesObject[selectedPiece].firstMove = false;
       //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if(/^wP/.test(selectedPiece) && (newPiecesObject[selectedPiece].y === 4 || newPiecesObject[selectedPiece].y === 3)){
+      if(/^(w|b)P/.test(selectedPiece) && (newPiecesObject[selectedPiece].y === 4 || newPiecesObject[selectedPiece].y === 3)){
+        console.log("passed EP test, piece should be flagged now");
         enPassantPiece = selectedPiece;
       }
     }
 
-    if(!pawnPromotionFlag){
-      selectedPiece = "";
-    }
-
     //update piece views
     newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, enPassantPiece);
-    
-    this.customSetState(newPiecesObject, newCellMap, selectedPiece, message, enPassantPiece, pawnPromotionFlag);
+
+    this.customSetState(newPiecesObject, newCellMap, "", message, enPassantPiece);
+
   }
 
 
   //separated this preemptively, might not be necessary
-  customSetState = (piecesObject, cellMap, selectedPiece, messageBoard, enPassantPiece, pawnPromotionFlag) => {
-    let turn = pawnPromotionFlag ? this.state.turn : !this.state.turn;
+  customSetState = (piecesObject, cellMap, selectedPiece, messageBoard, enPassantPiece) => {
+    
     this.setState({
       piecesObject,
       cellMap,
-      turn,
+      turn: !this.state.turn,
       selectedPiece,
       messageBoard,
-      enPassantPiece,
-      pawnPromotionFlag
+      enPassantPiece
     });
   }
 
@@ -588,29 +602,45 @@ class ChessGame extends Component{
       });
     });
 
+    let pieceNumbering = {
+      "wP": 0,
+      "wR": 0,
+      "wN": 0,
+      "wB": 0,
+      "wQ": 0,
+      "bP": 0,
+      "bR": 0,
+      "bN": 0,
+      "bB": 0,
+      "bQ": 0
+    };
+
     //declare pieces, give them their paths
     // let newPiecesObject = PIECE_OBJECTS;
-    let newPiecesObject = PP_TEST;
+    let newPiecesObject = EN_PASSANT_TEST;
     Object.keys(newPiecesObject).forEach((piece, i) => {
 
       switch(true){
-        case /^(w|b)Q/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["Q"];
+        case /^(w|b)Q/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["Q"]; pieceNumbering[`${piece.charAt(0)}Q`] += 1;
           break;
         case /^(w|b)K/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["K"]; 
           break;
-        case /^(w|b)B/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["B"];
+        case /^(w|b)B/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["B"]; pieceNumbering[`${piece.charAt(0)}B`] += 1;
           break;
-        case /^(w|b)R/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["R"];
+        case /^(w|b)R/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["R"]; pieceNumbering[`${piece.charAt(0)}R`] += 1;
           break;
-        case /^wP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["wP"];
+        case /^wP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["wP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
           break;
-        case /^bP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["bP"];
+        case /^bP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["bP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
           break; 
-        case /^(w|b)N/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["N"];
+        case /^(w|b)N/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["N"]; pieceNumbering[`${piece.charAt(0)}N`] += 1;
           break;
         default: console.log("something went wrong while assigning paths");
       }
     });
+
+    console.log("gamesetup, here's piece numbering");
+    console.log(pieceNumbering);
 
     //cellMap is used for piece name lookup by cell
     let cellMap = this.buildCellMap(newPiecesObject);
@@ -618,7 +648,7 @@ class ChessGame extends Component{
     //build the view properties of each piece
     newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
-    return [tileArr, cellMap, newPiecesObject];
+    return [tileArr, cellMap, newPiecesObject, pieceNumbering];
   }
 }
 
