@@ -3,6 +3,7 @@
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
+import ChessGraveyard from "./ChessGraveyard";
 import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
@@ -19,6 +20,7 @@ import {
 
 import "./ChessGame.css";
 import "./PromotionMenu.css";
+
 
 import KingClass from "./pieceData/KingClass";
 import QueenClass from "./pieceData/QueenClass";
@@ -500,7 +502,12 @@ class ChessGame extends Component{
     let boardTiles = this.makeTiles();
 
     //GENERATE PIECES
-    let pieceObjects = this.makePieces();
+    let [pieceObjects, graveyardPieces] = this.makePieces();
+    let wGraveyard, bGraveyard;
+    if(graveyardPieces.length > 0){
+      wGraveyard = graveyardPieces.filter(piece => piece.props.name.charAt(0) === "w");
+      bGraveyard = graveyardPieces.filter(piece => piece.props.name.charAt(0) === "b");
+    }
 
     let theMenu = this.state.pawnPromotionFlag ? <PromotionMenu selectPiece={this.promotePawn} /> : <div>NO MENU</div>;
 
@@ -508,53 +515,29 @@ class ChessGame extends Component{
     let tileContainerStyle = {
       width: `${this.state.boardDimensions[0] * this.state.tileSize}px`,
       height: `${this.state.boardDimensions[1] * this.state.tileSize}px`,
-      margin: `auto`,
-      padding: `0px`,
-      display: "flex",
-      flexFlow: "row",
-      flexWrap: "wrap",
-      border: `1px solid blue`,
-      position: "absolute"
     }
-    let outerStyle = {
-      display: "flex", 
-      alignItems: "center", 
-      justifyontent: "center",
-      flexFlow: "row",
-      height: "100vh"
-    }
+   
     let piecesContainerStyle = {
       width: `${this.state.boardDimensions[0] * this.state.tileSize}px`,
       height: `${this.state.boardDimensions[1] * this.state.tileSize}px`,
-      margin: `auto`,
-      padding: `0px`,
-      display: "flex",
-      flexFlow: "row",
-      flexWrap: "wrap",
-      position: "absolute",
-      pointerEvents: "none"
-    }
-    let h3Style = {
-      display: "inline",
-      alignSelf: "flex-end",
-      
-    }
-    let h2Style = {
-      display: "inline",
-      alignSelf: "flex-start"
-    }
+    }   
 
     return(
-      <div style={outerStyle}>
+      <div id="game-container" >
         {theMenu}
-        <h2 style={h2Style}>{this.state.turn ? "White turn" : "Black turn"}</h2>
+        <h2 id="turn-board" >{this.state.turn ? "White turn" : "Black turn"}</h2>
+        <div id="middle-container">
+          
+        </div>
         <div id="tile-container" style={tileContainerStyle}>
           {boardTiles}
         </div>
         <div id="pieces-container" style={piecesContainerStyle} >
           {pieceObjects}
         </div>
-        <h3 style={h3Style}>{this.state.messageBoard}</h3>
+        <h3 id="message-board" >{this.state.messageBoard}</h3>
+        <ChessGraveyard pieces={wGraveyard} />
+        <ChessGraveyard pieces={bGraveyard} />
       </div>
     )
   }
@@ -578,18 +561,40 @@ class ChessGame extends Component{
 
   //makes the pieces for the game
   makePieces = () => {
-    return Object.keys(this.state.piecesObject).map((name, i) => {
-      return <Piece 
-                x={this.state.piecesObject[name].x}
-                y={this.state.piecesObject[name].y}
-                dead={this.state.piecesObject[name].dead}
-                pngPos={this.state.piecesObject[name].pngPos}
-                key={name}
-                name={name}
-                size={TILESIZE}
-                border={this.state.selectedPiece}
-                onClick={this.pieceClick} />
+    let {piecesObject, selectedPiece} = this.state;
+    let livePieces = [];
+    let deadPieces = [];
+    Object.keys(piecesObject).forEach((name, i) => {
+      if(!piecesObject[name].dead){
+        livePieces.push(
+          <Piece 
+            x={piecesObject[name].x}
+            y={piecesObject[name].y}
+            dead={piecesObject[name].dead}
+            pngPos={piecesObject[name].pngPos}
+            key={name}
+            name={name}
+            size={TILESIZE}
+            border={selectedPiece}
+            onClick={this.pieceClick} />
+        );
+      }
+      else {
+        deadPieces.push(
+          <Piece
+            x={piecesObject[name].x}
+            y={piecesObject[name].y}
+            dead={piecesObject[name].dead}
+            pngPos={piecesObject[name].pngPos}
+            key={name}
+            name={name}
+            size={TILESIZE}
+            border={selectedPiece}
+            onClick={this.pieceClick} />
+        )
+      }
     });
+    return [livePieces, deadPieces];
   }
 
   gameSetup = () => {

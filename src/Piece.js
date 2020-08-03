@@ -4,19 +4,19 @@ import pieceImg from "./pieces.png";
 const BACKGROUNDSIZE = 400;
 
 //TODO - remove need for hard-coded BACKGROUNDSIZE property
-const Piece = (props) => {
+const Piece = ({border, name, dead, x, y, size, pngPos, onClick}) => {
 
-  let borderLogic = props.border === props.name ? "1px solid yellow" : "";
-  let isDead = props.dead ? 
+  let borderLogic = border === name ? "1px solid yellow" : "";
+  let isDead = dead ? 
     `translate(${-50}px,${-50}px)` : 
-    `translate(${props.size * props.x}px,${props.size * props.y}px)`;
+    `translate(${size * x}px,${size * y}px)`;
 
   let style = {
-    width: props.size,
-    height: props.size,
+    width: size,
+    height: size,
     backgroundImage: `url(${pieceImg})`,
     backgroundSize: `${BACKGROUNDSIZE}px`,
-    backgroundPosition: props.pngPos,
+    backgroundPosition: pngPos,
     backgroundOrigin: "border-box",
     position: "absolute",
     transform: isDead,
@@ -28,8 +28,8 @@ const Piece = (props) => {
     <div
         className="piece"
         style={style}
-        name={props.name}
-        onClick={(e) => props.onClick(e, props.name)}></div>
+        name={name}
+        onClick={(e) => onClick(e, name)}></div>
   );
 };
 

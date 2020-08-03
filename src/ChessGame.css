@@ -1,0 +1,59 @@
+/* 
+<div id="game-container" style={outerStyle}>
+  {theMenu}
+  <h2 id="turn-board" style={h2Style}>{this.state.turn ? "White turn" : "Black turn"}</h2>
+  <div id="tile-container" style={tileContainerStyle}>
+    {boardTiles}
+  </div>
+  <div id="pieces-container" style={piecesContainerStyle} >
+    {pieceObjects}
+  </div>
+  <h3 id="messageboard" style={h3Style}>{this.state.messageBoard}</h3>
+  <ChessGraveyard pieces={wGraveyard} />
+  <ChessGraveyard pieces={bGraveyard} />
+</div>
+*/
+
+#game-container{
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  flex-flow: column;
+  height: 100vh;
+}
+
+#turn-board{
+  width: 100%;
+  /* display: inline; */
+  /* align-self: flex-start; */
+}
+
+#middle-container{
+  display: flex;
+  flex-flow: row;
+}
+
+#tile-container{
+  margin: auto;
+  padding: 0px;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  border: 1px solid blue;
+  position: absolute;
+}
+
+#pieces-container{
+  margin: auto;
+  padding: 0px;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  position: absolute;
+  pointer-events: none;
+}
+
+#message-board{
+  display: inline;
+  align-self: flex-end;
+}

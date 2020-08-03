@@ -1,13 +1,12 @@
 # Chess!
 This is a project that has haunted me since College. I originally tried to do it in Java but screwed it up at the time. After, I was too busy to get around to finishing it. I've thought about it many times over the years so I figured I'd try to finish it for fun.
 
-### Where it's at (August 2 2020)
-I've built a rudimentary "pawn promotion menu". It's functional... Fixed a few pawn attack bugs
+### Where it's at (August 3 2020)
+I've built a rudimentary "pawn promotion menu". It's functional... in the process of styling it
 
 ### Todo: for now
+* focus on styling for the next few days
 * optimize code: it's a disorganized mess
-* restructure the styles - use external css files
-  * change how dead pieces are displayed
 
 ### Todo: in the future
 * implement "click and drag to move" for pieces
