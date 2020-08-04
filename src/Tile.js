@@ -6,9 +6,6 @@ const Tile = (props) => {
     width: `${props.size}px`,
     height: `${props.size}px`,
     border: `${props.borderSize}px solid ${props.borderColour}`,
-    margin: "0",
-    padding: "0",
-    boxSizing: "border-box"
   };
   
   return(

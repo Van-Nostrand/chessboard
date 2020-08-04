@@ -13,24 +13,30 @@
   <ChessGraveyard pieces={bGraveyard} />
 </div>
 */
+*{
+  margin: 0;
+  padding: 0;
+}
 
 #game-container{
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  flex-flow: column;
-  height: 100vh;
+  display: grid; 
+  grid-template-columns: 80px 120px 480px 120px 80px;
+  grid-template-rows: 80px 480px 80px;
 }
 
 #turn-board{
   width: 100%;
-  /* display: inline; */
-  /* align-self: flex-start; */
+  position: relative;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 #middle-container{
-  display: flex;
-  flex-flow: row;
+  position: relative;
+  margin: 0 auto;
+  grid-column: 3;
+  grid-row: 2;
+  left: -240px;
 }
 
 #tile-container{
@@ -43,6 +49,12 @@
   position: absolute;
 }
 
+.tile{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 #pieces-container{
   margin: auto;
   padding: 0px;
@@ -53,7 +65,28 @@
   pointer-events: none;
 }
 
+.piece{
+  background-origin: border-box;
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: all;
+}
+
+#wGraveyard{
+  grid-column: 2;
+  grid-row: 2;
+  background-color: #aaa;
+}
+
+#bGraveyard{
+  grid-column: 4;
+  grid-row: 2;
+  background-color: #aaa;
+}
+
 #message-board{
   display: inline;
-  align-self: flex-end;
+  position: relative;
+  grid-column: 3;
+  grid-row: 3;
 }

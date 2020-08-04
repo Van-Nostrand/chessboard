@@ -1,5 +1,3 @@
-//TODO - rename piecesObject to piecesLedger or something similar
-//TODO - Explore updating just an individual piece rather than the whole pieceLedger
 import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
@@ -527,17 +525,16 @@ class ChessGame extends Component{
         {theMenu}
         <h2 id="turn-board" >{this.state.turn ? "White turn" : "Black turn"}</h2>
         <div id="middle-container">
-          
-        </div>
-        <div id="tile-container" style={tileContainerStyle}>
-          {boardTiles}
-        </div>
-        <div id="pieces-container" style={piecesContainerStyle} >
-          {pieceObjects}
+          <div id="tile-container" style={tileContainerStyle}>
+            {boardTiles}
+          </div>
+          <div id="pieces-container" style={piecesContainerStyle} >
+            {pieceObjects}
+          </div>
         </div>
         <h3 id="message-board" >{this.state.messageBoard}</h3>
-        <ChessGraveyard pieces={wGraveyard} />
-        <ChessGraveyard pieces={bGraveyard} />
+        <ChessGraveyard pieces={wGraveyard} idString="wGraveyard" />
+        <ChessGraveyard pieces={bGraveyard} idString="bGraveyard" />
       </div>
     )
   }
@@ -621,8 +618,7 @@ class ChessGame extends Component{
     };
 
     //declare pieces, give them their paths
-    // let newPiecesObject = PIECE_OBJECTS;
-    let newPiecesObject = EN_PASSANT_TEST;
+    let newPiecesObject = PIECE_OBJECTS;
     Object.keys(newPiecesObject).forEach((piece, i) => {
 
       switch(true){

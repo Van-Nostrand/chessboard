@@ -17,13 +17,11 @@ const Piece = ({border, name, dead, x, y, size, pngPos, onClick}) => {
     backgroundImage: `url(${pieceImg})`,
     backgroundSize: `${BACKGROUNDSIZE}px`,
     backgroundPosition: pngPos,
-    backgroundOrigin: "border-box",
-    position: "absolute",
     transform: isDead,
     border: borderLogic,
-    boxSizing: "border-box",
-    pointerEvents: "all"
+    
   }
+
   return(
     <div
         className="piece"

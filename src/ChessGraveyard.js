@@ -1,6 +1,6 @@
 import React from "react";
 
-const ChessGraveyard = ({pieces}) => {
+const ChessGraveyard = ({pieces, idString}) => {
 
   let piecesToRender;
   if(pieces && pieces.length > 0){
@@ -8,8 +8,8 @@ const ChessGraveyard = ({pieces}) => {
   }
 
   return(
-    <div className="graveyard" >
-      the graveyard!
+    <div id={idString} className="graveyard" >
+      <h3>the graveyard</h3>
       {piecesToRender}
     </div>
   )
