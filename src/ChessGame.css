@@ -18,10 +18,6 @@ html{
   font-family: Helvetica, sans-serif;
 }
 
-body {
-  /* box-sizing: border-box; */
-}
-
 #game-container{
   display: grid; 
   grid-template-columns: 80px 150px 480px 150px 80px;

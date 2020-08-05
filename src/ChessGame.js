@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
 import ChessGraveyard from "./ChessGraveyard";
+import { useCanvas } from "./useCanvas";
 import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
@@ -563,6 +564,7 @@ class ChessGame extends Component{
         <h3 id="message-board" >{messageBoard}</h3>
         <ChessGraveyard pieces={wGraveyard} idString="wGraveyard" />
         <ChessGraveyard pieces={bGraveyard} idString="bGraveyard" />
+        
       </div>
     )
   }
