@@ -55,6 +55,15 @@ html{
   grid-row: 2;
 }
 
+#canvas-board{
+  margin: auto;
+  padding: 0;
+  box-sizing: border-box;
+
+  grid-column: 3;
+  grid-row: 2;
+}
+
 .tile{
   margin: 0;
   padding: 0;

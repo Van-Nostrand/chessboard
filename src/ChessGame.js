@@ -1,15 +1,12 @@
 import React, {Component} from "react";
-import Tile from "./Tile";
 import Piece from "./Piece";
+import CanvasChessBoard from "./CanvasChessBoard";
 import ChessGraveyard from "./ChessGraveyard";
-import { useCanvas } from "./useCanvas";
 import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
   TILEBORDERSIZE, 
-  LIGHT_TILE, 
-  DARK_TILE,
   PIECE_OBJECTS,
   PIECEPATHS,
   PIECE_PROTOTYPES,
@@ -19,7 +16,6 @@ import {
 
 import "./ChessGame.css";
 import "./PromotionMenu.css";
-
 
 import KingClass from "./pieceData/KingClass";
 import QueenClass from "./pieceData/QueenClass";
@@ -32,13 +28,12 @@ class ChessGame extends Component{
   constructor(props){
     super(props);
 
-    let [ piecesObject, cellMap, tileArr, pieceNumbering ] = this.gameSetup();
+    let [ piecesObject, cellMap, pieceNumbering ] = this.gameSetup();
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE,
       tileBorderSize: TILEBORDERSIZE,
-      tileArr,
       cellMap,
       piecesObject,
       wGraveyard: {},
@@ -63,6 +58,7 @@ class ChessGame extends Component{
   // - - En Passant
   // - illegal move attempt
   tileClick = (e) => {
+    console.log("tileclick");
     let { selectedPiece, piecesObject } = this.state;
 
     // Accidental, or clicking a tile while no piece selected
@@ -73,6 +69,9 @@ class ChessGame extends Component{
     // a piece is already selected, user wants to move here
     if(selectedPiece.length > 0){
       
+      //!!!!!!!!!!!!
+      // this is referencing the abstract pieces container rather than the board
+      // it works, but i can see this causing problems later... 
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
       let cell = [ Math.floor((e.clientX - rect.left) / TILESIZE) , Math.floor((e.clientY - rect.top) / TILESIZE) ];
       let cellString = `${cell[0]},${cell[1]}`;
@@ -530,9 +529,6 @@ class ChessGame extends Component{
   render(){
 
     let { boardDimensions, tileSize, messageBoard, turn, selectedPiece } = this.state;
-    
-    //GENERATE TILES
-    let boardTiles = this.makeTiles();
 
     //GENERATE PIECES
     let pieceObjects = this.makeLivePieces();
@@ -541,11 +537,6 @@ class ChessGame extends Component{
     let theMenu = this.state.pawnPromotionFlag ? <PromotionMenu selectPiece={this.promotePawn} team={selectedPiece.charAt(0)} /> : "";
 
     //STYLES
-    let tileContainerStyle = {
-      width: `${boardDimensions[0] * tileSize}px`,
-      height: `${boardDimensions[1] * tileSize}px`,
-    }
-   
     let piecesContainerStyle = {
       width: `${boardDimensions[0] * tileSize}px`,
       height: `${boardDimensions[1] * tileSize}px`,
@@ -555,9 +546,7 @@ class ChessGame extends Component{
       <div id="game-container" >
         {theMenu}
         <h2 id="turn-board" >{turn ? "White turn" : "Black turn"}</h2>
-        <div id="tile-container" style={tileContainerStyle}>
-          {boardTiles}
-        </div>
+        <CanvasChessBoard onClick={this.tileClick} />
         <div id="pieces-container" style={piecesContainerStyle} >
           {pieceObjects}
         </div>
@@ -575,22 +564,6 @@ class ChessGame extends Component{
     this.setState({
       messageBoard,
       selectedPiece: ""
-    });
-  }
-
-
-  //makes board tiles 
-  makeTiles = () => {
-    return new Array(this.state.boardDimensions[0]).fill().map((column, i) => {
-      return new Array(this.state.boardDimensions[1]).fill().map((tile,j) => {
-        return <Tile
-                  key={`tile-${i}-${j}`} 
-                  size={this.state.tileSize} 
-                  borderColour="red" 
-                  classString={this.state.tileArr[i][j]}
-                  borderSize={this.state.tileBorderSize} 
-                  onClick={this.tileClick} />
-      });
     });
   }
 
@@ -662,41 +635,43 @@ class ChessGame extends Component{
   // if an array filled with objects is ever used in future versions of this app, I'll have to modify this
   recursiveStateCopy = (oldstate) => {
     let newState = {};
-    Object.keys(oldstate).forEach(key => {
-      if(typeof(oldstate[key]) === "object" && !Array.isArray(oldstate[key])){
-        newState[key] = this.recursiveStateCopy(oldstate[key]);
-      }
-      else if(typeof(oldstate[key]) === "object" && Array.isArray(oldstate[key])){
-        newState[key] = oldstate[key].map(value => {
-          if(Array.isArray(value)){
-            return value.map(subvalue => subvalue);
-          }
-          else return value;
-        });
-      }
-      else if(typeof(oldstate[key]) === "string"){
-        newState[key] = `${oldstate[key]}`;
-      }
-      else {
-        newState[key] = oldstate[key];
-      }
-    });
+    let oldstateKeys = Object.keys(oldstate);
+
+    if(oldstateKeys.length > 0){
+      oldstateKeys.forEach(key => {
+        // recursive copy objects 
+        if(typeof(oldstate[key]) === "object" && !Array.isArray(oldstate[key])){
+          newState[key] = this.recursiveStateCopy(oldstate[key]);
+        }
+        // copy up to 2d arrays with map
+        else if(typeof(oldstate[key]) === "object" && Array.isArray(oldstate[key])){
+          newState[key] = oldstate[key].map(value => {
+            if(Array.isArray(value)){
+              return value.map(subvalue => subvalue);
+            }
+            else return value;
+          });
+        }
+        // copy strings
+        else if(typeof(oldstate[key]) === "string"){
+          newState[key] = `${oldstate[key]}`;
+        }
+        // copy primitives
+        else {
+          newState[key] = oldstate[key];
+        }
+      });
+    }
+    // i dont think this is necessary...
+    else{
+      newState = {...oldstate};
+    }
     return newState;
   }
 
 
   //initial game setup
   gameSetup = () => {
-    //create checkerboard
-    let tileBool = true;
-    let tileArr = new Array(BOARDDIMENSIONS[0]).fill().map((column, i) => {
-      return column = new Array(BOARDDIMENSIONS[1]).fill().map((tile,j) => {
-        tileBool = j % BOARDDIMENSIONS[0] === 0 ? tileBool : !tileBool;
-        // return tileBool? LIGHT_TILE : DARK_TILE;
-        return tileBool? "light-tile tile" : "dark-tile tile";
-      });
-    });
-
     let pieceNumbering = {
       "wP": 0,
       "wR": 0,
@@ -740,7 +715,7 @@ class ChessGame extends Component{
     //build the view properties of each piece
     newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
-    return [ newPiecesObject, cellMap, tileArr, pieceNumbering ];
+    return [ newPiecesObject, cellMap, pieceNumbering ];
   }
 }
 
