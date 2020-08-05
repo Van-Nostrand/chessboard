@@ -1,15 +1,14 @@
 /*==== PAWNS ====
 attacklogic() - similar to movelogic(), this pawn-exclusive function determines if a pawn can attack
 direction - a property set by this.name.charAt(0) which determines the direction this pawn may move in
-promotion - an unimplemented property to determine if the piece has promoted or not, however this will likely not be used. 
 fifthRank - an integer which represents the pawns 5th rank. Used to track en passant checks. 
 */
 export default class PawnClass{
   
-  //necessary?
+  // unused
   static attacklogic = (x,y, direction) => (x === 1 || x === -1) && (y === 1 * direction);
 
-  //necessary?
+  // unused
   static movelogic = (x, y, direction, firstMove) => {
 
     let success = false;
@@ -32,7 +31,7 @@ export default class PawnClass{
     return success;
   };
 
-  //necessary?
+  // unused
   static enpassantlogic = (x,y,targetcell,victim) => {
     return (
       targetcell[0] === victim[0] && 
@@ -40,11 +39,14 @@ export default class PawnClass{
         targetcell[1] === victim[1] - 1));
   };
 
+  // unused 
   static getPaths = (team) => {
     if(team === "w") return [[0,-1],[0,-2],[-1,-1], [1,-1]];
     else if (team === "b") return [[0,1],[0,2],[-1,1], [1,1]];
   }
 
+
+  // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
   static vision = (cellMap, piecesObject, name, enPassantPiece) => {
     let {x, y, fifthRank, paths, firstMove} = piecesObject[name];
     let BOARDSIZE = 8;

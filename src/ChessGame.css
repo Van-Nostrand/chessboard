@@ -1,34 +1,42 @@
-/* 
-<div id="game-container" style={outerStyle}>
-  {theMenu}
-  <h2 id="turn-board" style={h2Style}>{this.state.turn ? "White turn" : "Black turn"}</h2>
-  <div id="tile-container" style={tileContainerStyle}>
-    {boardTiles}
-  </div>
-  <div id="pieces-container" style={piecesContainerStyle} >
-    {pieceObjects}
-  </div>
-  <h3 id="messageboard" style={h3Style}>{this.state.messageBoard}</h3>
-  <ChessGraveyard pieces={wGraveyard} />
-  <ChessGraveyard pieces={bGraveyard} />
-</div>
-*/
-*{
+:root{
+  --light-tile: #f98f39;
+  --dark-tile: #603d0b;
+  --light-tile2: #ecb379;
+  --dark-tile2: #745120;
+}
+
+*,
+*::after,
+*::before{
   margin: 0;
   padding: 0;
+  box-sizing: inherit;
+}
+
+html{
+  font-size: 62.5%;
+  font-family: Helvetica, sans-serif;
+}
+
+body {
+  /* box-sizing: border-box; */
 }
 
 #game-container{
   display: grid; 
-  grid-template-columns: 80px 120px 480px 120px 80px;
+  grid-template-columns: 80px 150px 480px 150px 80px;
   grid-template-rows: 80px 480px 80px;
 }
 
 #turn-board{
   width: 100%;
+  display: inline-block;
   position: relative;
   grid-column: 3;
   grid-row: 1;
+  place-self: center;
+  text-align: center;
+  font-size: 4rem;
 }
 
 #middle-container{
@@ -45,8 +53,10 @@
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
-  border: 1px solid blue;
-  position: absolute;
+  box-sizing: border-box;
+
+  grid-column: 3;
+  grid-row: 2;
 }
 
 .tile{
@@ -55,38 +65,72 @@
   box-sizing: border-box;
 }
 
+.light-tile {
+  background-color: var(--light-tile2);
+}
+
+.dark-tile{
+  background-color: var(--dark-tile2);
+}
+
 #pieces-container{
   margin: auto;
   padding: 0px;
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
-  position: absolute;
   pointer-events: none;
+  box-sizing: border-box;
+
+  grid-column: 3;
+  grid-row: 2;
 }
 
 .piece{
   background-origin: border-box;
-  position: absolute;
   box-sizing: border-box;
   pointer-events: all;
+  /* position: absolute; */
 }
 
-#wGraveyard{
-  grid-column: 2;
+#wGraveyard, #bGraveyard{
   grid-row: 2;
+  display: flex;
+  flex-flow: column;
+  flex-wrap: wrap;
   background-color: #aaa;
 }
 
-#bGraveyard{
-  grid-column: 4;
-  grid-row: 2;
-  background-color: #aaa;
+#wGraveyard{grid-column: 2;}
+#bGraveyard{grid-column: 4;}
+
+#wGraveyard > h3,
+#bGraveyard > h3{
+  position: absolute;
+  top: 31rem;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  width: 48rem;
+  text-align: center;
+  color: #ccc;
 }
+
+#wGraveyard > h3 {
+  left: -7.4rem;
+}
+
+#bGraveyard > h3{
+  left: 54rem;
+}
+
+
 
 #message-board{
-  display: inline;
+  display: inline-block;
   position: relative;
   grid-column: 3;
   grid-row: 3;
+  place-self: center;
+  text-align: center;
+  font-size: 3rem;
 }

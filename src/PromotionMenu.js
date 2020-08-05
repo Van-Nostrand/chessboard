@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import pieceImg from "./pieces.png";
 
 
-export const  PromotionMenu = ({selectPiece, team}) => {
+export const PromotionMenu = ({selectPiece, team}) => {
   const [pieceSelection, setPieceSelection] = useState("");
 
   useEffect(() => {
