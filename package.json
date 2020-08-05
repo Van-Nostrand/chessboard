@@ -1,10 +1,10 @@
 {
   "name": "chessboard",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": false,
-  "description": "a chess game written in javascript with react",
+  "description": "a chess game written in React",
   "author": "Daniel Doull",
-  "license": "gpl-3.0",
+  "license": "gpl-3.0-or-later",
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
