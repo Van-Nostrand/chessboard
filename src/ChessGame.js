@@ -4,8 +4,8 @@ import CanvasChessBoard from "./CanvasChessBoard";
 import ChessGraveyard from "./ChessGraveyard";
 import {PromotionMenu} from "./PromotionMenu";
 import {
-  BOARDDIMENSIONS, 
-  TILESIZE, 
+  BOARDDIMENSIONS,
+  TILESIZE,
   TILEBORDERSIZE, 
   PIECE_OBJECTS,
   PIECEPATHS,
@@ -48,17 +48,13 @@ class ChessGame extends Component{
     }
   }
 
+  // ===================================================
+  // ================ EVENT HANDLERS ===================
 
   // this function decides why a user clicked a tile and then calls the appropriate function
-  // reasons a user would click a tile:
-  // - accidentally
-  // - to move a selected piece
-  // - - normal move
-  // - - Castling
-  // - - En Passant
-  // - illegal move attempt
+  // calls tryMoving, processCastling, processEnPassant, illegalMove
   tileClick = (e) => {
-    console.log("tileclick");
+    // console.log("tileclick");
     let { selectedPiece, piecesObject } = this.state;
 
     // Accidental, or clicking a tile while no piece selected
@@ -97,11 +93,7 @@ class ChessGame extends Component{
 
 
   // determines why the user clicked a piece and then calls the appropriate function
-  // reasons to click a piece:
-  // - accidental
-  // - to select
-  // - to deselect
-  // - to attack
+  // calls setState (*2), illegalMove (*2), tryAttacking
   pieceClick = (e, name) => {
     let { selectedPiece, piecesObject, turn } = this.state;
 
@@ -149,7 +141,13 @@ class ChessGame extends Component{
   }
 
 
-  //tests and completes attacks
+  
+
+  // ===================================================
+  // =================== TESTERS =======================
+
+  // tests and completes attacks
+  // calls recursiveStateCopy, buildCellMap, isMyKingInCheck, turnMaintenance, illegalMove
   tryAttacking = (targetCell, targetPieceName) => {
     let {selectedPiece, piecesObject, cellMap} = this.state;
     let wGraveyard = {...this.state.wGraveyard};
@@ -172,21 +170,20 @@ class ChessGame extends Component{
     delete newPiecesObject[targetPiece];
     let newCellMap = this.buildCellMap(newPiecesObject);
 
-
-    let isKingInCheck = this.isMyKingInCheck( newPiecesObject, newCellMap );
-    if(!isKingInCheck){
+    if(!this.isMyKingInCheck( newPiecesObject, newCellMap )){
       let message = `${selectedPiece} attacked ${targetPieceName}`;
 
       this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece, wGraveyard, bGraveyard);
     }
 
     else{
-      console.log("that attack puts your king in check...");
+      this.illegalMove("that attack puts your king in check");
     }
   }
 
 
   // tests and completes moves
+  // calls recursiveStateCopy, buildCellMap, isMyKingInCheck, pawnBeingPromoted, turnMaintenance, illegalMove
   tryMoving = (cell) => {
     let {selectedPiece, piecesObject} = this.state;
     let newPiecesObject = this.recursiveStateCopy(piecesObject);
@@ -215,170 +212,10 @@ class ChessGame extends Component{
     }
   }
 
-  // swaps a pawn with a piece of the users choice
-  promotePawn = ( newPieceType ) => {
-    let pieceNumbering = { ...this.state.pieceNumbering };
-    let { selectedPiece, piecesObject } = this.state;
 
-    let newPieceTeam = selectedPiece.charAt(0);
-    let newPiecesObject = this.recursiveStateCopy(piecesObject);
-
-    pieceNumbering[`${newPieceTeam}${newPieceType}`] += 1;
-
-    // a pieces name is made up of team, type, and number, to differentiate them in state
-    let newPiece = this.createPiece(
-                    newPieceType,
-                    newPieceTeam,
-                    newPiecesObject[selectedPiece].x,
-                    newPiecesObject[selectedPiece].y,
-                    pieceNumbering
-                  );
-
-    delete newPiecesObject[selectedPiece];
-    newPiecesObject[newPiece.name] = newPiece;
-
-    let cellMap = this.buildCellMap(newPiecesObject);
-    let messageBoard = `${selectedPiece} has been promoted to ${newPiece.name}`;
-
-    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
-    
-    this.setState({
-      piecesObject: newPiecesObject,
-      cellMap,
-      selectedPiece: "",
-      pawnPromotionFlag: false,
-      messageBoard,
-      pieceNumbering,
-      turn: !this.state.turn
-    });
-  }
-
-
-  // creates a new piece with given arguments
-  createPiece = (type, team, x, y, pieceNumbering) => {
-
-    let newPiece = {...PIECE_PROTOTYPES[type]};
-    newPiece.pngPos = team === "w" ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos;
-    delete newPiece.WpngPos;
-    delete newPiece.BpngPos;
-
-    if(type === "pawn"){
-      newPiece.fifthRank = team === "w" ? WfifthRank : BfifthRank;
-    }
-
-    let unitNumber = pieceNumbering[`${team}${type}`] + 1;
-    newPiece.x = x;
-    newPiece.y = y;
-    newPiece.name = `${team}${type}${unitNumber}`;
-    newPiece.paths = PIECEPATHS[type];
-
-    return newPiece;
-  }
-
-
-  // cellMap is used to lookup pieces by occupied cell coordinates rather than their name
-  buildCellMap = (piecesObject) => {
-    let cellMap = {};
-    let piecenames = Object.keys(piecesObject);
-    piecenames.forEach((piece, i) => {
-      if(!piecesObject[piece].dead){
-
-        let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
-        cellMap[coordinates] = piece;
-      }
-    }) ;
-    return cellMap;
-  }
-
-
-  //this calls a function on each piece that updates their own view property
-  updatePieceVision = (piecesObject, cellMap, enPassantPiece = "") => {
-    
-    let pieceNames = Object.keys(piecesObject);
-
-    for(let i = 0; i < pieceNames.length; i++){
-      if(!piecesObject[pieceNames[i]].dead){
-        switch(true){
-          case /^(w|b)Q/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = QueenClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)K/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KingClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)B/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = BishopClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)N/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = KnightClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)R/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = RookClass.vision(cellMap, piecesObject, pieceNames[i]);
-            break;
-          case /^(w|b)P/.test(pieceNames[i]): piecesObject[pieceNames[i]].view = PawnClass.vision(cellMap, piecesObject, pieceNames[i], enPassantPiece);
-            break;
-          default: console.log("something went wrong in updatepiecevision");
-        }
-      }
-    }
-    return piecesObject;
-  }
-
-
-  // called when a pawn reaches their 8th rank
-  // flags the pawn promotion menu to appear
-  pawnBeingPromoted = (piecesObject, cellMap) => {
-    let {selectedPiece} = this.state;
-    let messageBoard = `${selectedPiece} is being promoted`;
-    this.setState({
-      piecesObject,
-      cellMap,
-      messageBoard,
-      pawnPromotionFlag: true
-    });
-  }
-
-
-  //this will be hard coded so that I don't go insane thinking about it. Make it dynamic later
-  //KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame? 
-  processCastling = (cell) => {
-    let {selectedPiece, piecesObject} = this.state;
-    let rookName;
-    let newPiecesObject = this.recursiveStateCopy(piecesObject);
-
-    //shortside castling
-    if(cell[0] === 2){
-      rookName = selectedPiece.charAt(0) + "R1";
-      newPiecesObject[rookName].x = 3;
-      newPiecesObject[selectedPiece].x = 2;
-      newPiecesObject[rookName].firstMove = false;
-      newPiecesObject[selectedPiece].firstMove = false;
-    }
-    //longside castling
-    else if(cell[0] === 6){
-      rookName = selectedPiece.charAt(0) + "R2";
-      newPiecesObject[rookName].x = 5;
-      newPiecesObject[selectedPiece].x = 6;
-      newPiecesObject[selectedPiece].firstMove = false;
-      newPiecesObject[rookName].firstMove = false;
-    }
-    let newCellMap = this.buildCellMap(newPiecesObject);
-    let message = `${selectedPiece} has castled with ${rookName}`;
-
-    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece);
-  }
-
-
-  processEnPassant = (cell) => {
-    let {piecesObject, selectedPiece, enPassantPiece} = this.state;
-    
-    let message = `${selectedPiece} just attacked ${enPassantPiece} in passing`;
-    let newPiecesObject = this.recursiveStateCopy(piecesObject);
-
-    newPiecesObject[selectedPiece].x = cell[0];
-    newPiecesObject[selectedPiece].y = cell[1];
-    newPiecesObject[enPassantPiece].dead = true;
-
-    let newCellMap = this.buildCellMap(newPiecesObject);
-
-    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece);
-
-  }
-
+  // tests if the king on the team of the currently selected piece is in check
+  // used to test if a move or attack is safe
+  // returns boolean
   isMyKingInCheck = ( piecesObject, cellMap ) => {
 
     const kingName = this.state.turn ? "wK" : "bK";
@@ -428,7 +265,7 @@ class ChessGame extends Component{
     //if it's proven that the king is being attacked, then no need to continue checking
     if(!inCheckFlag){
 
-      //test for linear queen and rook attacks
+      //test for rook and horizontal/vertical queen attacks
       rookPaths.forEach(path => {
         let startX = kingX + path[0];
         let startY = kingY + path[1];
@@ -454,10 +291,8 @@ class ChessGame extends Component{
 
     }
 
-
+    //test for enemy pawn attacks
     if(!inCheckFlag){
-
-      //test for enemy pawn attacks
       pawnPaths.forEach(path => {
         let cellTest = `${kingX - path[0]},${kingY - path[1]}`;
   
@@ -469,9 +304,8 @@ class ChessGame extends Component{
 
     }
 
+    //test for knight attacks
     if(!inCheckFlag){
-
-      //test for knight attacks
       knightPaths.forEach(path => {
         let cellTest = `${kingX + path[0]},${kingY + path[1]}`;
   
@@ -481,13 +315,71 @@ class ChessGame extends Component{
         }
       });
     }
-
     return inCheckFlag;
   }
 
 
-  // it might not be necessary for this to exist...
+  // ===================================================
+  // ================== STATE SETTERS ==================
+
+  // called when a pawn reaches their 8th rank; flags the pawn promotion menu to appear
+  // calls setState
+  pawnBeingPromoted = (piecesObject, cellMap) => {
+    let {selectedPiece} = this.state;
+    let messageBoard = `${selectedPiece} is being promoted`;
+    this.setState({
+      piecesObject,
+      cellMap,
+      messageBoard,
+      pawnPromotionFlag: true
+    });
+  }
+
+
+  // swaps a pawn with a piece of the users choice
+  // calls recursiveStateCopy, createPiece, buildCellMap, updatePieceVision, setState
+  promotePawn = ( newPieceType ) => {
+    let pieceNumbering = { ...this.state.pieceNumbering };
+    let { selectedPiece, piecesObject } = this.state;
+
+    let newPieceTeam = selectedPiece.charAt(0);
+    let newPiecesObject = this.recursiveStateCopy(piecesObject);
+
+    pieceNumbering[`${newPieceTeam}${newPieceType}`] += 1;
+
+    // a pieces name is made up of team, type, and number, to differentiate them in state
+    let newPiece = this.createPiece(
+                    newPieceType,
+                    newPieceTeam,
+                    newPiecesObject[selectedPiece].x,
+                    newPiecesObject[selectedPiece].y,
+                    pieceNumbering
+                  );
+
+    delete newPiecesObject[selectedPiece];
+    newPiecesObject[newPiece.name] = newPiece;
+
+    let newCellMap = this.buildCellMap(newPiecesObject);
+    let messageBoard = `${selectedPiece} has been promoted to ${newPiece.name}`;
+
+    // newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
+    for(const piece in newPiecesObject){
+      newPiecesObject[piece].view = this.pieceVisionSwitch(newPiecesObject, newCellMap, piece);
+    };
+    
+    this.setState({
+      piecesObject: newPiecesObject,
+      cellMap: newCellMap,
+      selectedPiece: "",
+      pawnPromotionFlag: false,
+      messageBoard,
+      pieceNumbering,
+      turn: !this.state.turn
+    });
+  }
+
   // sets firstmove and enpassant flags, initiates vision update
+  // calls updatePieceVision, pieceVisionSwitch, setState
   turnMaintenance = ( newPiecesObject, newCellMap, message, selectedPiece, wGraveyard = this.state.wGraveyard, bGraveyard = this.state.bGraveyard ) => {
 
     let enPassantPiece = "";
@@ -503,29 +395,87 @@ class ChessGame extends Component{
     }
 
     //update piece views
-    //not sure I'm handling this properly
-    newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, enPassantPiece);
+    // newPiecesObject = this.updatePieceVision(newPiecesObject, newCellMap, enPassantPiece);
+    for(const piece in newPiecesObject){
+      newPiecesObject[piece].view = this.pieceVisionSwitch(newPiecesObject, newCellMap, piece, enPassantPiece);
+    }
 
-    this.customSetState(newPiecesObject, newCellMap, "", message, enPassantPiece, wGraveyard, bGraveyard);
-  }
-
-
-  //separated this preemptively, might not be necessary
-  customSetState = (piecesObject, cellMap, selectedPiece, messageBoard, enPassantPiece, wGraveyard, bGraveyard) => {
-    
     this.setState({
-      piecesObject,
-      cellMap,
-      turn: !this.state.turn,
-      selectedPiece,
-      messageBoard,
-      enPassantPiece,
-      wGraveyard,
+      piecesObject: newPiecesObject, 
+      cellMap: newCellMap, 
+      selectedPiece: "", 
+      messageBoard: message, 
+      enPassantPiece, 
+      wGraveyard, 
       bGraveyard
     });
   }
 
+
+  // called when a move or attack is illegal
+  // erases selection, sets messageboard text
+  // calls setState
+  illegalMove = (messageBoard) => {
+    this.setState({
+      messageBoard,
+      selectedPiece: ""
+    });
+  }
+
+
+  // ===================================================
+  // =================== MUTATORS ======================
+
+  // KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame? 
+  // calls recursiveStateCopy, buildCellMap, turnMaintenance
+  processCastling = (cell) => {
+    let {selectedPiece, piecesObject} = this.state;
+    let rookName;
+    let newPiecesObject = this.recursiveStateCopy(piecesObject);
+
+    //shortside castling
+    if(cell[0] === 2){
+      rookName = selectedPiece.charAt(0) + "R1";
+      newPiecesObject[rookName].x = 3;
+      newPiecesObject[selectedPiece].x = 2;
+      newPiecesObject[rookName].firstMove = false;
+      newPiecesObject[selectedPiece].firstMove = false;
+    }
+    //longside castling
+    else if(cell[0] === 6){
+      rookName = selectedPiece.charAt(0) + "R2";
+      newPiecesObject[rookName].x = 5;
+      newPiecesObject[selectedPiece].x = 6;
+      newPiecesObject[selectedPiece].firstMove = false;
+      newPiecesObject[rookName].firstMove = false;
+    }
+    let newCellMap = this.buildCellMap(newPiecesObject);
+    let message = `${selectedPiece} has castled with ${rookName}`;
+
+    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece);
+  }
+
+
+  // processes enPassant
+  // calls recursiveStateCopy, buildCellMap, turnMaintenance
+  processEnPassant = (cell) => {
+    let {piecesObject, selectedPiece, enPassantPiece} = this.state;
+    
+    let message = `${selectedPiece} just attacked ${enPassantPiece} in passing`;
+    let newPiecesObject = this.recursiveStateCopy(piecesObject);
+
+    newPiecesObject[selectedPiece].x = cell[0];
+    newPiecesObject[selectedPiece].y = cell[1];
+    newPiecesObject[enPassantPiece].dead = true;
+
+    let newCellMap = this.buildCellMap(newPiecesObject);
+
+    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece);
+
+  }
+
   
+  // calls makeLivePieces, makeDeadPieces
   render(){
 
     let { boardDimensions, tileSize, messageBoard, turn, selectedPiece } = this.state;
@@ -540,12 +490,14 @@ class ChessGame extends Component{
     let piecesContainerStyle = {
       width: `${boardDimensions[0] * tileSize}px`,
       height: `${boardDimensions[1] * tileSize}px`,
-    }   
+    }
 
     return(
       <div id="game-container" >
         {theMenu}
-        <h2 id="turn-board" >{turn ? "White turn" : "Black turn"}</h2>
+        <h2 id="turn-board" >
+          {turn ? "White turn" : "Black turn"}
+        </h2>
         <CanvasChessBoard onClick={this.tileClick} />
         <div id="pieces-container" style={piecesContainerStyle} >
           {pieceObjects}
@@ -553,124 +505,56 @@ class ChessGame extends Component{
         <h3 id="message-board" >{messageBoard}</h3>
         <ChessGraveyard pieces={wGraveyard} idString="wGraveyard" />
         <ChessGraveyard pieces={bGraveyard} idString="bGraveyard" />
-        
       </div>
     )
-  }
+  } 
+  
+  
+  // ===================================================
+  // ==================== CREATORS =====================
 
+  // creates a new piece with given arguments
+  // returns object representing a piece
+  createPiece = (type, team, x, y, pieceNumbering) => {
 
-  // erases selection, sets messageboard text
-  illegalMove = (messageBoard) => {
-    this.setState({
-      messageBoard,
-      selectedPiece: ""
-    });
-  }
+    let newPiece = {...PIECE_PROTOTYPES[type]};
+    newPiece.pngPos = team === "w" ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos;
+    delete newPiece.WpngPos;
+    delete newPiece.BpngPos;
 
-
-  //makes pieces for the render method
-  makeLivePieces = () => {
-    let { piecesObject, selectedPiece } = this.state;
-    let livePieces = [];
-
-    Object.keys(piecesObject).forEach((name, i) => {
-      livePieces.push(
-        <Piece 
-          x={piecesObject[name].x}
-          y={piecesObject[name].y}
-          dead={piecesObject[name].dead}
-          key={name}
-          name={name}
-          size={TILESIZE}
-          border={selectedPiece}
-          onClick={this.pieceClick} />
-      );
-    });
-    return livePieces;
-  }
-
-
-  makeDeadPieces = () => {
-    let { wGraveyard, bGraveyard } = this.state;
-    let wPieces = [];
-    let bPieces = [];
-    let wGraveyardKeys = Object.keys(wGraveyard);
-    let bGraveyardKeys = Object.keys(bGraveyard);
-
-    if(wGraveyardKeys.length > 0){
-      wGraveyardKeys.forEach(name => {
-        wPieces.push(
-          <Piece
-            x={wGraveyard[name].x}
-            y={wGraveyard[name].y}
-            dead={wGraveyard[name].dead}
-            key={name}
-            name={name}
-            size={TILESIZE} />
-        );
-      });
+    if(type === "pawn"){
+      newPiece.fifthRank = team === "w" ? WfifthRank : BfifthRank;
     }
 
-    if(bGraveyardKeys.length > 0){
-      bGraveyardKeys.forEach(name => {
-        bPieces.push(
-          <Piece
-            x={bGraveyard[name].x}
-            y={bGraveyard[name].y}
-            dead={bGraveyard[name].dead}
-            key={name}
-            name={name}
-            size={TILESIZE} />
-        )
-      });
-    }
+    let unitNumber = pieceNumbering[`${team}${type}`] + 1;
+    newPiece.x = x;
+    newPiece.y = y;
+    newPiece.name = `${team}${type}${unitNumber}`;
+    newPiece.paths = PIECEPATHS[type];
 
-    return [wPieces, bPieces];
-
+    return newPiece;
   }
 
 
-  // deep copies state, gets all recursive about it
-  // specifically only works with my current structure
-  // if an array filled with objects is ever used in future versions of this app, I'll have to modify this
-  recursiveStateCopy = (oldstate) => {
-    let newState = {};
-    let oldstateKeys = Object.keys(oldstate);
+  // cellMap is used to lookup pieces by occupied cell coordinates rather than their name
+  // returns new cellMap object
+  buildCellMap = (piecesObject) => {
+    let cellMap = {};
+    let piecenames = Object.keys(piecesObject);
+    piecenames.forEach((piece, i) => {
+      if(!piecesObject[piece].dead){
 
-    if(oldstateKeys.length > 0){
-      oldstateKeys.forEach(key => {
-        // recursive copy objects 
-        if(typeof(oldstate[key]) === "object" && !Array.isArray(oldstate[key])){
-          newState[key] = this.recursiveStateCopy(oldstate[key]);
-        }
-        // copy up to 2d arrays with map
-        else if(typeof(oldstate[key]) === "object" && Array.isArray(oldstate[key])){
-          newState[key] = oldstate[key].map(value => {
-            if(Array.isArray(value)){
-              return value.map(subvalue => subvalue);
-            }
-            else return value;
-          });
-        }
-        // copy strings
-        else if(typeof(oldstate[key]) === "string"){
-          newState[key] = `${oldstate[key]}`;
-        }
-        // copy primitives
-        else {
-          newState[key] = oldstate[key];
-        }
-      });
-    }
-    // i dont think this is necessary...
-    else{
-      newState = {...oldstate};
-    }
-    return newState;
+        let coordinates = `${piecesObject[piece].x},${piecesObject[piece].y}`;
+        cellMap[coordinates] = piece;
+      }
+    }) ;
+    return cellMap;
   }
 
 
-  //initial game setup
+  // initial game setup
+  // calls buildCellMap and updatePieceVision
+  // returns an array of three objects which make up initial game state
   gameSetup = () => {
     let pieceNumbering = {
       "wP": 0,
@@ -710,12 +594,133 @@ class ChessGame extends Component{
     });
 
     //cellMap is used for piece name lookup by cell
-    let cellMap = this.buildCellMap(newPiecesObject);
+    let newCellMap = this.buildCellMap(newPiecesObject);
 
     //build the view properties of each piece
-    newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
+    // newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
+    for(const piece in newPiecesObject){
+      newPiecesObject[piece].view = this.pieceVisionSwitch(newPiecesObject, newCellMap, piece);
+    };
 
-    return [ newPiecesObject, cellMap, pieceNumbering ];
+    return [ newPiecesObject, newCellMap, pieceNumbering ];
+  }
+
+
+  // makes pieces for the render method
+  // returns an array of piece components
+  makeLivePieces = () => {
+    let { piecesObject, selectedPiece } = this.state;
+    let livePieces = [];
+
+    Object.keys(piecesObject).forEach((name, i) => {
+      livePieces.push(
+        <Piece 
+          x={piecesObject[name].x}
+          y={piecesObject[name].y}
+          dead={piecesObject[name].dead}
+          key={name}
+          name={name}
+          size={TILESIZE}
+          border={selectedPiece}
+          onClick={this.pieceClick} />
+      );
+    });
+    return livePieces;
+  }
+
+
+  // makes pieces for the white and black graveyards
+  // returns an array, contains two arrays, each made of piece components
+  makeDeadPieces = () => {
+    let { wGraveyard, bGraveyard } = this.state;
+    let wPieces = [];
+    let bPieces = [];
+    let wGraveyardKeys = Object.keys(wGraveyard);
+    let bGraveyardKeys = Object.keys(bGraveyard);
+
+    if(wGraveyardKeys.length > 0){
+      wGraveyardKeys.forEach(name => {
+        wPieces.push(
+          <Piece
+            x={wGraveyard[name].x}
+            y={wGraveyard[name].y}
+            dead={wGraveyard[name].dead}
+            key={name}
+            name={name}
+            size={TILESIZE} />
+        );
+      });
+    }
+
+    if(bGraveyardKeys.length > 0){
+      bGraveyardKeys.forEach(name => {
+        bPieces.push(
+          <Piece
+            x={bGraveyard[name].x}
+            y={bGraveyard[name].y}
+            dead={bGraveyard[name].dead}
+            key={name}
+            name={name}
+            size={TILESIZE} />
+        )
+      });
+    }
+    return [wPieces, bPieces];
+  }
+
+  // deep copies state, gets all recursive about it
+  // may need modifying if state structure is altered in the future
+  // calls recursiveStateCopy
+  // returns object representing piece state
+  recursiveStateCopy = (oldstate) => {
+    let newState = {};
+    let oldstateKeys = Object.keys(oldstate);
+
+    if(oldstateKeys.length > 0){
+      oldstateKeys.forEach(key => {
+        // recursive copy objects 
+        if(typeof(oldstate[key]) === "object" && !Array.isArray(oldstate[key])){
+          newState[key] = this.recursiveStateCopy(oldstate[key]);
+        }
+        // copy up to 2d arrays with map
+        else if(typeof(oldstate[key]) === "object" && Array.isArray(oldstate[key])){
+          newState[key] = oldstate[key].map(value => {
+            if(Array.isArray(value)){
+              return value.map(subvalue => subvalue);
+            }
+            else return value;
+          });
+        }
+        // copy strings
+        else if(typeof(oldstate[key]) === "string"){
+          newState[key] = `${oldstate[key]}`;
+        }
+        // copy primitives
+        else {
+          newState[key] = oldstate[key];
+        }
+      });
+    }
+    // i dont think this is necessary...
+    else{
+      newState = {...oldstate};
+    }
+    return newState;
+  }
+
+
+  // switch statement wrapper
+  // returns an object representing a pieces view
+  pieceVisionSwitch = (piecesObject, cellMap, pieceName, enPassantPiece = "") => {
+    switch(true){
+      case /^(w|b)Q/.test(pieceName): return QueenClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)K/.test(pieceName): return KingClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)B/.test(pieceName): return BishopClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)N/.test(pieceName): return KnightClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)R/.test(pieceName): return RookClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)P/.test(pieceName): return PawnClass.vision(cellMap, piecesObject, pieceName, enPassantPiece);
+      default: console.log("something went wrong in updatepiecevision");
+    }
   }
 }
 
