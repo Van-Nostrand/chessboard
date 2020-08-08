@@ -13,10 +13,8 @@ const tileClick = (e) => {
 }
 
 ReactDOM.render(
-  <div>
-    {/* <CanvasChessBoard onClick={tileClick} />
-    <ChessGame /> */}
-    <ChessGame />
-  </div>
+  
+    <CanvasDrawTest />
+  
   , document.getElementById('root')
 );
