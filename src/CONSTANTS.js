@@ -104,7 +104,7 @@ export const PIECE_PROTOTYPES = {
   "N": {WpngPos: "197px -3px",BpngPos: "197px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
   "B": {WpngPos: "-136px -3px", BpngPos: "-136px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
 }
-export const PIECEPATHS = {
+export const PIECE_PATHS = {
   "Q": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
   "K": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
   "B": [[1,-1],[1,1],[-1,1],[-1,-1]],

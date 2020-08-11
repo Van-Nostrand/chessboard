@@ -8,7 +8,7 @@ import {
   TILESIZE,
   TILEBORDERSIZE, 
   PIECE_OBJECTS,
-  PIECEPATHS,
+  PIECE_PATHS,
   PIECE_PROTOTYPES,
   PIECE_SVG,
   PP_TEST,
@@ -531,7 +531,7 @@ class ChessGame extends Component{
     newPiece.x = x;
     newPiece.y = y;
     newPiece.name = `${team}${type}${unitNumber}`;
-    newPiece.paths = PIECEPATHS[type];
+    newPiece.paths = PIECE_PATHS[type];
 
     return newPiece;
   }
@@ -576,19 +576,19 @@ class ChessGame extends Component{
     Object.keys(newPiecesObject).forEach((piece, i) => {
 
       switch(true){
-        case /^(w|b)Q/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["Q"]; pieceNumbering[`${piece.charAt(0)}Q`] += 1;
+        case /^(w|b)Q/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["Q"]; pieceNumbering[`${piece.charAt(0)}Q`] += 1;
           break;
-        case /^(w|b)K/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["K"]; 
+        case /^(w|b)K/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["K"]; 
           break;
-        case /^(w|b)B/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["B"]; pieceNumbering[`${piece.charAt(0)}B`] += 1;
+        case /^(w|b)B/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["B"]; pieceNumbering[`${piece.charAt(0)}B`] += 1;
           break;
-        case /^(w|b)R/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["R"]; pieceNumbering[`${piece.charAt(0)}R`] += 1;
+        case /^(w|b)R/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["R"]; pieceNumbering[`${piece.charAt(0)}R`] += 1;
           break;
-        case /^wP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["wP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
+        case /^wP/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["wP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
           break;
-        case /^bP/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["bP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
+        case /^bP/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["bP"]; pieceNumbering[`${piece.charAt(0)}P`] += 1;
           break; 
-        case /^(w|b)N/.test(piece): newPiecesObject[piece].paths = PIECEPATHS["N"]; pieceNumbering[`${piece.charAt(0)}N`] += 1;
+        case /^(w|b)N/.test(piece): newPiecesObject[piece].paths = PIECE_PATHS["N"]; pieceNumbering[`${piece.charAt(0)}N`] += 1;
           break;
         default: console.log("something went wrong while assigning paths");
       }
