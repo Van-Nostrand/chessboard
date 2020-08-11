@@ -5,7 +5,8 @@ import CanvasChessBoard from "./CanvasChessBoard";
 import CanvasPieces from "./CanvasPieces";
 import "./PromotionMenu.css";
 // import "./index.css";
-import CanvasDrawTest from "./CanvasDrawTest";
+import CanvasPieceTest from "./CanvasPieceTest";
+import CanvasChessGameTest from "./CanvasChessGameTest";
 
 
 const tileClick = (e) => {
@@ -14,7 +15,7 @@ const tileClick = (e) => {
 
 ReactDOM.render(
   
-    <CanvasDrawTest />
+    <CanvasChessGameTest />
   
   , document.getElementById('root')
 );

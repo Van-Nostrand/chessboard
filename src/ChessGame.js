@@ -9,10 +9,7 @@ import {
   TILEBORDERSIZE, 
   PIECE_OBJECTS,
   PIECE_PATHS,
-  PIECE_PROTOTYPES,
-  PIECE_SVG,
-  PP_TEST,
-  EN_PASSANT_TEST
+  PIECE_PROTOTYPES
 } from "./CONSTANTS";
 
 import "./ChessGame.css";

@@ -4,12 +4,11 @@ import {
   PIECE_OBJECTS,
   PIECE_PATHS,
   PIECE_PROTOTYPES,
-  PIECE_SVG,
+  PIECE_SVGS,
 } from "./CONSTANTS";
 
-const CanvasDrawTest = (props = {}) => {
+const CanvasPieceTest = (props = {}) => {
 
-  
   const {
     tileSize = 60,
     boardWidth = 8,
@@ -17,26 +16,18 @@ const CanvasDrawTest = (props = {}) => {
     offsetTop = 0,
     offsetLeft = 0,
     onClick,
+    PIECE_SCALE = 0.58,
     pixelRatio = window.devicePixelRatio //unused
   } = props;
 
-  const PIECETEST = {
-    piece1: {svg: PIECE_SVG.BISHOP_SVG, x: 0, y: 0, transformArr: [-3,0]},
-    piece2: {svg: PIECE_SVG.QUEEN_SVG, x: 60, y: 0, transformArr: [-24,-61]},
-    piece3: {svg: PIECE_SVG.KING_SVG, x: 120, y: 0, transformArr: [-30,-64]},
-    piece4: {svg: PIECE_SVG.PAWN_SVG, x: 180, y: 0, transformArr: [0,0]},
-    piece5: {svg: PIECE_SVG.KNIGHT_SVG, x: 240, y: 0, transformArr: [0,0]},
-    piece6: {svg: PIECE_SVG.ROOK_SVG, x: 300, y: 0, transformArr: [0,0]}
-  };
-
   const getSVGData = (piece) => {
     switch(true){
-      case /^(w|b)Q/.test(piece): return {svg: PIECE_SVG.QUEEN_SVG, transformArr: [-39,-105]};
-      case /^(w|b)K/.test(piece): return {svg: PIECE_SVG.KING_SVG, transformArr: [-53,-110]} ;
-      case /^(w|b)B/.test(piece): return {svg: PIECE_SVG.BISHOP_SVG, transformArr: [-3,-5]};
-      case /^(w|b)R/.test(piece): return {svg: PIECE_SVG.ROOK_SVG, transformArr: [-57,-110]}
-      case /^(w|b)P/.test(piece): return {svg: PIECE_SVG.PAWN_SVG, transformArr: [-55,-65]};
-      case /^(w|b)N/.test(piece): return {svg: PIECE_SVG.KNIGHT_SVG, transformArr: [-41,-98]};
+      case /^(w|b)Q/.test(piece): return PIECE_SVGS.queen;
+      case /^(w|b)K/.test(piece): return PIECE_SVGS.king;
+      case /^(w|b)B/.test(piece): return PIECE_SVGS.bishop;
+      case /^(w|b)R/.test(piece): return PIECE_SVGS.rook;
+      case /^(w|b)P/.test(piece): return PIECE_SVGS.pawn;
+      case /^(w|b)N/.test(piece): return PIECE_SVGS.knight;
       default: console.log("something went wrong in getSVGData");
     }
   }
@@ -55,12 +46,10 @@ const CanvasDrawTest = (props = {}) => {
   let [selectedPiece, setSelectedPiece] = useState("");
 
   const backgroundRef = useRef(null);
-  const PIECESCALE = 0.58;
 
   const pieceClick = (e) => {
-    console.log(`just clicked ${e.target.id} at coordinates ${e.clientX},${e.clientY}`);
     if(selectedPiece.length > 0){
-
+      console.log(`${selectedPiece} is already selected`);
     }
     else{
       setSelectedPiece(e.target.id);
@@ -92,7 +81,11 @@ const CanvasDrawTest = (props = {}) => {
   }
 
   const backgroundClick = (e) => {
-    console.log(`just clicked the background at coordinates ${e.clientX}, ${e.clientY}`);
+    if(selectedPiece.length > 0){
+      console.log(`${e.clientX},${e.clientY}`);
+      setThePieces({...thePieces, [selectedPiece]: {...thePieces[selectedPiece], x: Math.floor(e.clientX / 60), y: Math.floor(e.clientY / 60)}});
+      setSelectedPiece("");
+    }
   }
   
   useEffect(() => {
@@ -109,7 +102,7 @@ const CanvasDrawTest = (props = {}) => {
     contextArray.forEach(ctx => {
       let pieceName = ctx.canvas.id;
       ctx.fillStyle="blue";
-      ctx.scale(PIECESCALE, PIECESCALE);
+      ctx.scale(PIECE_SCALE, PIECE_SCALE);
       ctx.translate(thePieces[pieceName].transformArr[0], thePieces[pieceName].transformArr[1]);
       ctx.fill(new Path2D(thePieces[pieceName].svg));
       ctx.restore();
@@ -131,7 +124,7 @@ const CanvasDrawTest = (props = {}) => {
     padding: 0,
     margin: 0,
     position: "absolute",
-    border: "2px solid green",
+    border: "1px solid green",
   }
   
   const pieceCanvasses = Object.keys(thePieces)
@@ -159,4 +152,4 @@ const CanvasDrawTest = (props = {}) => {
   )  
 };
 
-export default CanvasDrawTest;
+export default CanvasPieceTest;

@@ -1,46 +1,80 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef} from "react";
 
-const CanvasChessBoard = (props = {}) => {
-  
+const CanvasPieceTest = (props = {}) => {
   const {
-    tileSize = 60,
+    TILE_SIZE = 60,
     boardWidth = 8,
     boardHeight = 8,
-    offsetTop = 0,
-    offsetLeft = 0,
+    OFFSET_TOP = 0,
+    OFFSET_LEFT = 0,
     onClick,
+    pieceLedger,
+    selectedPiece,
+    setSelectedPiece,
+    PIECE_SCALE = 0.58,
     pixelRatio = window.devicePixelRatio //unused
   } = props;
 
-  const pieceBoardRef = useRef(null);
+  let canvasRefs = {};
+  Object.keys(pieceLedger).forEach(piece => canvasRefs[piece] = useRef(null));
+  
 
-  const PIECE_SVG = "m5 50 l50 50";
-  const PIECE_PATH = new Path2D(PIECE_SVG);
-
+  const pieceClick = (e) => {
+    if(selectedPiece.length > 0){
+      console.log(`${selectedPiece} is already selected`);
+    }
+    else if(selectedPiece === e.target.id){
+      props.setSelectedPiece("");
+    }
+    else{
+      props.setSelectedPiece(e.target.id);
+    }
+  }
+  
   useEffect(() => {
-    const context = pieceBoardRef.current.getContext('2d');
-    
-    context.save();
+    const contextArray = Object.keys(canvasRefs).map(refName => canvasRefs[refName].current.getContext('2d'));
 
+    //save the state of each context
+    contextArray.forEach(ctx => {
+      ctx.save();
+    });
 
-    context.restore();
-  })
+    //draw and position each piece
+    contextArray.forEach(ctx => {
+      let pieceName = ctx.canvas.id;
+      
+      ctx.fillStyle= /^w/.test(pieceName) ? "white" : "black";
+      ctx.scale(PIECE_SCALE, PIECE_SCALE);
+      ctx.translate(pieceLedger[pieceName].transformArr[0], pieceLedger[pieceName].transformArr[1]);
+      ctx.fill(new Path2D(pieceLedger[pieceName].svg));
+      ctx.restore();
+      canvasRefs[pieceName].current.style.left = pieceLedger[pieceName].x * 60 + "px";
+      canvasRefs[pieceName].current.style.top = pieceLedger[pieceName].y * 60 + "px";
+    });
+  });
 
-  const pieceBoardStyle = {
+  const pieceCanvasStyle = {
     padding: 0,
     margin: 0,
-    position: "relative"
+    position: "absolute",
+    boxSizing: "border-box"
   }
+  
+  const pieceCanvasses = Object.keys(pieceLedger).map(piece => 
+                                      <canvas
+                                        id={pieceLedger[piece].name}
+                                        key={pieceLedger[piece].name}
+                                        width={TILE_SIZE}
+                                        height={TILE_SIZE}
+                                        ref={canvasRefs[piece]}
+                                        style={pieceCanvasStyle}
+                                        onClick={pieceClick} /> );
 
   return (
-    <canvas 
-      id="piece-board"
-      ref={pieceBoardRef}
-      width={tileSize * boardWidth}
-      height={tileSize * boardHeight}
-      style={pieceBoardStyle}
-      onClick={onClick} />
-  )
+    <>
+      {pieceCanvasses}
+    </>
+  )  
 };
 
-export default CanvasChessBoard;
+export default CanvasPieceTest;

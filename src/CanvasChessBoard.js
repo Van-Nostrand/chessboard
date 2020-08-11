@@ -34,16 +34,14 @@ const CanvasChessBoard = (props = {}) => {
         }
       }
     }
-
-    // context.restore();
-  })
+  });
 
   const canvasStyle = {
     padding: 0,
     margin: 0,
     left: offsetLeft + "px",
     top: offsetTop + "px",
-    position: "relative"
+    position: "absolute"
   }
 
   return (
