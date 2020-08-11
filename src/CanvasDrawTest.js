@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useRef} from "react";
 import piecesIMG from "./pieces.png";
 import {
-
   PIECE_OBJECTS,
   PIECE_PATHS,
   PIECE_PROTOTYPES,
@@ -53,12 +52,20 @@ const CanvasDrawTest = (props = {}) => {
   let [coordinates, setCoordinates] = useState([0,0]);
   let [thePieces, setThePieces] = useState(pieceLedger);
   let [canvasRefs, setCanvasRefs] = useState(bunchOfRefs);
+  let [selectedPiece, setSelectedPiece] = useState("");
 
   const backgroundRef = useRef(null);
   const PIECESCALE = 0.58;
 
   const pieceClick = (e) => {
     console.log(`just clicked ${e.target.id} at coordinates ${e.clientX},${e.clientY}`);
+    if(selectedPiece.length > 0){
+
+    }
+    else{
+      setSelectedPiece(e.target.id);
+
+    }
   }
 
   const drawGrid = (context) => {
@@ -89,6 +96,7 @@ const CanvasDrawTest = (props = {}) => {
   }
   
   useEffect(() => {
+    console.log("called useEffect");
     const backgroundContext = backgroundRef.current.getContext('2d');
     drawGrid(backgroundContext);
 
