@@ -1,8 +1,8 @@
 # Chess!
 This is a project that has haunted me since College. I originally tried to do it in Java but screwed it up at the time. After, I was too busy to get around to finishing it. I've thought about it many times over the years so I figured I'd try to finish it for fun.
 
-### Where it's at (August 3 2020)
-I've built a rudimentary "pawn promotion menu". It's functional... in the process of styling it
+### Where it's at (August 11 2020)
+I've reimplemented the basics of the game using canvas elements and svg paths. will continue pursuing this. implemented hooks in some elements
 
 ### Todo: for now
 * focus on styling for the next few days
