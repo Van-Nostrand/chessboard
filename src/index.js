@@ -6,6 +6,7 @@ import CanvasPieces from "./CanvasPieces";
 import "./PromotionMenu.css";
 // import "./index.css";
 import CanvasPieceTest from "./CanvasPieceTest";
+
 import CanvasChessGameTest from "./CanvasChessGameTest";
 
 

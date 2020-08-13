@@ -8,14 +8,35 @@ import {
   PIECE_SVGS,
 } from "./CONSTANTS";
 
+import KingClass from "./pieceData/KingClass";
+import QueenClass from "./pieceData/QueenClass";
+import RookClass from "./pieceData/RookClass";
+import PawnClass from "./pieceData/PawnClass";
+import BishopClass from "./pieceData/BishopClass";
+import KnightClass from "./pieceData/KnightClass";
+
 class CanvasChessGameTest extends Component{
   constructor(props){
     super(props);
+
+    let pieceNumbering = {
+      "wP": 10,
+      "wR": 10,
+      "wN": 10,
+      "wB": 10,
+      "wQ": 10,
+      "bP": 10,
+      "bR": 10,
+      "bN": 10,
+      "bB": 10,
+      "bQ": 10
+    };
   
     let pieceLedger = {};
     for(let piece in PIECE_OBJECTS){
       switch(true){
         case /^(w|b)Q/.test(piece): pieceLedger[piece] = { ...PIECE_OBJECTS[piece], ...PIECE_SVGS.queen};
+          pieceNumbering
           break;
         case /^(w|b)K/.test(piece): pieceLedger[piece] = { ...PIECE_OBJECTS[piece], ...PIECE_SVGS.king};
           break;
@@ -31,10 +52,14 @@ class CanvasChessGameTest extends Component{
       }
     }
 
+    
+
     this.state = {
       pieceLedger,
       selectedPiece: "",
-      messageBoard: "Chess!"
+      messageBoard: "Chess!",
+      pieceNumbering,
+      
     }
   }
 
@@ -108,6 +133,20 @@ class CanvasChessGameTest extends Component{
         <h5 style={h5Style}>{this.state.messageBoard}</h5>
       </div>
     );
+  }
+
+  // switch statement wrapper
+  // returns an object representing a pieces view
+  pieceVisionSwitch = (piecesObject, cellMap, pieceName, enPassantPiece = "") => {
+    switch(true){
+      case /^(w|b)Q/.test(pieceName): return QueenClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)K/.test(pieceName): return KingClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)B/.test(pieceName): return BishopClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)N/.test(pieceName): return KnightClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)R/.test(pieceName): return RookClass.vision(cellMap, piecesObject, pieceName);
+      case /^(w|b)P/.test(pieceName): return PawnClass.vision(cellMap, piecesObject, pieceName, enPassantPiece);
+      default: console.log("something went wrong in updatepiecevision");
+    }
   }
 }
 
