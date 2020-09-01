@@ -32,24 +32,44 @@ class ChessGame extends Component{
     super(props);
 
     let [ piecesObject, cellMap, tileArr, pieceNumbering ] = this.gameSetup();
+    let gameState = {
+      cellMap,
+      piecesObject,
+      wGraveyard: {},
+      bGraveyard: {},
+      pieceNumbering,
+      turn: true,
+      selectedPiece: "",
+      enPassantPiece: ""
+    }
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE,
       tileBorderSize: TILEBORDERSIZE,
       tileArr,
-      cellMap,
-      piecesObject,
-      wGraveyard: {},
-      bGraveyard: {},
-      turn: true,
-      selectedPiece: "",
-      enPassantPiece: "",
+      gameState,
       messageBoard: "no piece selected",
       pawnPromotionFlag: false,
-      pieceNumbering,
-      prevTurn: {}
+      prevTurn: {} // UNUSED
     }
+    // this.state = {
+    //   boardDimensions: BOARDDIMENSIONS,
+    //   tileSize: TILESIZE,
+    //   tileBorderSize: TILEBORDERSIZE,
+    //   tileArr,
+    //   cellMap,
+    //   piecesObject,
+    //   wGraveyard: {},
+    //   bGraveyard: {},
+    //   pieceNumbering,
+    //   turn: true,
+    //   selectedPiece: "",
+    //   enPassantPiece: "",
+    //   messageBoard: "no piece selected",
+    //   pawnPromotionFlag: false,
+    //   prevTurn: {} // UNUSED
+    // }
   }
 
 
@@ -62,7 +82,8 @@ class ChessGame extends Component{
   // - - En Passant
   // - illegal move attempt
   tileClick = (e) => {
-    let { selectedPiece, piecesObject } = this.state;
+    // let { selectedPiece, piecesObject } = this.state;
+    let { selectedPiece, piecesObject } = this.state.gameState;
 
     // Accidental, or clicking a tile while no piece selected
     if(selectedPiece.length === 0){
@@ -98,12 +119,13 @@ class ChessGame extends Component{
 
   // determines why the user clicked a piece and then calls the appropriate function
   // reasons to click a piece:
-  // - accidental
+  // - illegal selection or attack
   // - to select
   // - to deselect
   // - to attack
   pieceClick = (e, name) => {
-    let { selectedPiece, piecesObject, turn } = this.state;
+    let { selectedPiece, piecesObject, turn } = this.state.gameState;
+    // let { selectedPiece, piecesObject, turn } = this.state;
 
     //if selecting a piece
     if(selectedPiece.length === 0){
@@ -149,14 +171,14 @@ class ChessGame extends Component{
   }
 
 
-  //tests and completes attacks
+  // tests and completes attacks
+  // before this is called, it is verified that the attacking piece can technically attack this cell
+  // the only test this applies is whether or not 
   tryAttacking = (targetCell, targetPieceName) => {
-    let {selectedPiece, piecesObject, cellMap} = this.state;
-    let wGraveyard = {...this.state.wGraveyard};
-    let bGraveyard = {...this.state.bGraveyard};
+    let newGameState = this.recursiveStateCopy(this.state.gameState);
+    let {selectedPiece, piecesObject, cellMap, wGraveyard, bGraveyard} = newGameState;
 
     //make a copy of state and carry out the attack
-    let newPiecesObject = this.recursiveStateCopy(piecesObject);
     
     [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y]  = targetCell;
     let targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`];
@@ -188,9 +210,8 @@ class ChessGame extends Component{
 
   // tests and completes moves
   tryMoving = (cell) => {
-    let {selectedPiece, piecesObject} = this.state;
-    let newPiecesObject = this.recursiveStateCopy(piecesObject);
-    // let newPiecesObject = JSON.parse(JSON.stringify(piecesObject));
+    let newGameState = this.recursiveStateCopy(this.state.gameState);
+    let {selectedPiece, piecesObject} = newGameState;
     [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y] = cell;
     
     //test whether move puts own king in check
