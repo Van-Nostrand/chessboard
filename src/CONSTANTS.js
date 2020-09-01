@@ -97,13 +97,21 @@ export const EN_PASSANT_TEST = {
   "wK": {checkView: {}, firstMove: true, pngPos: "-4px -3px", dead: false, paths: [], name: "wK", view: {}, x: 0, y: 7},
 };
 export const PIECE_PROTOTYPES = {
-  "R": {WpngPos: "130px -3px", BpngPos: "130px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "Q": {WpngPos: "-70px -3px", BpngPos: "-70px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "K": {WpngPos: "-4px -3px", BpngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, checkView: {}, x: 0, y: 0},
-  "P": {enPassant: false, firstMove: true, BfifthRank: 4, WfifthRank: 3, BpngPos: "65px 63px", WpngPos: "65px -3px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "N": {WpngPos: "197px -3px",BpngPos: "197px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "B": {WpngPos: "-136px -3px", BpngPos: "-136px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
+  "R": {WpngPos: "13rem -0.3rem", BpngPos: "13rem 6.3rem", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+  "Q": {WpngPos: "-7rem -0.3rem", BpngPos: "-7rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+  "K": {WpngPos: "-0.4rem -0.3rem", BpngPos: "-0.4rem 6.3rem", firstMove: true, dead: false, paths: [], name: "", view: {}, checkView: {}, x: 0, y: 0},
+  "P": {enPassant: false, firstMove: true, BfifthRank: 4, WfifthRank: 3, BpngPos: "6.5rem 6.3rem", WpngPos: "6.5rem -0.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+  "N": {WpngPos: "19.7rem -0.3rem",BpngPos: "19.7rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+  "B": {WpngPos: "-13.6rem -0.3rem", BpngPos: "-13.6rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
 }
+// export const PIECE_PROTOTYPES = {
+//   "R": {WpngPos: "130px -3px", BpngPos: "130px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+//   "Q": {WpngPos: "-70px -3px", BpngPos: "-70px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+//   "K": {WpngPos: "-4px -3px", BpngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, checkView: {}, x: 0, y: 0},
+//   "P": {enPassant: false, firstMove: true, BfifthRank: 4, WfifthRank: 3, BpngPos: "65px 63px", WpngPos: "65px -3px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+//   "N": {WpngPos: "197px -3px",BpngPos: "197px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
+//   "B": {WpngPos: "-136px -3px", BpngPos: "-136px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
+// }
 export const PIECEPATHS = {
   "Q": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
   "K": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],

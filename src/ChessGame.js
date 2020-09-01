@@ -94,7 +94,10 @@ class ChessGame extends Component{
     if(selectedPiece.length > 0){
       
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
-      let cell = [ Math.floor((e.clientX - rect.left) / TILESIZE) , Math.floor((e.clientY - rect.top) / TILESIZE) ];
+
+      // In order for this game to dynamically scale, Tilesize needs to be dynamic
+      // getTileSize checks the current window width and returns a dynamic tilesize
+      let cell = [ Math.floor((e.clientX - rect.left) / this.getTileSize()) , Math.floor((e.clientY - rect.top) / this.getTileSize()) ];
       let cellString = `${cell[0]},${cell[1]}`;
       
       //MOVING
@@ -210,8 +213,9 @@ class ChessGame extends Component{
 
   // tests and completes moves
   tryMoving = (cell) => {
-    let newGameState = this.recursiveStateCopy(this.state.gameState);
-    let {selectedPiece, piecesObject} = newGameState;
+    let {selectedPiece, piecesObject} = this.state;
+    let newPiecesObject = this.recursiveStateCopy(piecesObject);
+
     [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y] = cell;
     
     //test whether move puts own king in check
@@ -386,18 +390,27 @@ class ChessGame extends Component{
 
   processEnPassant = (cell) => {
     let {piecesObject, selectedPiece, enPassantPiece} = this.state;
+    let wGraveyard = {...this.state.wGraveyard};
+    let bGraveyard = {...this.state.bGraveyard};
     
     let message = `${selectedPiece} just attacked ${enPassantPiece} in passing`;
     let newPiecesObject = this.recursiveStateCopy(piecesObject);
 
     newPiecesObject[selectedPiece].x = cell[0];
     newPiecesObject[selectedPiece].y = cell[1];
-    newPiecesObject[enPassantPiece].dead = true;
+
+    if(enPassantPiece.charAt(0) === "w"){
+      wGraveyard[enPassantPiece] = {...newPiecesObject[enPassantPiece]};
+      wGraveyard[enPassantPiece].dead = true;
+    }
+    else if(enPassantPiece.charAt(0) === "b"){
+      bGraveyard[enPassantPiece] = {...newPiecesObject[enPassantPiece]};
+      bGraveyard[enPassantPiece].dead = true;
+    }
 
     let newCellMap = this.buildCellMap(newPiecesObject);
 
-    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece);
-
+    this.turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece, wGraveyard, bGraveyard);
   }
 
   isMyKingInCheck = ( piecesObject, cellMap ) => {
@@ -549,10 +562,14 @@ class ChessGame extends Component{
   
   render(){
 
-    let { boardDimensions, tileSize, messageBoard, turn, selectedPiece } = this.state;
+    let { boardDimensions, messageBoard, turn, selectedPiece } = this.state;
+
+    //GENERATE SCALING 
+    let backgroundSize = this.getBackgroundSize();
+    let tileSize = this.getTileSize();
     
     //GENERATE TILES
-    let boardTiles = this.makeTiles();
+    let boardTiles = this.makeTiles(tileSize);
 
     //GENERATE PIECES
     let pieceObjects = this.makeLivePieces();
@@ -562,13 +579,13 @@ class ChessGame extends Component{
 
     //STYLES
     let tileContainerStyle = {
-      width: `${boardDimensions[0] * tileSize}px`,
-      height: `${boardDimensions[1] * tileSize}px`,
+      width: `${(boardDimensions[0] * tileSize)/10}rem`,
+      height: `${(boardDimensions[1] * tileSize)/10}rem`,
     }
    
     let piecesContainerStyle = {
-      width: `${boardDimensions[0] * tileSize}px`,
-      height: `${boardDimensions[1] * tileSize}px`,
+      width: `${(boardDimensions[0] * tileSize)/10}rem`,
+      height: `${(boardDimensions[1] * tileSize)/10}rem`,
     }   
 
     return(
@@ -599,12 +616,14 @@ class ChessGame extends Component{
 
 
   //makes board tiles 
-  makeTiles = () => {
+  makeTiles = (tileSize) => {
+    
+    console.log(`tilesize is ${tileSize}`);
     return new Array(this.state.boardDimensions[0]).fill().map((column, i) => {
       return new Array(this.state.boardDimensions[1]).fill().map((tile,j) => {
         return <Tile
                   key={`tile-${i}-${j}`} 
-                  size={this.state.tileSize} 
+                  size={tileSize} 
                   borderColour="red" 
                   classString={this.state.tileArr[i][j]}
                   borderSize={this.state.tileBorderSize} 
@@ -615,9 +634,11 @@ class ChessGame extends Component{
 
 
   //makes pieces for the render method
-  makeLivePieces = () => {
+  makeLivePieces = (tileSize, backgroundSize) => {
     let { piecesObject, selectedPiece } = this.state;
     let livePieces = [];
+    
+    console.log(`backgroundsize is ${backgroundSize}`)
 
     Object.keys(piecesObject).forEach((name, i) => {
       livePieces.push(
@@ -627,7 +648,8 @@ class ChessGame extends Component{
           dead={piecesObject[name].dead}
           key={name}
           name={name}
-          size={TILESIZE}
+          size={tileSize}
+          backgroundSize={backgroundSize}
           border={selectedPiece}
           onClick={this.pieceClick} />
       );
@@ -636,12 +658,13 @@ class ChessGame extends Component{
   }
 
 
-  makeDeadPieces = () => {
+  makeDeadPieces = (tileSize, backgroundSize) => {
     let { wGraveyard, bGraveyard } = this.state;
     let wPieces = [];
     let bPieces = [];
     let wGraveyardKeys = Object.keys(wGraveyard);
     let bGraveyardKeys = Object.keys(bGraveyard);
+    let backgroundSize = this.getBackgroundSize();
 
     if(wGraveyardKeys.length > 0){
       wGraveyardKeys.forEach(name => {
@@ -652,7 +675,8 @@ class ChessGame extends Component{
             dead={wGraveyard[name].dead}
             key={name}
             name={name}
-            size={TILESIZE} />
+            backgroundSize={backgroundSize}
+            size={tileSize} />
         );
       });
     }
@@ -666,7 +690,8 @@ class ChessGame extends Component{
             dead={bGraveyard[name].dead}
             key={name}
             name={name}
-            size={TILESIZE} />
+            backgroundSize={backgroundSize}
+            size={tileSize} />
         )
       });
     }
@@ -760,6 +785,73 @@ class ChessGame extends Component{
     newPiecesObject = this.updatePieceVision(newPiecesObject, cellMap);
 
     return [ newPiecesObject, cellMap, tileArr, pieceNumbering ];
+  }
+
+  getTileSize = () => {
+    /*
+    ASSUMPTIONS: 
+    - browser fontsize is set to default - 16px
+    - dynamic scale styling is set up:
+    - - html element font-size is set to 62.5% 
+    - - 1rem therefore equals 10px, a nice round number 
+    - I built the game with a TILESIZE of 60px
+    - if the tilesize is 60 at 62.5%, then it would be 96 at 100%
+    */
+
+    const BASETILESIZE = 96;
+    
+    //tablet landscape
+    if(window.innerWidth <= 1200 && window.innerWidth > 900){
+      return BASETILESIZE * 0.5625;
+    }
+    //tablet portrait
+    else if(window.innerWidth <= 900 && window.innerWidth > 600){
+      return BASETILESIZE * 0.5;
+    }
+    //phone
+    else if(window.innerWidth <= 600){
+      return BASETILESIZE * 0.4;
+    }
+    //desktop
+    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
+      return BASETILESIZE * 0.625;
+    }
+    //big desktop
+    else if(window.innerWidth > 1800){
+      return BASETILESIZE * 0.75;
+    }
+  }
+
+  getBackgroundSize = () => {
+    /* 
+    ASSUMPTIONS:
+    - same assumptions as in getTileSize()
+    - exception being that BACKGROUNDSIZE in each <Piece /> was set at 400 through development
+    - at html font-size: 100%, BACKGROUNDSIZE would be 640
+    */
+
+    const BASEBACKGROUNDSIZE = 640;
+    
+    //big desktop
+    if(window.innerWidth > 1800){
+      return BASEBACKGROUNDSIZE * 0.75;
+    }
+    //desktop
+    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
+      return BASEBACKGROUNDSIZE * 0.625;
+    }
+    //tablet landscape
+    if(window.innerWidth <= 1200 && window.innerWidth > 900){
+      return BASEBACKGROUNDSIZE * 0.5625;
+    }
+    //tablet portrait
+    else if(window.innerWidth <= 900 && window.innerWidth > 600){
+      return BASEBACKGROUNDSIZE * 0.5;
+    }
+    //phone
+    else if(window.innerWidth <= 600){
+      return BASEBACKGROUNDSIZE * 0.4;
+    }
   }
 }
 
