@@ -537,7 +537,6 @@ class ChessGame extends Component{
   checkResize = () => {
     let currentWidth = window.innerWidth;
     let screenType;
-    console.log(currentWidth);
     switch(true){
       case currentWidth > 1800: screenType = "big"; break;
       case currentWidth <= 1800 && currentWidth > 1200: screenType = "desktop"; break;
