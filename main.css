@@ -1,0 +1,191 @@
+:root{
+  --light-tile: #f98f39;
+  --dark-tile: #603d0b;
+  --light-tile2: #ecb379;
+  --dark-tile2: #745120;
+}
+
+*,
+*::after,
+*::before{
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html{
+  font-size: 62.5%;
+  
+  font-family: Helvetica, sans-serif;
+}
+/* under 1200px ~ tablet-landscape */
+@media screen and (max-width: 75em){
+  html{
+    font-size: 56.25%;
+  }
+}
+/* under 900px ~ tablet-portrait */
+@media screen and (max-width: 56.25em){
+  html{
+    font-size: 50%;
+  }
+}
+/* under 600px ~ phone */
+@media screen and (max-width: 37.5em){ 
+  html{
+    font-size: 40%;
+  }
+}
+/* over 1800px ~ big desktops */
+@media (min-width: 112.5em){
+  html{
+    font-size: 75%;
+  }
+}
+
+body {
+  /* box-sizing: border-box; */
+  margin: 0 auto;
+}
+
+#game-container{
+  display: grid; 
+  grid-template-columns: 8rem 15rem 48rem 15rem 8rem;
+  grid-template-rows: 8rem 48rem 8rem;
+}
+
+
+#turn-board{
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  grid-column: 3;
+  grid-row: 1;
+  place-self: center;
+  text-align: center;
+  font-size: 4rem;
+}
+
+#middle-container{
+  position: relative;
+  margin: 0 auto;
+  grid-column: 3;
+  grid-row: 2;
+  
+}
+
+#tile-container{
+  margin: auto;
+  padding: 0;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.tile{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.light-tile {
+  background-color: var(--light-tile2);
+}
+
+.dark-tile{
+  background-color: var(--dark-tile2);
+}
+
+#pieces-container{
+  margin: auto;
+  padding: 0;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  pointer-events: none;
+  box-sizing: border-box;
+
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.piece{
+  background-origin: border-box;
+  box-sizing: border-box;
+  pointer-events: all;
+  /* position: absolute; */
+}
+
+#wGraveyard, #bGraveyard{
+  grid-row: 2;
+  display: flex;
+  flex-flow: column;
+  flex-wrap: wrap;
+  background-color: #aaa;
+}
+
+#wGraveyard{grid-column: 2;}
+#bGraveyard{grid-column: 4;}
+
+#wGraveyard > h3,
+#bGraveyard > h3{
+  position: absolute;
+  top: 31rem;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  width: 48rem;
+  text-align: center;
+  color: #ccc;
+}
+
+#wGraveyard > h3 {
+  left: -7.4rem;
+}
+
+#bGraveyard > h3{
+  left: 54rem;
+}
+
+
+
+#message-board{
+  display: inline-block;
+  position: relative;
+  grid-column: 3;
+  grid-row: 3;
+  place-self: center;
+  text-align: center;
+  font-size: 3rem;
+}
+#promotion-menu {
+  z-index: 2;
+  width: 400px;
+  height: 100px;
+  background-color: #cccccc;
+  font-family: Helvetica, sans-serif;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#promotion-menu > p{
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.promotion-choice{
+  width: 60px;
+  height: 60px;
+  border: 1px dotted red;
+  text-align: center;
+  margin: 2px;
+  line-height: 105px;
+  box-sizing: border-box;
+}
