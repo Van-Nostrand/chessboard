@@ -32,16 +32,12 @@ class ChessGame extends Component{
     super(props);
 
     let [ piecesObject, cellMap, tileArr, pieceNumbering ] = this.gameSetup();
-<<<<<<< HEAD
-    let gameState = {
-=======
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
       tileSize: TILESIZE, // unused
       tileBorderSize: TILEBORDERSIZE, // unused
       tileArr,
->>>>>>> temp
       cellMap,
       piecesObject,
       wGraveyard: {},
@@ -49,38 +45,6 @@ class ChessGame extends Component{
       pieceNumbering,
       turn: true,
       selectedPiece: "",
-<<<<<<< HEAD
-      enPassantPiece: ""
-    }
-
-    this.state = {
-      boardDimensions: BOARDDIMENSIONS,
-      tileSize: TILESIZE,
-      tileBorderSize: TILEBORDERSIZE,
-      tileArr,
-      gameState,
-      messageBoard: "no piece selected",
-      pawnPromotionFlag: false,
-      prevTurn: {} // UNUSED
-    }
-    // this.state = {
-    //   boardDimensions: BOARDDIMENSIONS,
-    //   tileSize: TILESIZE,
-    //   tileBorderSize: TILEBORDERSIZE,
-    //   tileArr,
-    //   cellMap,
-    //   piecesObject,
-    //   wGraveyard: {},
-    //   bGraveyard: {},
-    //   pieceNumbering,
-    //   turn: true,
-    //   selectedPiece: "",
-    //   enPassantPiece: "",
-    //   messageBoard: "no piece selected",
-    //   pawnPromotionFlag: false,
-    //   prevTurn: {} // UNUSED
-    // }
-=======
       enPassantPiece: "",
       messageBoard: "CHESS!",
       pawnPromotionFlag: false,
@@ -88,7 +52,6 @@ class ChessGame extends Component{
       prevTurn: {},
       windowSize: ""
     }
->>>>>>> temp
   }
 
 
