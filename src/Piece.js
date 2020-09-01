@@ -63,7 +63,7 @@ const Piece = ({border = "", name, dead, x, y, size, onClick, backgroundSize }) 
       position: "absolute",
       border: borderLogic    
     };
-    console.log(style);
+    
     divElement = <div
                   className="piece"
                   style={style}
