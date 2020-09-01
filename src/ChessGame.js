@@ -6,7 +6,7 @@ import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
-  TILEBORDERSIZE,
+  TILEBORDERSIZE, 
   PIECE_OBJECTS,
   PIECEPATHS,
   PIECE_PROTOTYPES
@@ -38,7 +38,6 @@ class ChessGame extends Component{
       piecesObject,
       wGraveyard: {},
       bGraveyard: {},
-      pieceNumbering,
       turn: true,
       selectedPiece: "",
       enPassantPiece: "",
@@ -60,8 +59,7 @@ class ChessGame extends Component{
   // - - En Passant
   // - illegal move attempt
   tileClick = (e) => {
-    // let { selectedPiece, piecesObject } = this.state;
-    let { selectedPiece, piecesObject } = this.state.gameState;
+    let { selectedPiece, piecesObject } = this.state;
 
     // Accidental, or clicking a tile while no piece selected
     if(selectedPiece.length === 0){
@@ -100,13 +98,12 @@ class ChessGame extends Component{
 
   // determines why the user clicked a piece and then calls the appropriate function
   // reasons to click a piece:
-  // - illegal selection or attack
+  // - accidental
   // - to select
   // - to deselect
   // - to attack
   pieceClick = (e, name) => {
     let { selectedPiece, piecesObject, turn } = this.state;
-    // let { selectedPiece, piecesObject, turn } = this.state;
 
     //if selecting a piece
     if(selectedPiece.length === 0){
@@ -152,14 +149,14 @@ class ChessGame extends Component{
   }
 
 
-  // tests and completes attacks
-  // before this is called, it is verified that the attacking piece can technically attack this cell
-  // the only test this applies is whether or not 
+  //tests and completes attacks
   tryAttacking = (targetCell, targetPieceName) => {
-    let newGameState = this.recursiveStateCopy(this.state.gameState);
-    let {selectedPiece, piecesObject, cellMap, wGraveyard, bGraveyard} = newGameState;
+    let {selectedPiece, piecesObject, cellMap} = this.state;
+    let wGraveyard = {...this.state.wGraveyard};
+    let bGraveyard = {...this.state.bGraveyard};
 
     //make a copy of state and carry out the attack
+    let newPiecesObject = this.recursiveStateCopy(piecesObject);
     
     [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y]  = targetCell;
     let targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`];
