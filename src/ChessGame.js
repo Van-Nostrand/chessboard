@@ -32,7 +32,16 @@ class ChessGame extends Component{
     super(props);
 
     let [ piecesObject, cellMap, tileArr, pieceNumbering ] = this.gameSetup();
+<<<<<<< HEAD
     let gameState = {
+=======
+
+    this.state = {
+      boardDimensions: BOARDDIMENSIONS,
+      tileSize: TILESIZE, // unused
+      tileBorderSize: TILEBORDERSIZE, // unused
+      tileArr,
+>>>>>>> temp
       cellMap,
       piecesObject,
       wGraveyard: {},
@@ -40,6 +49,7 @@ class ChessGame extends Component{
       pieceNumbering,
       turn: true,
       selectedPiece: "",
+<<<<<<< HEAD
       enPassantPiece: ""
     }
 
@@ -70,6 +80,15 @@ class ChessGame extends Component{
     //   pawnPromotionFlag: false,
     //   prevTurn: {} // UNUSED
     // }
+=======
+      enPassantPiece: "",
+      messageBoard: "CHESS!",
+      pawnPromotionFlag: false,
+      pieceNumbering,
+      prevTurn: {},
+      windowSize: ""
+    }
+>>>>>>> temp
   }
 
 
@@ -559,7 +578,31 @@ class ChessGame extends Component{
     });
   }
 
-  
+  checkResize = () => {
+    let currentWidth = window.innerWidth;
+    let screenType;
+    console.log(currentWidth);
+    switch(true){
+      case currentWidth > 1800: screenType = "big"; break;
+      case currentWidth <= 1800 && currentWidth > 1200: screenType = "desktop"; break;
+      case currentWidth <= 1200 && currentWidth > 900: screenType = "tab-land"; break;
+      case currentWidth <= 900 && currentWidth > 600: screenType = "tab-port"; break;
+      case currentWidth <= 600: screenType = "phone"; break;
+      default: console.log("ERROR IN HANDLE RESIZE");
+    }
+    if(screenType !== this.state.windowSize){
+      this.setState({windowSize: screenType});
+    }
+  }
+
+  componentDidMount = () => {
+    window.addEventListener('resize', this.checkResize);
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('resize');
+  }
+
   render(){
 
     let { boardDimensions, messageBoard, turn, selectedPiece } = this.state;
@@ -572,20 +615,20 @@ class ChessGame extends Component{
     let boardTiles = this.makeTiles(tileSize);
 
     //GENERATE PIECES
-    let pieceObjects = this.makeLivePieces();
-    let [ wGraveyard, bGraveyard ] = this.makeDeadPieces();
+    let pieceObjects = this.makeLivePieces(tileSize, backgroundSize);
+    let [ wGraveyard, bGraveyard ] = this.makeDeadPieces(tileSize, backgroundSize);
 
     let theMenu = this.state.pawnPromotionFlag ? <PromotionMenu selectPiece={this.promotePawn} team={selectedPiece.charAt(0)} /> : "";
 
     //STYLES
     let tileContainerStyle = {
-      width: `${(boardDimensions[0] * tileSize)/10}rem`,
-      height: `${(boardDimensions[1] * tileSize)/10}rem`,
+      width: `${boardDimensions[0] * tileSize}px`,
+      height: `${boardDimensions[1] * tileSize}px`,
     }
    
     let piecesContainerStyle = {
-      width: `${(boardDimensions[0] * tileSize)/10}rem`,
-      height: `${(boardDimensions[1] * tileSize)/10}rem`,
+      width: `${boardDimensions[0] * tileSize}px`,
+      height: `${boardDimensions[1] * tileSize}px`,
     }   
 
     return(
@@ -618,7 +661,6 @@ class ChessGame extends Component{
   //makes board tiles 
   makeTiles = (tileSize) => {
     
-    console.log(`tilesize is ${tileSize}`);
     return new Array(this.state.boardDimensions[0]).fill().map((column, i) => {
       return new Array(this.state.boardDimensions[1]).fill().map((tile,j) => {
         return <Tile
@@ -638,8 +680,6 @@ class ChessGame extends Component{
     let { piecesObject, selectedPiece } = this.state;
     let livePieces = [];
     
-    console.log(`backgroundsize is ${backgroundSize}`)
-
     Object.keys(piecesObject).forEach((name, i) => {
       livePieces.push(
         <Piece 
@@ -664,7 +704,6 @@ class ChessGame extends Component{
     let bPieces = [];
     let wGraveyardKeys = Object.keys(wGraveyard);
     let bGraveyardKeys = Object.keys(bGraveyard);
-    let backgroundSize = this.getBackgroundSize();
 
     if(wGraveyardKeys.length > 0){
       wGraveyardKeys.forEach(name => {
@@ -787,6 +826,7 @@ class ChessGame extends Component{
     return [ newPiecesObject, cellMap, tileArr, pieceNumbering ];
   }
 
+  
   getTileSize = () => {
     /*
     ASSUMPTIONS: 
@@ -800,8 +840,16 @@ class ChessGame extends Component{
 
     const BASETILESIZE = 96;
     
+    //big desktop
+    if(window.innerWidth > 1800){
+      return BASETILESIZE * 0.75;
+    }
+    //desktop
+    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
+      return BASETILESIZE * 0.625;
+    }
     //tablet landscape
-    if(window.innerWidth <= 1200 && window.innerWidth > 900){
+    else if(window.innerWidth <= 1200 && window.innerWidth > 900){
       return BASETILESIZE * 0.5625;
     }
     //tablet portrait
@@ -811,14 +859,6 @@ class ChessGame extends Component{
     //phone
     else if(window.innerWidth <= 600){
       return BASETILESIZE * 0.4;
-    }
-    //desktop
-    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
-      return BASETILESIZE * 0.625;
-    }
-    //big desktop
-    else if(window.innerWidth > 1800){
-      return BASETILESIZE * 0.75;
     }
   }
 
