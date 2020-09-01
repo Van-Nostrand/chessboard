@@ -6,14 +6,10 @@ import {PromotionMenu} from "./PromotionMenu";
 import {
   BOARDDIMENSIONS, 
   TILESIZE, 
-  TILEBORDERSIZE, 
-  LIGHT_TILE, 
-  DARK_TILE,
+  TILEBORDERSIZE,
   PIECE_OBJECTS,
   PIECEPATHS,
-  PIECE_PROTOTYPES,
-  PP_TEST,
-  EN_PASSANT_TEST
+  PIECE_PROTOTYPES
 } from "./CONSTANTS";
 
 import "./ChessGame.css";
@@ -109,7 +105,7 @@ class ChessGame extends Component{
   // - to deselect
   // - to attack
   pieceClick = (e, name) => {
-    let { selectedPiece, piecesObject, turn } = this.state.gameState;
+    let { selectedPiece, piecesObject, turn } = this.state;
     // let { selectedPiece, piecesObject, turn } = this.state;
 
     //if selecting a piece

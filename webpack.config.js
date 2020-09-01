@@ -44,7 +44,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: __dirname + "/public/index.html",
+      template: path.resolve(__dirname, "public/index.html"),
       inject: "body"
     }),
     new MiniCssExtractPlugin({
@@ -52,9 +52,4 @@ module.exports = {
       chunkFilename: "[id].css"
     })
   ],
-  // devServer: {
-  //   historyApiFallback: true,
-  //   contentBase: "./public",
-  //   port: 8080
-  // }
 };
