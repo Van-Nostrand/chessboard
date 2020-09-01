@@ -1,6 +1,6 @@
 {
   "name": "chessboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "a chess game written with React",
   "author": "Daniel Doull",
@@ -12,7 +12,9 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production ",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "predeploy": "npm run build",
+    "deploy": "npm run-script build && gh-pages -d dist"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
