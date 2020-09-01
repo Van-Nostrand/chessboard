@@ -15,18 +15,45 @@
 
 html{
   font-size: 62.5%;
+  
   font-family: Helvetica, sans-serif;
+}
+/* under 1200px ~ tablet-landscape */
+@media screen and (max-width: 75em){
+  html{
+    font-size: 56.25%;
+  }
+}
+/* under 900px ~ tablet-portrait */
+@media screen and (max-width: 56.25em){
+  html{
+    font-size: 50%;
+  }
+}
+/* under 600px ~ phone */
+@media screen and (max-width: 37.5em){ 
+  html{
+    font-size: 40%;
+  }
+}
+/* over 1800px ~ big desktops */
+@media (min-width: 112.5em){
+  html{
+    font-size: 75%;
+  }
 }
 
 body {
   /* box-sizing: border-box; */
+  margin: 0 auto;
 }
 
 #game-container{
   display: grid; 
-  grid-template-columns: 80px 150px 480px 150px 80px;
-  grid-template-rows: 80px 480px 80px;
+  grid-template-columns: 8rem 15rem 48rem 15rem 8rem;
+  grid-template-rows: 8rem 48rem 8rem;
 }
+
 
 #turn-board{
   width: 100%;
@@ -44,12 +71,12 @@ body {
   margin: 0 auto;
   grid-column: 3;
   grid-row: 2;
-  left: -240px;
+  
 }
 
 #tile-container{
   margin: auto;
-  padding: 0px;
+  padding: 0;
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
@@ -75,7 +102,7 @@ body {
 
 #pieces-container{
   margin: auto;
-  padding: 0px;
+  padding: 0;
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
