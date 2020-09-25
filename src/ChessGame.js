@@ -15,7 +15,6 @@ import {
 import "./ChessGame.css";
 import "./PromotionMenu.css";
 
-
 import KingClass from "./pieceData/KingClass";
 import QueenClass from "./pieceData/QueenClass";
 import RookClass from "./pieceData/RookClass";
@@ -31,8 +30,6 @@ class ChessGame extends Component{
 
     this.state = {
       boardDimensions: BOARDDIMENSIONS,
-      tileSize: TILESIZE, // unused
-      tileBorderSize: TILEBORDERSIZE, // unused
       tileArr,
       cellMap,
       piecesObject,
