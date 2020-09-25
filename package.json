@@ -5,14 +5,15 @@
   "description": "a chess game written with React",
   "author": "Daniel Doull",
   "license": "GPL-3.0-only",
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
-  },
+  
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production ",
     "start": "webpack-dev-server"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
