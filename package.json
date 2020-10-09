@@ -5,16 +5,16 @@
   "description": "a chess game written with React",
   "author": "Daniel Doull",
   "license": "GPL-3.0-only",
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
-  },
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production ",
     "start": "webpack-dev-server",
     "predeploy": "npm run build",
     "deploy": "npm run-script build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
@@ -30,7 +30,7 @@
     "mini-css-extract-plugin": "^0.9.0",
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
-    "webpack": "^4.43.0",
+    "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
   }
