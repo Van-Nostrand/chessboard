@@ -7,7 +7,6 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
-    // publicPath: "../public"
   },
   module: {
     rules: [
@@ -17,28 +16,36 @@ module.exports = {
         loader: "babel-loader"
       },
       {
-        test: /\.css$/,
+        test: /\.s[ac]ss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
+          'style-loader',
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
-              // minimize: PROD ? true : false
+              sourceMap: true
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: require('sass'),
+              sourceMap: true
             }
           }
         ]
       },
       {
-        test: /\.(png|jpg)$/i,
+        test: /\.css$/,
         use: [
           {
-            loader: 'url-loader',
-            options: {
-              limit: 8192
-            }
-          }
+            loader: MiniCssExtractPlugin.loader,
+          },
+          "css-loader"
         ]
+      },
+      {
+        test: /\.(png|jpe?g|svg|gif)$/i,
+        type: "asset/resource"
       }
     ]
   },
@@ -52,4 +59,5 @@ module.exports = {
       chunkFilename: "[id].css"
     })
   ],
+  devtool: "source-map"
 };

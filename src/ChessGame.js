@@ -117,31 +117,33 @@ export default function ChessGame() {
   // - illegal move attempt
   const tileClick = (e) => {
 
+    let [ selectedPiece, piecesObject ] = state;
+
     // Accidental, or clicking a tile while no piece selected
-    if(state.selectedPiece.length === 0){
+    if(selectedPiece.length === 0){
       return;
     }
 
     // a piece is already selected, user wants to move here
-    if(state.selectedPiece.length > 0){
+    if(selectedPiece.length > 0){
       
       let rect = document.getElementById("pieces-container").getBoundingClientRect();
 
-      // In order for this game to dynamically scale, Tilesize needs to be dynamic
+      // In order for this game to dynamically scale with window sizes, Tilesize needs to be dynamic
       // getTileSize checks the current window width and returns a dynamic tilesize
       let cell = [ Math.floor((e.clientX - rect.left) / getTileSize()) , Math.floor((e.clientY - rect.top) / getTileSize()) ];
       let cellString = `${cell[0]},${cell[1]}`;
       
       //MOVING
-      if(state.piecesObject[state.selectedPiece].view[cellString] && state.piecesObject[state.selectedPiece].view[cellString] === "m"){
+      if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "m"){
         tryMoving(cell);
       }
       //CASTLING
-      else if(state.piecesObject[state.selectedPiece].view[cellString] && state.piecesObject[state.selectedPiece].view[cellString] === "c"){
+      else if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "c"){
         processCastling(cell);
       }
       //ENPASSANT
-      else if(state.piecesObject[state.selectedPiece].view[cellString] && state.piecesObject[state.selectedPiece].view[cellString] === "e"){
+      else if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "e"){
         processEnPassant(cell);
       }
       //ILLEGAL MOVE
@@ -160,11 +162,13 @@ export default function ChessGame() {
   // - to attack
   const pieceClick = (e, name) => {
 
+    let [ selectedPiece, turn, piecesObject ] = state;
+
     //if selecting a piece
-    if(state.selectedPiece.length === 0){
+    if(selectedPiece.length === 0){
 
       //check turn, then confirm selection and update piece.view
-      if((state.turn && (/^w/.test(name))) || (!state.turn && (/^b/.test(name)))){
+      if((turn && (/^w/.test(name))) || (!turn && (/^b/.test(name)))){
 
         dispatch({type: "selected", name});
         
@@ -175,15 +179,15 @@ export default function ChessGame() {
       }
     }
     //if deselecting a piece
-    else if(state.selectedPiece === name){
+    else if(selectedPiece === name){
       dispatch({type: "deselected"});
     }
     //if attacking a piece
-    else if(state.selectedPiece.length > 0 && name.charAt(0) !== state.selectedPiece.charAt(0)){
-      let targetCell = [state.piecesObject[name].x, state.piecesObject[name].y];
+    else if(selectedPiece.length > 0 && name.charAt(0) !== selectedPiece.charAt(0)){
+      let targetCell = [ piecesObject[name].x, piecesObject[name].y ];
 
       //if the selected piece can see this cell, and the cell is verified for attacks...
-      if(state.piecesObject[state.selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] && state.piecesObject[state.selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] === "a"){ 
+      if(piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] && piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] === "a"){ 
 
         tryAttacking(targetCell, name);
       }
@@ -201,6 +205,8 @@ export default function ChessGame() {
 
   //tests and completes attacks
   const tryAttacking = (targetCell, targetPieceName) => {
+
+    let [ wGraveyard, bGraveyard ] = state;
     
     let newWGraveyard = recursiveStateCopy(state.wGraveyard);
     let newBGraveyard = recursiveStateCopy(state.bGraveyard);
