@@ -117,7 +117,7 @@ export default function ChessGame() {
   // - illegal move attempt
   const tileClick = (e) => {
 
-    let [ selectedPiece, piecesObject ] = state;
+    let { selectedPiece, piecesObject } = state;
 
     // Accidental, or clicking a tile while no piece selected
     if(selectedPiece.length === 0){
@@ -162,7 +162,7 @@ export default function ChessGame() {
   // - to attack
   const pieceClick = (e, name) => {
 
-    let [ selectedPiece, turn, piecesObject ] = state;
+    let { selectedPiece, turn, piecesObject } = state;
 
     //if selecting a piece
     if(selectedPiece.length === 0){
@@ -206,7 +206,7 @@ export default function ChessGame() {
   //tests and completes attacks
   const tryAttacking = (targetCell, targetPieceName) => {
 
-    let [ wGraveyard, bGraveyard ] = state;
+    let { wGraveyard, bGraveyard } = state;
     
     let newWGraveyard = recursiveStateCopy(state.wGraveyard);
     let newBGraveyard = recursiveStateCopy(state.bGraveyard);
