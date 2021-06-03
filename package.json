@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production ",
-    "start": "webpack serve --mode=development"
+    "start": "webpack serve --mode development"
   },
   "dependencies": {
     "react": "^17.0.2",

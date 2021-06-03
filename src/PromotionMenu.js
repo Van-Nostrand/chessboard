@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import pieceImg from "./pieces.png";
+import pieceImg from "./assets/pieces.png";
 
 
 export const PromotionMenu = ({selectPiece, team}) => {

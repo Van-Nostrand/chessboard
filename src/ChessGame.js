@@ -1,11 +1,11 @@
-import React, {useState, useEffect, useReducer} from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import Tile from "./Tile";
 import Piece from "./Piece";
 import ChessGraveyard from "./ChessGraveyard";
 import {PromotionMenu} from "./PromotionMenu";
 
 import {
-  BOARDDIMENSIONS, 
+  BOARDDIMENSIONS,
   PIECEPATHS,
   PIECE_PROTOTYPES
 } from "./CONSTANTS";
