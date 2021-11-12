@@ -2,13 +2,14 @@ module.exports = {
   'env': {
     'browser': true,
     'commonjs': true,
-    'es2021': true
+    'es2021': true,
   },
   'extends': [
     'eslint:recommended',
     'plugin:react/recommended'
   ],
   'parserOptions': {
+    'sourceType': 'module',
     'ecmaFeatures': {
       'jsx': true
     },
@@ -37,6 +38,13 @@ module.exports = {
     'space-before-function-paren': [
       'error',
       'always'
+    ],
+    'prefer-const': [
+      'error',
+      {
+        'destructuring': 'any',
+        'ignoreReadBeforeAssign': false
+      }
     ]
   }
 }
