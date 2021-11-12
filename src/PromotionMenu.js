@@ -37,7 +37,7 @@ export const PromotionMenu = ({selectPiece, team}) => {
   }
 
   return (
-    <div id="promotion-menu">
+    <div class="promotion-menu">
       <p>Choose a piece</p>
       <div style={queenStyle} className="promotion-choice" onClick={() => setPieceSelection("Q")}></div>
       <div style={knightStyle} className="promotion-choice" onClick={() => setPieceSelection("N")}></div>

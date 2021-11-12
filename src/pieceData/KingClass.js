@@ -50,28 +50,28 @@ export default class KingClass{
     let rook2 = new RegExp("^" + TEAMCOLOUR + "R2");
     //CASTLING VIEW
     //has king taken first move?
-    if(firstMove){
+    if (firstMove) {
       //is R1 at 0,y and has it moved yet?
-      if(cellMap[`0,${y}`] && rook1.test(cellMap[`0,${y}`]) && piecesObject[cellMap[`0,${y}`]].firstMove){
+      if (cellMap[`0,${y}`] && rook1.test(cellMap[`0,${y}`]) && piecesObject[cellMap[`0,${y}`]].firstMove) {
         //are [1,y] [2,y] and [3,y] empty?
-        if(!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]){
+        if (!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]) {
           // checkmate check at [2,y] and [3,y]
           let longPieces2y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 2, y}}, name);
           let longPieces3y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x:3, y}}, name);
-          if(Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0){
+          if (Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0) {
             pathsObject[`2,${y}`] = "c";
           }
         }
       }
       //is R2 at 7,y and has it moved yet?
-      if(cellMap[`7,${y}`] && rook2.test(cellMap[`7,${y}`]) && piecesObject[cellMap[`7,${y}`]].firstMove){
+      if (cellMap[`7,${y}`] && rook2.test(cellMap[`7,${y}`]) && piecesObject[cellMap[`7,${y}`]].firstMove) {
         //are [5,y] and [6,y] empty?
-        if(!cellMap[`6,${y}`] && !cellMap[`5,${y}`]){
+        if (!cellMap[`6,${y}`] && !cellMap[`5,${y}`]) {
   
           // checkmate check at [5,y] and [6,y]
           let shortPieces5y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 5, y}}, name);
           let shortPieces6y = this.amIChecked(cellMap, {...piecesObject, [name]: {...piecesObject[name], x: 6, y}}, name);
-          if(Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0){
+          if (Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0) {
             pathsObject[`6,${y}`] = "c";
           }
         }
@@ -82,42 +82,42 @@ export default class KingClass{
 
   static amIChecked = (cellMap, piecesObject, name) => {
     
-    let pathsObject = {};
+    const pathsObject = {};
     const BOARDSIZE = 8;
-    let enemyChar = name.charAt(0) === "w" ? "b" : "w";
+    const enemyChar = name.charAt(0) === "w" ? "b" : "w";
     
-    let bishopPaths = [[1,-1], [1,1], [-1,1], [-1,-1]];
-    let rookPaths = [[0,-1], [1,0], [0,1], [-1,0]];
-    let pawnPaths = [[-1,enemyChar === "w" ? -1 : 1], [1,enemyChar === "w" ? -1 : 1]];
-    let knightPaths = [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1], [-1,-2]];
+    const bishopPaths = [[1,-1], [1,1], [-1,1], [-1,-1]];
+    const rookPaths = [[0,-1], [1,0], [0,1], [-1,0]];
+    const pawnPaths = [[-1,enemyChar === "w" ? -1 : 1], [1,enemyChar === "w" ? -1 : 1]];
+    const knightPaths = [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1], [-1,-2]];
 
-    let queenReg = new RegExp("^" + enemyChar + "Q");
-    let rookReg = new RegExp("^" + enemyChar + "R");
-    let bishReg = new RegExp("^" + enemyChar + "B");
-    let pawnRegex = new RegExp("^" + enemyChar + "P");
-    let knightRegex = new RegExp("^" + enemyChar + "N");
+    const queenReg = new RegExp("^" + enemyChar + "Q");
+    const rookReg = new RegExp("^" + enemyChar + "R");
+    const bishReg = new RegExp("^" + enemyChar + "B");
+    const pawnRegex = new RegExp("^" + enemyChar + "P");
+    const knightRegex = new RegExp("^" + enemyChar + "N");
 
-    let testX = piecesObject[name].x;
-    let testY = piecesObject[name].y;
+    const testX = piecesObject[name].x;
+    const testY = piecesObject[name].y;
     
     // test queen bishop attacks
-    // for(let n = 0; n < bishopPaths.length; n++){
+    // for(const n = 0; n < bishopPaths.length; n++){
     bishopPaths.forEach((path, i) => {
 
-      let startX = testX + path[0];
-      let startY = testY + path[1];
+      const startX = testX + path[0];
+      const startY = testY + path[1];
       let pathDone = false;
 
-      for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
-        if(!pathDone){
-          let cellTest = `${i},${j}`;
+      for (let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]) {
+        if (!pathDone) {
+          const cellTest = `${i},${j}`;
           // if cell in path contains enemy
-          if (cellMap[cellTest] && (queenReg.test(cellMap[cellTest]) || bishReg.test(cellMap[cellTest]))){
+          if (cellMap[cellTest] && (queenReg.test(cellMap[cellTest]) || bishReg.test(cellMap[cellTest]))) {
             pathsObject[cellTest] = cellMap[cellTest];
             pathDone = true;
           }
           // else it's some other piece that can't attack. 
-          else if (cellMap[cellTest]){
+          else if (cellMap[cellTest]) {
             pathDone = true;
           }
         }
@@ -128,20 +128,20 @@ export default class KingClass{
     // test queen rook attacks
     rookPaths.forEach((path, i) => {
 
-      let startX = testX + path[0];
-      let startY = testY + path[1];
+      const startX = testX + path[0];
+      const startY = testY + path[1];
       let pathDone = false;
 
-      for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
-        if(!pathDone){
-          let cellTest = `${i},${j}`;
+      for (let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]) {
+        if (!pathDone) {
+          const cellTest = `${i},${j}`;
           // if cell in path contains enemy
-          if (cellMap[cellTest] && (queenReg.test(cellMap[cellTest]) || rookReg.test(cellMap[cellTest]))){
+          if (cellMap[cellTest] && (queenReg.test(cellMap[cellTest]) || rookReg.test(cellMap[cellTest]))) {
             pathsObject[cellTest] = cellMap[cellTest];
             pathDone = true;
           }
           // else it's some other piece that can't attack. 
-          else if (cellMap[cellTest] ){
+          else if (cellMap[cellTest]) {
             pathDone = true;
           }
         }
@@ -149,10 +149,10 @@ export default class KingClass{
     });
 
     pawnPaths.forEach((path, i) => {
-      let cellTest = `${testX + path[0]},${testY + path[1]}`;
+      const cellTest = `${testX + path[0]},${testY + path[1]}`;
       
       //test position
-      if(cellMap[cellTest] && pawnRegex.test(cellMap[cellTest])){
+      if (cellMap[cellTest] && pawnRegex.test(cellMap[cellTest])) {
         pathsObject[cellTest] = cellMap[cellTest];
       }
     });

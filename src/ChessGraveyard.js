@@ -1,27 +1,20 @@
 import React from "react";
 
-const ChessGraveyard = ({pieces, idString}) => {
+export default function ChessGraveyard ({ pieces, classString }) {
 
   let piecesToRender;
   if(pieces && pieces.length > 0){
     piecesToRender = pieces;
   }
 
-  
-  let text = idString.charAt(0) === "w" ? "WHITE GRAVEYARD" : "BLACK GRAVEYARD";
-
-  let transformString = `rotate(${idString.charAt(0) === "w" ? "-90deg" : "90deg"})`;
-
-  let style = {
-    transform: transformString
-  }
+  const text = classString.charAt(0) === "w" ? "WHITE GRAVEYARD" : "BLACK GRAVEYARD";
+  const transformString = `rotate(${classString.charAt(0) === "w" ? "-90deg" : "90deg"})`;
+  const style = { transform: transformString }
   
   return(
-    <div id={idString} className="graveyard" >
+    <div className={`graveyard ${classString}`} >
       <h3 style={style}>{text}</h3>
       {piecesToRender}
     </div>
   )
 }
-
-export default ChessGraveyard;

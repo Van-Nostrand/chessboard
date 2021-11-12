@@ -1,4 +1,4 @@
-#promotion-menu {
+.promotion-menu {
   z-index: 2;
   width: 400px;
   height: 100px;
@@ -11,7 +11,7 @@
   align-items: center;
 }
 
-#promotion-menu > p{
+.promotion-menu > p{
   width: 100%;
   margin: 0 auto;
   text-align: center;

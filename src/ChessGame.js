@@ -10,6 +10,10 @@ import {
   PIECE_PROTOTYPES
 } from "./CONSTANTS";
 
+import {
+  recursiveStateCopy
+} from './functions/recursiveStateCopy';
+
 import "./ChessGame.css";
 import "./PromotionMenu.css";
 
@@ -655,33 +659,6 @@ export default function ChessGame() {
   }
 
 
-  // deep copies state, gets all recursive about it
-  // specifically only works with my current structure
-  // if an array filled with objects is ever used in future versions of this app, I'll have to modify this
-  const recursiveStateCopy = (oldstate) => {
-    let newState = {};
-    Object.keys(oldstate).forEach(key => {
-      if(typeof(oldstate[key]) === "object" && !Array.isArray(oldstate[key])){
-        newState[key] = recursiveStateCopy(oldstate[key]);
-      }
-      else if(typeof(oldstate[key]) === "object" && Array.isArray(oldstate[key])){
-        newState[key] = oldstate[key].map(value => {
-          if(Array.isArray(value)){
-            return value.map(subvalue => subvalue);
-          }
-          else return value;
-        });
-      }
-      else if(typeof(oldstate[key]) === "string"){
-        newState[key] = `${oldstate[key]}`;
-      }
-      else {
-        newState[key] = oldstate[key];
-      }
-    });
-    return newState;
-  }
-  
   const getTileSize = () => {
     /*
     ASSUMPTIONS: 
@@ -763,42 +740,42 @@ export default function ChessGame() {
   // ======================= 
 
   //GENERATE SCALING 
-  let backgroundSize = getBackgroundSize();
-  let tileSize = getTileSize();
+  const backgroundSize = getBackgroundSize();
+  const tileSize = getTileSize();
   
   //GENERATE TILES
-  let boardTiles = makeTiles(tileSize);
+  const boardTiles = makeTiles(tileSize);
 
   //GENERATE PIECES
-  let pieceObjects = makeLivePieces(tileSize, backgroundSize);
-  let [ wGraveyardPieces, bGraveyardPieces ] = makeDeadPieces(tileSize, backgroundSize);
+  const pieceObjects = makeLivePieces(tileSize, backgroundSize);
+  const [ wGraveyardPieces, bGraveyardPieces ] = makeDeadPieces(tileSize, backgroundSize);
 
-  let theMenu = state.pawnPromotionFlag ? <PromotionMenu selectPiece={promotePawn} team={state.selectedPiece.charAt(0)} /> : "";
+  const theMenu = state.pawnPromotionFlag ? <PromotionMenu selectPiece={promotePawn} team={state.selectedPiece.charAt(0)} /> : "";
 
   //STYLES
-  let tileContainerStyle = {
+  const tileContainerStyle = {
     width: `${state.boardDimensions[0] * tileSize}px`,
     height: `${state.boardDimensions[1] * tileSize}px`,
   }
   
-  let piecesContainerStyle = {
+  const piecesContainerStyle = {
     width: `${state.boardDimensions[0] * tileSize}px`,
     height: `${state.boardDimensions[1] * tileSize}px`,
   }  
 
   return(
-    <div id="game-container" >
+    <div class="game-container" >
       {theMenu}
-      <h2 id="turn-board" >{state.turn ? "White turn" : "Black turn"}</h2>
-      <div id="tile-container" style={tileContainerStyle}>
+      <h2 class="turn-board" >{state.turn ? "White turn" : "Black turn"}</h2>
+      <div class="tile-container" style={tileContainerStyle}>
         {boardTiles}
       </div>
-      <div id="pieces-container" style={piecesContainerStyle} >
+      <div class="pieces-container" style={piecesContainerStyle} >
         {pieceObjects}
       </div>
-      <h3 id="message-board" >{state.messageBoard}</h3>
-      <ChessGraveyard pieces={wGraveyardPieces} idString="wGraveyard" />
-      <ChessGraveyard pieces={bGraveyardPieces} idString="bGraveyard" />
+      <h3 class="message-board" >{state.messageBoard}</h3>
+      <ChessGraveyard pieces={wGraveyardPieces} classString="wGraveyard" />
+      <ChessGraveyard pieces={bGraveyardPieces} classString="bGraveyard" />
     </div>
   )
 }
