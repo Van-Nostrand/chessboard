@@ -1,27 +1,27 @@
-import React, { useState, useEffect, useReducer } from "react";
-import Tile from "./Tile";
-import Piece from "./Piece";
-import ChessGraveyard from "./ChessGraveyard";
-import {PromotionMenu} from "./PromotionMenu";
+import React, { useEffect, useReducer } from 'react'
+import Tile from './Tile'
+import Piece from './Piece'
+import ChessGraveyard from './ChessGraveyard'
+import { PromotionMenu } from './PromotionMenu'
 
 import {
   BOARDDIMENSIONS,
   PIECEPATHS,
   PIECE_PROTOTYPES
-} from "./CONSTANTS";
+} from './CONSTANTS'
 
 import {
   recursiveStateCopy
-} from './functions/recursiveStateCopy';
+} from './functions/recursiveStateCopy'
 
-import "./ChessGame.css";
-import "./PromotionMenu.css";
+import './ChessGame.css'
+import './PromotionMenu.css'
 
-import { gameSetup } from "./functions/gameSetup";
-import { updatePieceVision } from  "./functions/updatePieceVision";
-import { buildNewCellMap } from "./functions/buildNewCellMap";
+import { gameSetup } from './functions/gameSetup'
+import { updatePieceVision } from  './functions/updatePieceVision'
+import { buildNewCellMap } from './functions/buildNewCellMap'
 
-const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup();
+const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
 
 const initialState = {
   boardDimensions: BOARDDIMENSIONS,
@@ -31,85 +31,85 @@ const initialState = {
   wGraveyard: {},
   bGraveyard: {},
   turn: true,
-  selectedPiece: "",
-  enPassantPiece: "",
-  messageBoard: "CHESS!",
+  selectedPiece: '',
+  enPassantPiece: '',
+  messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
   pieceNumbering: initialPieceNumbers,
-  windowSize: "",
-  screenType: ""
+  windowSize: '',
+  screenType: ''
 }
 
-function reducer(state, action){
-  switch(action.type){
-    case "illegal":
-      return {
-        ...state,
-        selectedPiece: "",
-        messageBoard: action.message
-      };
-    case "selected":
-      return {
-        ...state,
-        selectedPiece: action.name, 
-        messageBoard: `piece ${action.name} is selected`
-      };
-    case "deselected":
-      return {
-        ...state,
-        selectedPiece: "", 
-        messageBoard: "no piece selected"
-      };
-    case "promoted":
-      return {
-        ...state,
-        piecesObject: action.piecesObject, 
-        cellMap: action.cellMap,
-        messageBoard: action.messageBoard,
-        pieceNumbering: action.pieceNumbering,
-        selectedPiece: "",
-        pawnPromotionFlag: false,
-        turn: !state.turn
-      };
-    case "promoting":
-      return {
-        ...state,
-        piecesObject: action.piecesObject,
-        cellMap: action.cellMap,
-        pawnPromotionFlag: true,
-        messageBoard: `${state.selectedPiece} is being promoted`
-      };
-    case "maintenance":
-      return {
-        ...state,
-        piecesObject: action.piecesObject, 
-        cellMap: action.cellMap, 
-        messageBoard: action.messageBoard, 
-        enPassantPiece: action.enPassantPiece, 
-        wGraveyard: action.wGraveyard, 
-        bGraveyard: action.bGraveyard,
-        selectedPiece: "",
-        turn: !state.turn
-      };
-    case "windowWidthChange":
-      return {
-        ...state,
-        windowSize: action.windowSize
-      };
-    case "screenBreakpoint":
-      return {
-        ...state,
-        screenType: action.screenType,
-        windowSize: action.windowSize
-      };
-    default:
-      throw new Error("3RR0RZ");  
+function reducer (state, action) {
+  switch (action.type) {
+  case 'illegal':
+    return {
+      ...state,
+      selectedPiece: '',
+      messageBoard: action.message
+    }
+  case 'selected':
+    return {
+      ...state,
+      selectedPiece: action.name,
+      messageBoard: `piece ${action.name} is selected`
+    }
+  case 'deselected':
+    return {
+      ...state,
+      selectedPiece: '',
+      messageBoard: 'no piece selected'
+    }
+  case 'promoted':
+    return {
+      ...state,
+      piecesObject: action.piecesObject,
+      cellMap: action.cellMap,
+      messageBoard: action.messageBoard,
+      pieceNumbering: action.pieceNumbering,
+      selectedPiece: '',
+      pawnPromotionFlag: false,
+      turn: !state.turn
+    }
+  case 'promoting':
+    return {
+      ...state,
+      piecesObject: action.piecesObject,
+      cellMap: action.cellMap,
+      pawnPromotionFlag: true,
+      messageBoard: `${state.selectedPiece} is being promoted`
+    }
+  case 'maintenance':
+    return {
+      ...state,
+      piecesObject: action.piecesObject,
+      cellMap: action.cellMap,
+      messageBoard: action.messageBoard,
+      enPassantPiece: action.enPassantPiece,
+      wGraveyard: action.wGraveyard,
+      bGraveyard: action.bGraveyard,
+      selectedPiece: '',
+      turn: !state.turn
+    }
+  case 'windowWidthChange':
+    return {
+      ...state,
+      windowSize: action.windowSize
+    }
+  case 'screenBreakpoint':
+    return {
+      ...state,
+      screenType: action.screenType,
+      windowSize: action.windowSize
+    }
+  default:
+    throw new Error('3RR0RZ')
   }
 }
 
-export default function ChessGame() {
+export default function ChessGame () {
 
-  const [ state, dispatch ] = useReducer(reducer, initialState);
+  const [ chessGameState, dispatch ] = useReducer(reducer, initialState)
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -121,40 +121,40 @@ export default function ChessGame() {
   // - illegal move attempt
   const tileClick = (e) => {
 
-    let { selectedPiece, piecesObject } = state;
+    const { selectedPiece, piecesObject } = chessGameState
 
     // Accidental, or clicking a tile while no piece selected
-    if(selectedPiece.length === 0){
-      return;
+    if (selectedPiece.length === 0) {
+      return
     }
 
     // a piece is already selected, user wants to move here
-    if(selectedPiece.length > 0){
-      
-      let rect = document.getElementById("pieces-container").getBoundingClientRect();
+    if (selectedPiece.length > 0) {
+
+      const rect = document.getElementById('pieces-container').getBoundingClientRect()
 
       // In order for this game to dynamically scale with window sizes, Tilesize needs to be dynamic
       // getTileSize checks the current window width and returns a dynamic tilesize
-      let cell = [ Math.floor((e.clientX - rect.left) / getTileSize()) , Math.floor((e.clientY - rect.top) / getTileSize()) ];
-      let cellString = `${cell[0]},${cell[1]}`;
-      
+      const cell = [ Math.floor((e.clientX - rect.left) / getTileSize()), Math.floor((e.clientY - rect.top) / getTileSize()) ]
+      const cellString = `${cell[0]},${cell[1]}`
+
       //MOVING
-      if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "m"){
-        tryMoving(cell);
+      if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'm') {
+        tryMoving(cell)
       }
       //CASTLING
-      else if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "c"){
-        processCastling(cell);
+      else if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'c') {
+        processCastling(cell)
       }
       //ENPASSANT
-      else if(piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === "e"){
-        processEnPassant(cell);
+      else if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'e') {
+        processEnPassant(cell)
       }
       //ILLEGAL MOVE
-      else{
-        illegalMove("Illegal Move");
-      } 
-    } 
+      else {
+        illegalMove('Illegal Move')
+      }
+    }
   }
 
 
@@ -166,43 +166,43 @@ export default function ChessGame() {
   // - to attack
   const pieceClick = (e, name) => {
 
-    let { selectedPiece, turn, piecesObject } = state;
+    const { selectedPiece, turn, piecesObject } = chessGameState
 
     //if selecting a piece
-    if(selectedPiece.length === 0){
+    if (selectedPiece.length === 0) {
 
       //check turn, then confirm selection and update piece.view
-      if((turn && (/^w/.test(name))) || (!turn && (/^b/.test(name)))){
+      if ((turn && (/^w/.test(name))) || (!turn && (/^b/.test(name)))) {
 
-        dispatch({type: "selected", name});
-        
+        dispatch({ type: 'selected', name })
+
       }
       //failed selection
       else {
-        illegalMove("Illegal selection, try again")
+        illegalMove('Illegal selection, try again')
       }
     }
     //if deselecting a piece
-    else if(selectedPiece === name){
-      dispatch({type: "deselected"});
+    else if (selectedPiece === name) {
+      dispatch({ type: 'deselected' })
     }
     //if attacking a piece
-    else if(selectedPiece.length > 0 && name.charAt(0) !== selectedPiece.charAt(0)){
-      let targetCell = [ piecesObject[name].x, piecesObject[name].y ];
+    else if (selectedPiece.length > 0 && name.charAt(0) !== selectedPiece.charAt(0)) {
+      const targetCell = [ piecesObject[name].x, piecesObject[name].y ]
 
       //if the selected piece can see this cell, and the cell is verified for attacks...
-      if(piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] && piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] === "a"){ 
+      if (piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] && piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] === 'a') {
 
-        tryAttacking(targetCell, name);
+        tryAttacking(targetCell, name)
       }
       //failed
       else {
-        illegalMove("Illegal attack");
+        illegalMove('Illegal attack')
       }
-    } 
+    }
     //error
     else {
-      console.log("something is wrong in pieceClick");
+      console.log('something is wrong in pieceClick')
     }
   }
 
@@ -210,105 +210,107 @@ export default function ChessGame() {
   //tests and completes attacks
   const tryAttacking = (targetCell, targetPieceName) => {
 
-    let { wGraveyard, bGraveyard } = state;
-    
-    let newWGraveyard = recursiveStateCopy(state.wGraveyard);
-    let newBGraveyard = recursiveStateCopy(state.bGraveyard);
+    const { wGraveyard, bGraveyard, piecesObject, selectedPiece, cellMap } = chessGameState
+
+    const newWGraveyard = recursiveStateCopy(wGraveyard)
+    const newBGraveyard = recursiveStateCopy(bGraveyard)
 
     //make a copy of state and carry out the attack
-    let newPiecesObject = recursiveStateCopy(state.piecesObject);
-    
-    [ newPiecesObject[state.selectedPiece].x, newPiecesObject[state.selectedPiece].y ]  = targetCell;
-    let targetPiece = state.cellMap[`${targetCell[0]},${targetCell[1]}`];
-    
-    if(targetPiece.charAt(0) === "w"){
-      newWGraveyard[targetPiece] = {...newPiecesObject[targetPiece]};
-      newWGraveyard[targetPiece].dead = true;
+    const newPiecesObject = recursiveStateCopy(piecesObject);
+
+    [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ]  = targetCell
+    const targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`]
+
+    if (targetPiece.charAt(0) === 'w') {
+      newWGraveyard[targetPiece] = { ...newPiecesObject[targetPiece] }
+      newWGraveyard[targetPiece].dead = true
     }
-    else if(targetPiece.charAt(0) === "b"){
-      newBGraveyard[targetPiece] = {...newPiecesObject[targetPiece]};
-      newBGraveyard[targetPiece].dead = true;
+    else if (targetPiece.charAt(0) === 'b') {
+      newBGraveyard[targetPiece] = { ...newPiecesObject[targetPiece] }
+      newBGraveyard[targetPiece].dead = true
     }
 
-    delete newPiecesObject[targetPiece];
-    let newCellMap = buildNewCellMap(newPiecesObject);
-    let isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap );
+    delete newPiecesObject[targetPiece]
+    const newCellMap = buildNewCellMap(newPiecesObject)
+    const isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap )
 
-    if(!isKingInCheck){
+    if (!isKingInCheck) {
       // SUCCESSFUL ATTACK!
-      let message = `${state.selectedPiece} attacked ${targetPieceName}`;
+      const message = `${selectedPiece} attacked ${targetPieceName}`
 
-      turnMaintenance(newPiecesObject, newCellMap, message, state.selectedPiece, newWGraveyard, newBGraveyard);
+      turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece, newWGraveyard, newBGraveyard)
     }
 
-    else{
-      console.log("that attack puts your king in check...");
+    else {
+      console.log('that attack puts your king in check...')
     }
   }
 
 
   // tests and completes moves
   const tryMoving = (cell) => {
-    let newPiecesObject = recursiveStateCopy(state.piecesObject);
+    const { piecesObject, selectedPiece } = chessGameState
+    const newPiecesObject = recursiveStateCopy(piecesObject);
 
-    [newPiecesObject[state.selectedPiece].x, newPiecesObject[state.selectedPiece].y] = cell;
-    
+    [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y] = cell
+
     //test whether move puts own king in check
-    let newCellMap = buildNewCellMap(newPiecesObject);
-    let isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap );
+    const newCellMap = buildNewCellMap(newPiecesObject)
+    const isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap )
 
-    if(!isKingInCheck){
-    
+    if (!isKingInCheck) {
+
       //test for pawn promotion
-      if((/^wP/.test(state.selectedPiece) && newPiecesObject[state.selectedPiece].y === 0 ) || (/^bP/.test(state.selectedPiece) && newPiecesObject[state.selectedPiece].y === 7)){
+      if ((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)) {
 
-        pawnBeingPromoted(newPiecesObject, newCellMap);
-        return;
+        pawnBeingPromoted(newPiecesObject, newCellMap)
+        return
       }
-    
-      let message = `${state.selectedPiece} moved to ${cell[0]},${cell[1]}`;
-      
-      turnMaintenance(newPiecesObject, newCellMap, message, state.selectedPiece);
+
+      const message = `${selectedPiece} moved to ${cell[0]},${cell[1]}`
+
+      turnMaintenance(newPiecesObject, newCellMap, message, selectedPiece)
     }
 
-    else{
-      illegalMove("you're endangering your king...");
+    else {
+      illegalMove('you\'re endangering your king...')
     }
   }
 
   // swaps a pawn with a piece of the users choice
   const promotePawn = ( newPieceType ) => {
-    let newPieceNumbering = recursiveStateCopy(state.pieceNumbering);
-    
-    let newPieceTeam = state.selectedPiece.charAt(0);
-    let newPiecesObject = recursiveStateCopy(state.piecesObject);
+    const { pieceNumbering, selectedPiece, piecesObject } = chessGameState
+    const newPieceNumbering = recursiveStateCopy(pieceNumbering)
 
-    newPieceNumbering[`${newPieceTeam}${newPieceType}`] += 1;
+    const newPieceTeam = selectedPiece.charAt(0)
+    let newPiecesObject = recursiveStateCopy(piecesObject)
+
+    newPieceNumbering[`${newPieceTeam}${newPieceType}`] += 1
 
     // a pieces name is made up of team, type, and number, to differentiate them in state
-    let newPiece = createPiece(
-                    newPieceType,
-                    newPieceTeam,
-                    newPiecesObject[state.selectedPiece].x,
-                    newPiecesObject[state.selectedPiece].y,
-                    newPieceNumbering
-                  );
+    const newPiece = createPiece(
+      newPieceType,
+      newPieceTeam,
+      newPiecesObject[selectedPiece].x,
+      newPiecesObject[selectedPiece].y,
+      newPieceNumbering
+    )
 
-    delete newPiecesObject[state.selectedPiece];
-    newPiecesObject[newPiece.name] = newPiece;
+    delete newPiecesObject[selectedPiece]
+    newPiecesObject[newPiece.name] = newPiece
 
-    let newCellMap = buildNewCellMap(newPiecesObject);
-    let newMessageBoard = `${state.selectedPiece} has been promoted to ${newPiece.name}`;
+    const newCellMap = buildNewCellMap(newPiecesObject)
+    const newMessageBoard = `${selectedPiece} has been promoted to ${newPiece.name}`
 
-    newPiecesObject = updatePieceVision(newPiecesObject, newCellMap);
-    
+    newPiecesObject = updatePieceVision(newPiecesObject, newCellMap)
+
     dispatch({
-      type: "promoted",
+      type: 'promoted',
       piecesObject: newPiecesObject,
       cellMap: newCellMap,
       messageBoard: newMessageBoard,
       pieceNumbering: newPieceNumbering
-    });
+    })
 
   }
 
@@ -316,245 +318,258 @@ export default function ChessGame() {
   // creates a new piece with given arguments
   const createPiece = (type, team, x, y, newPieceNumbering) => {
 
-    let newPiece = {...PIECE_PROTOTYPES[type]};
-    newPiece.pngPos = team === "w" ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos;
-    delete newPiece.WpngPos;
-    delete newPiece.BpngPos;
+    const newPiece = { ...PIECE_PROTOTYPES[type] }
+    newPiece.pngPos = team === 'w' ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos
+    delete newPiece.WpngPos
+    delete newPiece.BpngPos
 
-    if(type === "pawn"){
-      newPiece.fifthRank = team === "w" ? WfifthRank : BfifthRank;
+    if (type === 'pawn') {
+      newPiece.fifthRank = team === 'w' ? 3 : 4
     }
 
-    let unitNumber = newPieceNumbering[`${team}${type}`] + 1;
-    newPiece.x = x;
-    newPiece.y = y;
-    newPiece.name = `${team}${type}${unitNumber}`;
-    newPiece.paths = PIECEPATHS[type];
+    const unitNumber = newPieceNumbering[`${team}${type}`] + 1
+    newPiece.x = x
+    newPiece.y = y
+    newPiece.name = `${team}${type}${unitNumber}`
+    newPiece.paths = PIECEPATHS[type]
 
-    return newPiece;
+    return newPiece
   }
 
 
   // called when a pawn reaches their 8th rank
   // flags the pawn promotion menu to appear
   const pawnBeingPromoted = (newPiecesObject, newCellMap) => {
-    
+
     dispatch({
-      type: "promoting",
+      type: 'promoting',
       piecesObject: newPiecesObject,
       cellMap: newCellMap
-    });
+    })
   }
 
 
   //this will be hard coded so that I don't go insane thinking about it. Make it dynamic later
-  //KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame? 
+  //KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame?
   const processCastling = (cell) => {
-    let rookName;
-    let newPiecesObject = recursiveStateCopy(state.piecesObject);
+    const { piecesObject, selectedPiece } = chessGameState
+    let rookName
+    const newPiecesObject = recursiveStateCopy(piecesObject)
 
     //shortside castling
-    if(cell[0] === 2){
-      rookName = state.selectedPiece.charAt(0) + "R1";
-      newPiecesObject[rookName].x = 3;
-      newPiecesObject[rookName].firstMove = false;
-      newPiecesObject[state.selectedPiece].x = 2;
-      newPiecesObject[state.selectedPiece].firstMove = false;
+    if (cell[0] === 2) {
+      rookName = selectedPiece.charAt(0) + 'R1'
+      newPiecesObject[rookName].x = 3
+      newPiecesObject[rookName].firstMove = false
+      newPiecesObject[selectedPiece].x = 2
+      newPiecesObject[selectedPiece].firstMove = false
     }
     //longside castling
-    else if(cell[0] === 6){
-      rookName = state.selectedPiece.charAt(0) + "R2";
-      newPiecesObject[rookName].x = 5;
-      newPiecesObject[rookName].firstMove = false;
-      newPiecesObject[state.selectedPiece].x = 6;
-      newPiecesObject[state.selectedPiece].firstMove = false;
+    else if (cell[0] === 6) {
+      rookName = selectedPiece.charAt(0) + 'R2'
+      newPiecesObject[rookName].x = 5
+      newPiecesObject[rookName].firstMove = false
+      newPiecesObject[selectedPiece].x = 6
+      newPiecesObject[selectedPiece].firstMove = false
     }
-    let newCellMap = buildNewCellMap(newPiecesObject);
-    let newMessageBoard = `${state.selectedPiece} has castled with ${rookName}`;
+    const newCellMap = buildNewCellMap(newPiecesObject)
+    const newMessageBoard = `${selectedPiece} has castled with ${rookName}`
 
-    turnMaintenance(newPiecesObject, newCellMap, newMessageBoard, state.selectedPiece);
+    turnMaintenance(newPiecesObject, newCellMap, newMessageBoard, selectedPiece)
   }
 
 
   const processEnPassant = (cell) => {
-    
-    let newWGraveyard = recursiveStateCopy(state.wGraveyard);
-    let newBGraveyard = recursiveStateCopy(state.bGraveyard);
-    
-    let newMessageBoard = `${state.selectedPiece} just attacked ${state.enPassantPiece} in passing`;
-    let newPiecesObject = recursiveStateCopy(state.piecesObject);
 
-    newPiecesObject[state.selectedPiece].x = cell[0];
-    newPiecesObject[state.selectedPiece].y = cell[1];
+    const { wGraveyard, bGraveyard, selectedPiece, enPassantPiece, piecesObject } = chessGameState
 
-    if(state.enPassantPiece.charAt(0) === "w"){
-      newWGraveyard[state.enPassantPiece] = {...newPiecesObject[state.enPassantPiece]};
-      newWGraveyard[state.enPassantPiece].dead = true;
+    const newWGraveyard = recursiveStateCopy(wGraveyard)
+    const newBGraveyard = recursiveStateCopy(bGraveyard)
+
+    const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} in passing`
+    const newPiecesObject = recursiveStateCopy(piecesObject)
+
+    newPiecesObject[selectedPiece].x = cell[0]
+    newPiecesObject[selectedPiece].y = cell[1]
+
+    if (enPassantPiece.charAt(0) === 'w') {
+      newWGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
+      newWGraveyard[enPassantPiece].dead = true
     }
-    else if(state.enPassantPiece.charAt(0) === "b"){
-      newBGraveyard[state.enPassantPiece] = {...newPiecesObject[state.enPassantPiece]};
-      newBGraveyard[state.enPassantPiece].dead = true;
+    else if (enPassantPiece.charAt(0) === 'b') {
+      newBGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
+      newBGraveyard[enPassantPiece].dead = true
     }
 
-    let newCellMap = buildNewCellMap(newPiecesObject);
+    const newCellMap = buildNewCellMap(newPiecesObject)
 
-    turnMaintenance(newPiecesObject, newCellMap, newMessageBoard, state.selectedPiece, newWGraveyard, newBGraveyard);
+    turnMaintenance(newPiecesObject, newCellMap, newMessageBoard, selectedPiece, newWGraveyard, newBGraveyard)
   }
 
   const isMyKingInCheck = ( newPiecesObject, newCellMap ) => {
 
-    const kingName = state.turn ? "wK" : "bK";
-    const BOARDSIZE = 8;
-    const enemyChar = kingName.charAt(0) === "w" ? "b" : "w";
-    
-    const bishopPaths = [[1,-1], [1,1], [-1,1], [-1,-1]];
-    const rookPaths = [[0,-1], [1,0], [0,1], [-1,0]];
-    const pawnPaths = [[-1,enemyChar === "w" ? -1 : 1], [1,enemyChar === "w" ? -1 : 1]];
-    const knightPaths = [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1], [-1,-2]];
+    const { turn } = chessGameState
 
-    const queenReg = new RegExp("^" + enemyChar + "Q");
-    const rookReg = new RegExp("^" + enemyChar + "R");
-    const bishReg = new RegExp("^" + enemyChar + "B");
-    const pawnReg = new RegExp("^" + enemyChar + "P");
-    const knightReg = new RegExp("^" + enemyChar + "N");
+    const kingName = turn ? 'wK' : 'bK'
+    const BOARDSIZE = 8
+    const enemyChar = kingName.charAt(0) === 'w' ? 'b' : 'w'
 
-    let kingX = newPiecesObject[kingName].x;
-    let kingY = newPiecesObject[kingName].y;
-    let inCheckFlag = false;
+    const bishopPaths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
+    const rookPaths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
+    const pawnPaths = [[-1, enemyChar === 'w' ? -1 : 1], [1, enemyChar === 'w' ? -1 : 1]]
+    const knightPaths = [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]]
+
+    const queenReg = new RegExp('^' + enemyChar + 'Q')
+    const rookReg = new RegExp('^' + enemyChar + 'R')
+    const bishReg = new RegExp('^' + enemyChar + 'B')
+    const pawnReg = new RegExp('^' + enemyChar + 'P')
+    const knightReg = new RegExp('^' + enemyChar + 'N')
+
+    const kingX = newPiecesObject[kingName].x
+    const kingY = newPiecesObject[kingName].y
+    let inCheckFlag = false
 
     //test bishop and diagonal queen attacks
     bishopPaths.forEach(path => {
-      let startX = kingX + path[0];
-      let startY = kingY + path[1];
+      const startX = kingX + path[0]
+      const startY = kingY + path[1]
 
-      for(
-        let i = startX, j = startY, pathDone = false; 
-        !pathDone && 
-        i < BOARDSIZE && j < BOARDSIZE && 
+      for (
+        let i = startX, j = startY, pathDone = false;
+        !pathDone &&
+        i < BOARDSIZE && j < BOARDSIZE &&
         i >= 0 && j >= 0;
-        i += path[0], j += path[1]){
+        i += path[0], j += path[1]) {
 
         //if the tested cell is occupied by either an enemy queen or bishop, stop checking
-        if(newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || bishReg.test(newCellMap[`${i},${j}`]))){
-          pathDone = true;
-          inCheckFlag = true;
-          return;
+        if (newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || bishReg.test(newCellMap[`${i},${j}`]))) {
+          pathDone = true
+          inCheckFlag = true
+          return
         }
         //if the tested cell is occupied, but not by an enemy queen or bishop, this path is done but continue checking other paths
-        else if(newCellMap[`${i},${j}`]){
-          pathDone = true;
+        else if (newCellMap[`${i},${j}`]) {
+          pathDone = true
         }
       }
-    });
+    })
 
     //if it's proven that the king is being attacked, then no need to continue checking
-    if(!inCheckFlag){
+    if (!inCheckFlag) {
 
       //test for linear queen and rook attacks
       rookPaths.forEach(path => {
-        let startX = kingX + path[0];
-        let startY = kingY + path[1];
-  
-        for(
-          let i = startX, j = startY, pathDone = false; 
-          !pathDone && 
-          i < BOARDSIZE && j < BOARDSIZE && 
+        const startX = kingX + path[0]
+        const startY = kingY + path[1]
+
+        for (
+          let i = startX, j = startY, pathDone = false;
+          !pathDone &&
+          i < BOARDSIZE && j < BOARDSIZE &&
           i >= 0 && j >= 0;
-          i += path[0], j += path[1]){
-            
-            if(newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || rookReg.test(newCellMap[`${i},${j}`]))){
-              pathDone = true;
-              inCheckFlag = true;
-              return;
-            }
-            else if(newCellMap[`${i},${j}`]){
-              pathDone = true;
-            }
+          i += path[0], j += path[1]) {
+
+          if (newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || rookReg.test(newCellMap[`${i},${j}`]))) {
+            pathDone = true
+            inCheckFlag = true
+            return
           }
-      });
+          else if (newCellMap[`${i},${j}`]) {
+            pathDone = true
+          }
+        }
+      })
     }
 
     //test for enemy pawn attacks
-    if(!inCheckFlag){
+    if (!inCheckFlag) {
       pawnPaths.forEach(path => {
-        let cellTest = `${kingX - path[0]},${kingY - path[1]}`;
-  
-        if(newCellMap[cellTest] && pawnReg.test(newCellMap[cellTest])){
-          inCheckFlag = true;
-          return;
+        const cellTest = `${kingX - path[0]},${kingY - path[1]}`
+
+        if (newCellMap[cellTest] && pawnReg.test(newCellMap[cellTest])) {
+          inCheckFlag = true
+          return
         }
-      });
+      })
     }
 
     //test for knight attacks
-    if(!inCheckFlag){
+    if (!inCheckFlag) {
       knightPaths.forEach(path => {
-        let cellTest = `${kingX + path[0]},${kingY + path[1]}`;
-  
-        if(newCellMap[cellTest] && knightReg.test(newCellMap[cellTest])){
-          inCheckFlag = true;
-          return;
+        const cellTest = `${kingX + path[0]},${kingY + path[1]}`
+
+        if (newCellMap[cellTest] && knightReg.test(newCellMap[cellTest])) {
+          inCheckFlag = true
+          return
         }
-      });
+      })
     }
-    return inCheckFlag;
+    return inCheckFlag
   }
 
   // triggered after most turns
   // selectedpiece gets a namechange here to avoid redeclaring and confusion of variables. again, strike against this function
-  const turnMaintenance = ( newPiecesObject, newCellMap, newMessageBoard, currentPiece, newWGraveyard = state.wGraveyard, newBGraveyard = state.bGraveyard ) => {
+  // todo - change argument to single object
+  const turnMaintenance = (
+    newPiecesObject,
+    newCellMap,
+    newMessageBoard,
+    currentPiece,
+    newWGraveyard = chessGameState.wGraveyard,
+    newBGraveyard = chessGameState.bGraveyard
+  ) => {
 
-    let newEnPassantPiece = "";
+    let newEnPassantPiece = ''
 
     //if the piece has a firstMove prop, flip it
-    if(newPiecesObject[currentPiece].firstMove){
-      newPiecesObject[currentPiece].firstMove = false;
+    if (newPiecesObject[currentPiece].firstMove) {
+      newPiecesObject[currentPiece].firstMove = false
 
       //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if(/^(w|b)P/.test(currentPiece) && (newPiecesObject[currentPiece].y === 4 || newPiecesObject[currentPiece].y === 3)){
-        newEnPassantPiece = currentPiece;
+      if (/^(w|b)P/.test(currentPiece) && (newPiecesObject[currentPiece].y === 4 || newPiecesObject[currentPiece].y === 3)) {
+        newEnPassantPiece = currentPiece
       }
     }
 
     //update piece views
     //not sure I'm handling this properly
-    newPiecesObject = updatePieceVision(newPiecesObject, newCellMap, newEnPassantPiece);
+    newPiecesObject = updatePieceVision(newPiecesObject, newCellMap, newEnPassantPiece)
 
     dispatch({
-      type: "maintenance",
-      piecesObject: newPiecesObject, 
-      cellMap: newCellMap, 
-      messageBoard: newMessageBoard, 
-      enPassantPiece: newEnPassantPiece, 
-      wGraveyard: newWGraveyard, 
+      type: 'maintenance',
+      piecesObject: newPiecesObject,
+      cellMap: newCellMap,
+      messageBoard: newMessageBoard,
+      enPassantPiece: newEnPassantPiece,
+      wGraveyard: newWGraveyard,
       bGraveyard: newBGraveyard
-    });
+    })
   }
 
   const checkResize = () => {
-    let currentWidth = window.innerWidth;
-    let newScreenType;
-    console.log(currentWidth);
-    switch(true){
-      case currentWidth > 1800: newScreenType = "big"; break;
-      case currentWidth <= 1800 && currentWidth > 1200: newScreenType = "desktop"; break;
-      case currentWidth <= 1200 && currentWidth > 900: newScreenType = "tab-land"; break;
-      case currentWidth <= 900 && currentWidth > 600: newScreenType = "tab-port"; break;
-      case currentWidth <= 600: newScreenType = "phone"; break;
-      default: console.log("ERROR IN HANDLE RESIZE");
+    const currentWidth = window.innerWidth
+    let newScreenType
+    console.log(currentWidth)
+    switch (true) {
+    case currentWidth > 1800: newScreenType = 'big'; break
+    case currentWidth <= 1800 && currentWidth > 1200: newScreenType = 'desktop'; break
+    case currentWidth <= 1200 && currentWidth > 900: newScreenType = 'tab-land'; break
+    case currentWidth <= 900 && currentWidth > 600: newScreenType = 'tab-port'; break
+    case currentWidth <= 600: newScreenType = 'phone'; break
+    default: console.log('ERROR IN HANDLE RESIZE')
     }
-    if(newScreenType !== state.screenType){
+    if (newScreenType !== chessGameState.screenType) {
       dispatch({
-        type: "screenBreakpoint", 
-        screenType: newScreenType, 
+        type: 'screenBreakpoint',
+        screenType: newScreenType,
         windowSize: currentWidth
-      });
-    } 
+      })
+    }
     else {
       dispatch({
-        type: "windowWidthChange", 
+        type: 'windowWidthChange',
         windowSize: currentWidth
-      });
+      })
     }
   }
 
@@ -563,217 +578,226 @@ export default function ChessGame() {
   const illegalMove = (newMessageBoard) => {
 
     dispatch({
-      type: "illegal",
+      type: 'illegal',
       messageBoard: newMessageBoard
-    });
-    
+    })
+
   }
 
 
-  //makes board tiles 
+  //makes board tiles
   const makeTiles = (tileSize) => {
-    
+
     // return new Array(state.boardDimensions[0]).fill().map((column, i) => {
     //   return new Array(state.boardDimensions[1]).fill().map((tile,j) => {
     //     return <Tile
-    //               key={`tile-${i}-${j}`} 
-    //               size={tileSize} 
-    //               borderColour="red" 
+    //               key={`tile-${i}-${j}`}
+    //               size={tileSize}
+    //               borderColour="red"
     //               classString={state.tileArr[i][j]}
-                  
+
     //               onClick={tileClick} />
     //   });
     // });
     return new Array(8).fill().map((column, i) => {
-      return new Array(8).fill().map((tile,j) => {
+      return new Array(8).fill().map((tile, j) => {
         return <Tile
-                  key={`tile-${i}-${j}`} 
-                  size={tileSize} 
-                  borderColour="red" 
-                  classString={state.tileArr[i][j]}
-                  
-                  onClick={tileClick} />
-      });
-    });
+          key={`tile-${i}-${j}`}
+          size={tileSize}
+          borderColour="red"
+          classString={chessGameState.tileArr[i][j]}
+
+          onClick={tileClick} />
+      })
+    })
   }
 
   //makes pieces for the render method
   const makeLivePieces = (tileSize, backgroundSize) => {
-    let livePieces = [];
-    
-    Object.keys(state.piecesObject).forEach((name, i) => {
+    const { piecesObject, selectedPiece } = chessGameState
+    const livePieces = []
+
+    Object.keys(piecesObject).forEach( name => {
       livePieces.push(
-        <Piece 
-          x={state.piecesObject[name].x}
-          y={state.piecesObject[name].y}
-          dead={state.piecesObject[name].dead}
+        <Piece
+          x={piecesObject[name].x}
+          y={piecesObject[name].y}
+          dead={piecesObject[name].dead}
           key={name}
           name={name}
           size={tileSize}
           backgroundSize={backgroundSize}
-          border={state.selectedPiece}
+          border={selectedPiece}
           onClick={pieceClick} />
-      );
-    });
-    return livePieces;
+      )
+    })
+    return livePieces
   }
 
 
   const makeDeadPieces = (tileSize, backgroundSize) => {
-    
-    let wPieces = [];
-    let bPieces = [];
-    let wGraveyardKeys = Object.keys(state.wGraveyard);
-    let bGraveyardKeys = Object.keys(state.bGraveyard);
+    const { wGraveyard, bGraveyard } = chessGameState
 
-    if(wGraveyardKeys.length > 0){
+    const wPieces = []
+    const bPieces = []
+    const wGraveyardKeys = Object.keys(wGraveyard)
+    const bGraveyardKeys = Object.keys(bGraveyard)
+
+    if (wGraveyardKeys.length > 0) {
       wGraveyardKeys.forEach(name => {
         wPieces.push(
           <Piece
-            x={state.wGraveyard[name].x}
-            y={state.wGraveyard[name].y}
-            dead={state.wGraveyard[name].dead}
-            key={name}
-            name={name}
-            backgroundSize={backgroundSize}
-            size={tileSize} />
-        );
-      });
-    }
-
-    if(bGraveyardKeys.length > 0){
-      bGraveyardKeys.forEach(name => {
-        bPieces.push(
-          <Piece
-            x={state.bGraveyard[name].x}
-            y={state.bGraveyard[name].y}
-            dead={state.bGraveyard[name].dead}
+            x={wGraveyard[name].x}
+            y={wGraveyard[name].y}
+            dead={wGraveyard[name].dead}
             key={name}
             name={name}
             backgroundSize={backgroundSize}
             size={tileSize} />
         )
-      });
+      })
     }
-    return [wPieces, bPieces];
+
+    if (bGraveyardKeys.length > 0) {
+      bGraveyardKeys.forEach(name => {
+        bPieces.push(
+          <Piece
+            x={bGraveyard[name].x}
+            y={bGraveyard[name].y}
+            dead={bGraveyard[name].dead}
+            key={name}
+            name={name}
+            backgroundSize={backgroundSize}
+            size={tileSize} />
+        )
+      })
+    }
+    return [wPieces, bPieces]
   }
 
 
   const getTileSize = () => {
     /*
-    ASSUMPTIONS: 
+    ASSUMPTIONS:
     - browser fontsize is set to default - 16px
     - dynamic scale styling is set up:
-    - - html element font-size is set to 62.5% 
-    - - 1rem therefore equals 10px, a nice round number 
+    - - html element font-size is set to 62.5%
+    - - 1rem therefore equals 10px, a nice round number
     - I built the game with a TILESIZE of 60px
     - if the tilesize is 60 at 62.5%, then it would be 96 at 100%
     */
 
-    const BASETILESIZE = 96;
-    
+    const BASETILESIZE = 96
+
     //big desktop
-    if(window.innerWidth > 1800){
-      return BASETILESIZE * 0.75;
+    if (window.innerWidth > 1800) {
+      return BASETILESIZE * 0.75
     }
     //desktop
-    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
-      return BASETILESIZE * 0.625;
+    else if (window.innerWidth > 1200 && window.innerWidth <= 1800) {
+      return BASETILESIZE * 0.625
     }
     //tablet landscape
-    else if(window.innerWidth <= 1200 && window.innerWidth > 900){
-      return BASETILESIZE * 0.5625;
+    else if (window.innerWidth <= 1200 && window.innerWidth > 900) {
+      return BASETILESIZE * 0.5625
     }
     //tablet portrait
-    else if(window.innerWidth <= 900 && window.innerWidth > 600){
-      return BASETILESIZE * 0.5;
+    else if (window.innerWidth <= 900 && window.innerWidth > 600) {
+      return BASETILESIZE * 0.5
     }
     //phone
-    else if(window.innerWidth <= 600){
-      return BASETILESIZE * 0.4;
+    else if (window.innerWidth <= 600) {
+      return BASETILESIZE * 0.4
     }
   }
 
   const getBackgroundSize = () => {
-    /* 
+    /*
     ASSUMPTIONS:
     - same assumptions as in getTileSize()
     - exception being that BACKGROUNDSIZE in each <Piece /> was set at 400 through development
     - at html font-size: 100%, BACKGROUNDSIZE would be 640
     */
 
-    const BASEBACKGROUNDSIZE = 640;
-    
+    const BASEBACKGROUNDSIZE = 640
+
     //big desktop
-    if(window.innerWidth > 1800){
-      return BASEBACKGROUNDSIZE * 0.75;
+    if (window.innerWidth > 1800) {
+      return BASEBACKGROUNDSIZE * 0.75
     }
     //desktop
-    else if(window.innerWidth > 1200 && window.innerWidth <= 1800){
-      return BASEBACKGROUNDSIZE * 0.625;
+    else if (window.innerWidth > 1200 && window.innerWidth <= 1800) {
+      return BASEBACKGROUNDSIZE * 0.625
     }
     //tablet landscape
-    if(window.innerWidth <= 1200 && window.innerWidth > 900){
-      return BASEBACKGROUNDSIZE * 0.5625;
+    if (window.innerWidth <= 1200 && window.innerWidth > 900) {
+      return BASEBACKGROUNDSIZE * 0.5625
     }
     //tablet portrait
-    else if(window.innerWidth <= 900 && window.innerWidth > 600){
-      return BASEBACKGROUNDSIZE * 0.5;
+    else if (window.innerWidth <= 900 && window.innerWidth > 600) {
+      return BASEBACKGROUNDSIZE * 0.5
     }
     //phone
-    else if(window.innerWidth <= 600){
-      return BASEBACKGROUNDSIZE * 0.4;
+    else if (window.innerWidth <= 600) {
+      return BASEBACKGROUNDSIZE * 0.4
     }
   }
 
   useEffect(() => {
-    window.addEventListener('resize', checkResize);
+    window.addEventListener('resize', checkResize)
 
-    return function removeWindowListener(){
-      window.removeEventListener('resize', checkResize);
-    };
-  }, [state.screenType]);
+    return function removeWindowListener () {
+      window.removeEventListener('resize', checkResize)
+    }
+  }, [chessGameState.screenType])
 
- 
+
   // =======================
   // START PROCESSING RENDER
-  // ======================= 
+  // =======================
 
-  //GENERATE SCALING 
-  const backgroundSize = getBackgroundSize();
-  const tileSize = getTileSize();
-  
+  //GENERATE SCALING
+  const backgroundSize = getBackgroundSize()
+  const tileSize = getTileSize()
+
   //GENERATE TILES
-  const boardTiles = makeTiles(tileSize);
+  const boardTiles = makeTiles(tileSize)
 
   //GENERATE PIECES
-  const pieceObjects = makeLivePieces(tileSize, backgroundSize);
-  const [ wGraveyardPieces, bGraveyardPieces ] = makeDeadPieces(tileSize, backgroundSize);
+  const pieceObjects = makeLivePieces(tileSize, backgroundSize)
+  const [ wGraveyardPieces, bGraveyardPieces ] = makeDeadPieces(tileSize, backgroundSize)
 
-  const theMenu = state.pawnPromotionFlag ? <PromotionMenu selectPiece={promotePawn} team={state.selectedPiece.charAt(0)} /> : "";
+  const theMenu = chessGameState.pawnPromotionFlag
+    ? (
+      <PromotionMenu
+        selectPiece={promotePawn}
+        team={chessGameState.selectedPiece.charAt(0)}
+      />
+    )
+    : ''
 
   //STYLES
   const tileContainerStyle = {
-    width: `${state.boardDimensions[0] * tileSize}px`,
-    height: `${state.boardDimensions[1] * tileSize}px`,
+    width: `${chessGameState.boardDimensions[0] * tileSize}px`,
+    height: `${chessGameState.boardDimensions[1] * tileSize}px`,
   }
-  
-  const piecesContainerStyle = {
-    width: `${state.boardDimensions[0] * tileSize}px`,
-    height: `${state.boardDimensions[1] * tileSize}px`,
-  }  
 
-  return(
-    <div class="game-container" >
+  const piecesContainerStyle = {
+    width: `${chessGameState.boardDimensions[0] * tileSize}px`,
+    height: `${chessGameState.boardDimensions[1] * tileSize}px`,
+  }
+
+  return (
+    <div className="game-container" >
       {theMenu}
-      <h2 class="turn-board" >{state.turn ? "White turn" : "Black turn"}</h2>
-      <div class="tile-container" style={tileContainerStyle}>
+      <h2 className="turn-board" >{chessGameState.turn ? 'White turn' : 'Black turn'}</h2>
+      <div className="tile-container" style={tileContainerStyle}>
         {boardTiles}
       </div>
-      <div class="pieces-container" style={piecesContainerStyle} >
+      <div className="pieces-container" style={piecesContainerStyle} >
         {pieceObjects}
       </div>
-      <h3 class="message-board" >{state.messageBoard}</h3>
+      <h3 className="message-board" >{chessGameState.messageBoard}</h3>
       <ChessGraveyard pieces={wGraveyardPieces} classString="wGraveyard" />
       <ChessGraveyard pieces={bGraveyardPieces} classString="bGraveyard" />
     </div>

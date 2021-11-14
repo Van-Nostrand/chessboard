@@ -1,42 +1,42 @@
-export const BOARDDIMENSIONS = [8,8];
-export const TILESIZE = 60;
-export const TILEBORDERSIZE = 1;
-export const LIGHT_TILE = "#f98f39";
-export const DARK_TILE = "#603d0b";
+export const BOARDDIMENSIONS = [8, 8]
+export const TILESIZE = 60
+export const TILEBORDERSIZE = 1
+export const LIGHT_TILE = '#f98f39'
+export const DARK_TILE = '#603d0b'
 export const PIECE_OBJECTS = {
-  "wR1": {firstMove: true, dead: false, paths: [], name: "wR1", view: {}, x: 0, y: 7},
-  "wR2": {firstMove: true, dead: false, paths: [], name: "wR2", view: {}, x: 7, y: 7},
-  "wN1": {dead: false, paths: [], name: "wN1", view: {}, x: 1, y: 7},
-  "wN2": {dead: false, paths: [], name: "wN2", view: {}, x: 6, y: 7},
-  "wB1": {dead: false, paths: [], name: "wB1", view: {}, x: 2, y: 7},
-  "wB2": {dead: false, paths: [], name: "wB2", view: {}, x: 5, y: 7},
-  "wK": {checkView: {}, firstMove: true, dead: false, paths: [], name: "wK", view: {}, x: 4, y: 7},
-  "wQ": {dead: false, paths: [], name: "wQ", view: {}, x: 3, y: 7},
-  "wP1": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP1", view: {}, x: 0, y: 6},
-  "wP2": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP2", view: {}, x: 1, y: 6},
-  "wP3": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP3", view: {}, x: 2, y: 6},
-  "wP4": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP4", view: {}, x: 3, y: 6},
-  "wP5": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP5", view: {}, x: 4, y: 6},
-  "wP6": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP6", view: {}, x: 5, y: 6},
-  "wP7": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP7", view: {}, x: 6, y: 6},
-  "wP8": {firstMove: true, fifthRank: 3, dead: false, paths: [], name: "wP8", view: {}, x: 7, y: 6},
-  "bR1": {firstMove: true, dead: false, paths: [], name: "bR1", view: {}, x: 0, y: 0},
-  "bR2": {firstMove: true, dead: false, paths: [], name: "bR2", view: {}, x: 7, y: 0},
-  "bN1": {dead: false, paths: [], name: "bN1", view: {}, x: 1, y: 0},
-  "bN2": {dead: false, paths: [], name: "bN2", view: {}, x: 6, y: 0},
-  "bB1": {dead: false, paths: [], name: "bB1", view: {}, x: 2, y: 0},
-  "bB2": {dead: false, paths: [], name: "bB2", view: {}, x: 5, y: 0},
-  "bK": {checkView: {}, firstMove: true, dead: false, paths: [], name: "bK", view: {}, x: 4, y: 0},
-  "bQ": {dead: false, paths: [], name: "bQ", view: {}, x: 3, y: 0},
-  "bP1": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP1", view: {}, x: 0, y: 1},
-  "bP2": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP2", view: {}, x: 1, y: 1},
-  "bP3": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP3", view: {}, x: 2, y: 1},
-  "bP4": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP4", view: {}, x: 3, y: 1},
-  "bP5": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP5", view: {}, x: 4, y: 1},
-  "bP6": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP6", view: {}, x: 5, y: 1},
-  "bP7": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP7", view: {}, x: 6, y: 1},
-  "bP8": {firstMove: true, fifthRank: 4, dead: false, paths: [], name: "bP8", view: {}, x: 7, y: 1},
-};
+  'wR1': { firstMove: true, dead: false, paths: [], name: 'wR1', view: {}, x: 0, y: 7 },
+  'wR2': { firstMove: true, dead: false, paths: [], name: 'wR2', view: {}, x: 7, y: 7 },
+  'wN1': { dead: false, paths: [], name: 'wN1', view: {}, x: 1, y: 7 },
+  'wN2': { dead: false, paths: [], name: 'wN2', view: {}, x: 6, y: 7 },
+  'wB1': { dead: false, paths: [], name: 'wB1', view: {}, x: 2, y: 7 },
+  'wB2': { dead: false, paths: [], name: 'wB2', view: {}, x: 5, y: 7 },
+  'wK': { checkView: {}, firstMove: true, dead: false, paths: [], name: 'wK', view: {}, x: 4, y: 7 },
+  'wQ': { dead: false, paths: [], name: 'wQ', view: {}, x: 3, y: 7 },
+  'wP1': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP1', view: {}, x: 0, y: 6 },
+  'wP2': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP2', view: {}, x: 1, y: 6 },
+  'wP3': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP3', view: {}, x: 2, y: 6 },
+  'wP4': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP4', view: {}, x: 3, y: 6 },
+  'wP5': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP5', view: {}, x: 4, y: 6 },
+  'wP6': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP6', view: {}, x: 5, y: 6 },
+  'wP7': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP7', view: {}, x: 6, y: 6 },
+  'wP8': { firstMove: true, fifthRank: 3, dead: false, paths: [], name: 'wP8', view: {}, x: 7, y: 6 },
+  'bR1': { firstMove: true, dead: false, paths: [], name: 'bR1', view: {}, x: 0, y: 0 },
+  'bR2': { firstMove: true, dead: false, paths: [], name: 'bR2', view: {}, x: 7, y: 0 },
+  'bN1': { dead: false, paths: [], name: 'bN1', view: {}, x: 1, y: 0 },
+  'bN2': { dead: false, paths: [], name: 'bN2', view: {}, x: 6, y: 0 },
+  'bB1': { dead: false, paths: [], name: 'bB1', view: {}, x: 2, y: 0 },
+  'bB2': { dead: false, paths: [], name: 'bB2', view: {}, x: 5, y: 0 },
+  'bK': { checkView: {}, firstMove: true, dead: false, paths: [], name: 'bK', view: {}, x: 4, y: 0 },
+  'bQ': { dead: false, paths: [], name: 'bQ', view: {}, x: 3, y: 0 },
+  'bP1': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP1', view: {}, x: 0, y: 1 },
+  'bP2': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP2', view: {}, x: 1, y: 1 },
+  'bP3': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP3', view: {}, x: 2, y: 1 },
+  'bP4': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP4', view: {}, x: 3, y: 1 },
+  'bP5': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP5', view: {}, x: 4, y: 1 },
+  'bP6': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP6', view: {}, x: 5, y: 1 },
+  'bP7': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP7', view: {}, x: 6, y: 1 },
+  'bP8': { firstMove: true, fifthRank: 4, dead: false, paths: [], name: 'bP8', view: {}, x: 7, y: 1 },
+}
 // export const PIECE_OBJECTS = {
 //   "wR1": {pngPos: "130px -3px", firstMove: true, dead: false, paths: [], name: "wR1", view: {}, x: 0, y: 7},
 //   "wR2": {pngPos: "130px -3px", firstMove: true, dead: false, paths: [], name: "wR2", view: {}, x: 7, y: 7},
@@ -72,37 +72,37 @@ export const PIECE_OBJECTS = {
 //   "bP8": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP8", view: {}, x: 7, y: 1},
 // };
 export const PP_TEST = {
-  "wP1": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP1", view: {}, x: 0, y: 1},
-  "wP2": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP2", view: {}, x: 1, y: 1},
-  "wP3": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP3", view: {}, x: 2, y: 1},
-  "wP4": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP4", view: {}, x: 3, y: 1},
-  "bP5": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP5", view: {}, x: 4, y: 6},
-  "bP6": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP6", view: {}, x: 5, y: 6},
-  "bP7": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP7", view: {}, x: 6, y: 6},
-  "bP8": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP8", view: {}, x: 7, y: 6},
-  "bK": {checkView: {}, pngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "bK", view: {}, x: 6, y: 0},
-  "wK": {checkView: {}, firstMove: true, pngPos: "-4px -3px", dead: false, paths: [], name: "wK", view: {}, x: 2, y: 7},
-};
+  'wP1': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP1', view: {}, x: 0, y: 1 },
+  'wP2': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP2', view: {}, x: 1, y: 1 },
+  'wP3': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP3', view: {}, x: 2, y: 1 },
+  'wP4': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP4', view: {}, x: 3, y: 1 },
+  'bP5': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP5', view: {}, x: 4, y: 6 },
+  'bP6': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP6', view: {}, x: 5, y: 6 },
+  'bP7': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP7', view: {}, x: 6, y: 6 },
+  'bP8': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP8', view: {}, x: 7, y: 6 },
+  'bK': { checkView: {}, pngPos: '-4px 63px', firstMove: true, dead: false, paths: [], name: 'bK', view: {}, x: 6, y: 0 },
+  'wK': { checkView: {}, firstMove: true, pngPos: '-4px -3px', dead: false, paths: [], name: 'wK', view: {}, x: 2, y: 7 },
+}
 export const EN_PASSANT_TEST = {
-  "wP1": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP1", view: {}, x: 0, y: 6},
-  "wP2": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP2", view: {}, x: 1, y: 6},
-  "wP3": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP3", view: {}, x: 2, y: 6},
-  "wP4": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP4", view: {}, x: 3, y: 6},
-  "wP7": {enPassant: false, firstMove: true, fifthRank: 3, pngPos: "65px -3px", dead: false, paths: [], name: "wP7", view: {}, x: 6, y: 6},
-  "bP5": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP5", view: {}, x: 4, y: 1},
-  "bP6": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP6", view: {}, x: 5, y: 1},
-  "bP7": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP7", view: {}, x: 6, y: 1},
-  "bP8": {enPassant: false, firstMove: true, fifthRank: 4, pngPos: "65px 63px", dead: false, paths: [], name: "bP8", view: {}, x: 7, y: 1},
-  "bK": {checkView: {}, pngPos: "-4px 63px", firstMove: true, dead: false, paths: [], name: "bK", view: {}, x: 7, y: 0},
-  "wK": {checkView: {}, firstMove: true, pngPos: "-4px -3px", dead: false, paths: [], name: "wK", view: {}, x: 0, y: 7},
-};
+  'wP1': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP1', view: {}, x: 0, y: 6 },
+  'wP2': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP2', view: {}, x: 1, y: 6 },
+  'wP3': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP3', view: {}, x: 2, y: 6 },
+  'wP4': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP4', view: {}, x: 3, y: 6 },
+  'wP7': { enPassant: false, firstMove: true, fifthRank: 3, pngPos: '65px -3px', dead: false, paths: [], name: 'wP7', view: {}, x: 6, y: 6 },
+  'bP5': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP5', view: {}, x: 4, y: 1 },
+  'bP6': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP6', view: {}, x: 5, y: 1 },
+  'bP7': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP7', view: {}, x: 6, y: 1 },
+  'bP8': { enPassant: false, firstMove: true, fifthRank: 4, pngPos: '65px 63px', dead: false, paths: [], name: 'bP8', view: {}, x: 7, y: 1 },
+  'bK': { checkView: {}, pngPos: '-4px 63px', firstMove: true, dead: false, paths: [], name: 'bK', view: {}, x: 7, y: 0 },
+  'wK': { checkView: {}, firstMove: true, pngPos: '-4px -3px', dead: false, paths: [], name: 'wK', view: {}, x: 0, y: 7 },
+}
 export const PIECE_PROTOTYPES = {
-  "R": {WpngPos: "13rem -0.3rem", BpngPos: "13rem 6.3rem", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "Q": {WpngPos: "-7rem -0.3rem", BpngPos: "-7rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "K": {WpngPos: "-0.4rem -0.3rem", BpngPos: "-0.4rem 6.3rem", firstMove: true, dead: false, paths: [], name: "", view: {}, checkView: {}, x: 0, y: 0},
-  "P": {enPassant: false, firstMove: true, BfifthRank: 4, WfifthRank: 3, BpngPos: "6.5rem 6.3rem", WpngPos: "6.5rem -0.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "N": {WpngPos: "19.7rem -0.3rem",BpngPos: "19.7rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
-  "B": {WpngPos: "-13.6rem -0.3rem", BpngPos: "-13.6rem 6.3rem", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
+  'R': { WpngPos: '13rem -0.3rem', BpngPos: '13rem 6.3rem', firstMove: true, dead: false, paths: [], name: '', view: {}, x: 0, y: 0 },
+  'Q': { WpngPos: '-7rem -0.3rem', BpngPos: '-7rem 6.3rem', dead: false, paths: [], name: '', view: {}, x: 0, y: 0 },
+  'K': { WpngPos: '-0.4rem -0.3rem', BpngPos: '-0.4rem 6.3rem', firstMove: true, dead: false, paths: [], name: '', view: {}, checkView: {}, x: 0, y: 0 },
+  'P': { enPassant: false, firstMove: true, BfifthRank: 4, WfifthRank: 3, BpngPos: '6.5rem 6.3rem', WpngPos: '6.5rem -0.3rem', dead: false, paths: [], name: '', view: {}, x: 0, y: 0 },
+  'N': { WpngPos: '19.7rem -0.3rem', BpngPos: '19.7rem 6.3rem', dead: false, paths: [], name: '', view: {}, x: 0, y: 0 },
+  'B': { WpngPos: '-13.6rem -0.3rem', BpngPos: '-13.6rem 6.3rem', dead: false, paths: [], name: '', view: {}, x: 0, y: 0 }
 }
 // export const PIECE_PROTOTYPES = {
 //   "R": {WpngPos: "130px -3px", BpngPos: "130px 63px", firstMove: true, dead: false, paths: [], name: "", view: {}, x: 0, y: 0},
@@ -113,11 +113,11 @@ export const PIECE_PROTOTYPES = {
 //   "B": {WpngPos: "-136px -3px", BpngPos: "-136px 63px", dead: false, paths: [], name: "", view: {}, x: 0, y: 0}
 // }
 export const PIECEPATHS = {
-  "Q": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
-  "K": [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]],
-  "B": [[1,-1],[1,1],[-1,1],[-1,-1]],
-  "N": [[1,-2], [2,-1], [2,1], [1,2], [-1,2], [-2,1], [-2,-1],[-1,-2]],
-  "bP": [[0,1],[0,2],[-1,1], [1,1]],
-  "wP": [[0,-1],[0,-2],[-1,-1], [1,-1]],
-  "R": [[0,-1],[1,0],[0,1],[-1,0]]
+  'Q': [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]],
+  'K': [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]],
+  'B': [[1, -1], [1, 1], [-1, 1], [-1, -1]],
+  'N': [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]],
+  'bP': [[0, 1], [0, 2], [-1, 1], [1, 1]],
+  'wP': [[0, -1], [0, -2], [-1, -1], [1, -1]],
+  'R': [[0, -1], [1, 0], [0, 1], [-1, 0]]
 }

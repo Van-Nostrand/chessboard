@@ -1,21 +1,18 @@
-/*
-Rooks
-*/
+export default class RookClass {
 
-export default class RookClass{
+  static movelogic = (x, y) => x === 0 ^ y === 0
 
-  static movelogic = (x,y) => x === 0 ^ y === 0
-
+  // unimplemented...?
   static castlelogic = () => {
     return true
   }
 
   static getPaths = () => {
-    return [[0,-1],[1,0],[0,1],[-1,0]]
+    return [[0, -1], [1, 0], [0, 1], [-1, 0]]
   }
 
   static vision = (cellMap, piecesObject, name) => {
-    const {x, y, paths} = piecesObject[name]
+    const { x, y, paths } = piecesObject[name]
 
     const pathsObject = {}
     const BOARDSIZE = 8
@@ -25,15 +22,15 @@ export default class RookClass{
       const startY = y + path[1]
       let blockedFlag = false
 
-      for(let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]){
+      for (let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]) {
         const cellTest = `${i},${j}`
 
         // if cell in path contains piece
-        if (cellMap[cellTest]){
+        if (cellMap[cellTest]) {
           // if piece is enemy
-          if(cellMap[cellTest].charAt(0) !== this.name.charAt(0)){
+          if (cellMap[cellTest].charAt(0) !== this.name.charAt(0)) {
             // if enemy has not been found in this path yet then the path is clear and cell can be attacked
-            if(!blockedFlag){
+            if (!blockedFlag) {
               pathsObject[cellTest] = 'a'
               blockedFlag = true
             }
@@ -51,7 +48,7 @@ export default class RookClass{
         // else cell is empty
         else {
           // if cell not blocked, can move to tile
-          if(!blockedFlag){
+          if (!blockedFlag) {
             pathsObject[cellTest] = 'm'
           }
           // else cell is blocked by something prior
