@@ -1,20 +1,24 @@
+import PieceClass from './PieceClass'
 /*
 ==== KNIGHTS ====
 */
+export default class KnightClass extends PieceClass {
 
-export default class KnightClass {
+  constructor (props) {
+    super(props)
+    this.imgSrc = props.name.charAt(0) + '-knight.svg'
+    this.paths = [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]]
+  }
 
   static movelogic = (x, y) =>
     x !== 0 !== y &&
-    x !== y &&
-    x < 3 && x > -3 &&
-    y < 3 && y > -3 && (
-      x%2 === 0 ^ y%2 === 0
-    )
+    3 > Math.abs(x) &&
+    3 > Math.abs(y) &&
+    ((Math.abs(x) === 2 ^ Math.abs(y) === 2) === 1)
 
 
   static getPaths = () => {
-    return [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+    return [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]]
   }
 
 

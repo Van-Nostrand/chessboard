@@ -1,30 +1,46 @@
+import PieceClass from './PieceClass'
 /*==== PAWNS ====
 attacklogic() - similar to movelogic(), this pawn-exclusive function determines if a pawn can attack
 direction - a property set by this.name.charAt(0) which determines the direction this pawn may move in
 fifthRank - an integer which represents the pawns 5th rank. Used to track en passant checks.
 */
-export default class PawnClass {
+export default class PawnClass extends PieceClass {
+  constructor (props) {
+    super(props)
+    this.firstMove = true
+    this.canBeCapturedInPassing = false
+    this.imgSrc = props.name.charAt(0) + '-pawn.svg'
+    this.paths = props.name.charAt(0) === 'w'
+      ? [[0, -1], [0, -2], [-1, -1], [1, -1]]
+      : [[0, 1], [0, 2], [-1, 1], [1, 1]]
+    this.direction = props.name.charAt(0) === 'w'
+      ? -1
+      : 1
+    // fifthRank is a y index starting from the top
+    this.fifthRank = props.name.charAt(0) === 'w'
+      ? 3
+      : 4
+  }
+  // unused
+  static attacklogic = (x, y) => (x === 1 || x === -1) && (y === 1 * this.direction)
 
   // unused
-  static attacklogic = (x, y, direction) => (x === 1 || x === -1) && (y === 1 * direction)
-
-  // unused
-  static movelogic = (x, y, direction, firstMove) => {
+  static movelogic = (x, y) => {
 
     let success = false
-    if (direction > 0) {
-      if (firstMove) {
+    if (this.direction > 0) {
+      if (this.firstMove) {
         success = x === 0 && (y === 1 || y === 2)
       }
-      else if (!firstMove) {
+      else if (!this.firstMove) {
         success = x === 0 && y === 1
       }
     }
-    else if (direction < 0) {
-      if (firstMove) {
+    else if (this.direction < 0) {
+      if (this.firstMove) {
         success = x === 0 && (y === -1 || y === -2)
       }
-      else if (!firstMove) {
+      else if (!this.firstMove) {
         success = x === 0 && y === -1
       }
     }
@@ -43,6 +59,9 @@ export default class PawnClass {
   static getPaths = (team) => {
     if (team === 'w') return [[0, -1], [0, -2], [-1, -1], [1, -1]]
     else if (team === 'b') return [[0, 1], [0, 2], [-1, 1], [1, 1]]
+    // return this.name.charAt(0) === 'w'
+    //   ? [[0, -1], [0, -2], [-1, -1], [1, -1]]
+    //   : [[0, 1], [0, 2], [-1, 1], [1, 1]]
   }
 
 

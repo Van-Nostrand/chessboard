@@ -1,4 +1,11 @@
-export default class QueenClass {
+import PieceClass from './PieceClass'
+
+export default class QueenClass extends PieceClass {
+  constructor (props) {
+    super(props)
+    this.imgSrc = props.name.charAt(0) + '-queen.svg'
+    this.paths = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+  }
 
   static movelogic = (x, y) => {
     const result = (x === 0 ^ y === 0) ^ x/y === 1 || x/y === -1

@@ -10,23 +10,22 @@ import {
   ChessGraveyard,
   PromotionMenu
 } from '@/components'
-
 import {
   PIECEPATHS,
   PIECE_PROTOTYPES
 } from '@/constants'
-
-import { useWindowToGetTileSize } from '@/hooks'
+import { ChessGameContext } from '@/context'
 import {
   recursiveStateCopy,
   updatePieceVision,
   buildNewCellMap
 } from '@/functions'
+import { useWindowToGetTileSize } from '@/hooks'
 
-import { ChessGameContext } from '@/context'
 
 export default function ChessGame () {
   const { chessGameState, dispatch } = useContext(ChessGameContext)
+
   const piecesContainerRef = useRef(null)
   const tileSize = useWindowToGetTileSize()
 
@@ -83,9 +82,7 @@ export default function ChessGame () {
 
       //check turn, then confirm selection and update piece.view
       if ((turn && (/^w/.test(name))) || (!turn && (/^b/.test(name)))) {
-
         dispatch({ type: 'selected', name })
-
       }
       //failed selection
       else {
@@ -102,7 +99,6 @@ export default function ChessGame () {
 
       //if the selected piece can see this cell, and the cell is verified for attacks...
       if (piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] && piecesObject[selectedPiece].view[`${targetCell[0]},${targetCell[1]}`] === 'a') {
-
         tryAttacking(targetCell, name)
       }
       //failed
@@ -126,8 +122,9 @@ export default function ChessGame () {
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
     //make a copy of state and carry out the attack
-    const newPiecesObject = recursiveStateCopy(piecesObject);
+    const newPiecesObject = recursiveStateCopy(piecesObject)
 
+    // eslint-disable-next-line
     [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ]  = targetCell
     const targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`]
 
@@ -296,11 +293,11 @@ export default function ChessGame () {
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
-    const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} in passing`
+    const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} en passent`
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
-    newPiecesObject[selectedPiece].x = cell[0]
-    newPiecesObject[selectedPiece].y = cell[1]
+    //eslint-disable-next-line
+    [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ] = cell
 
     if (enPassantPiece.charAt(0) === 'w') {
       newWGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
@@ -316,19 +313,21 @@ export default function ChessGame () {
     turnMaintenance(newPiecesObject, newCellMap, newMessageBoard, selectedPiece, newWGraveyard, newBGraveyard)
   }
 
+  // todo - does this need to exist here and in a king class?
   const isMyKingInCheck = ( newPiecesObject, newCellMap ) => {
-
     const { turn } = chessGameState
 
     const kingName = turn ? 'wK' : 'bK'
     const BOARDSIZE = 8
     const enemyChar = kingName.charAt(0) === 'w' ? 'b' : 'w'
 
+    // todo - get from constants
     const bishopPaths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
     const rookPaths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
     const pawnPaths = [[-1, enemyChar === 'w' ? -1 : 1], [1, enemyChar === 'w' ? -1 : 1]]
     const knightPaths = [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]]
 
+    // todo - move to constants
     const queenReg = new RegExp('^' + enemyChar + 'Q')
     const rookReg = new RegExp('^' + enemyChar + 'R')
     const bishReg = new RegExp('^' + enemyChar + 'B')
@@ -340,7 +339,7 @@ export default function ChessGame () {
     let inCheckFlag = false
 
     //test bishop and diagonal queen attacks
-    bishopPaths.forEach(path => {
+    bishopPaths.forEach( path => {
       const startX = kingX + path[0]
       const startY = kingY + path[1]
 
@@ -379,12 +378,12 @@ export default function ChessGame () {
           i >= 0 && j >= 0;
           i += path[0], j += path[1]) {
 
+          //
           if (newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || rookReg.test(newCellMap[`${i},${j}`]))) {
             pathDone = true
             inCheckFlag = true
             return
-          }
-          else if (newCellMap[`${i},${j}`]) {
+          } else if (newCellMap[`${i},${j}`]) {
             pathDone = true
           }
         }

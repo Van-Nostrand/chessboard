@@ -1,11 +1,17 @@
+import PieceClass from './PieceClass'
 /*
 ==== KINGS ====
 amIChecked() - this looks for attackers and reports them back
 
 TODO - make amIChecked a function that returns bool instead of a list of cells. not important now to know every cell that can attack, just need to know if one can
 */
-export default class KingClass {
-
+export default class KingClass extends PieceClass {
+  constructor (props) {
+    super(props)
+    this.imgSrc = props.name.charAt(0) + '-king.svg'
+    this.paths = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+    this.firstMove = true
+  }
 
   static movelogic = (x, y) => x < 2 && x > -2 && y < 2 && y > -2
 

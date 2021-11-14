@@ -1,6 +1,13 @@
-export default class RookClass {
+import PieceClass from './PieceClass'
 
-  static movelogic = (x, y) => x === 0 ^ y === 0
+export default class RookClass extends PieceClass {
+  constructor (props) {
+    super(props)
+    this.imgSrc = props.name.charAt(0) + '-rook.svg'
+    this.paths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
+    this.firstMove = true
+  }
+  static movelogic = (x, y) => (x === 0 ^ y === 0) === 1
 
   // unimplemented...?
   static castlelogic = () => {

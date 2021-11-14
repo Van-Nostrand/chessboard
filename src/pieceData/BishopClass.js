@@ -1,4 +1,11 @@
-export default class BishopClass {
+import PieceClass from './PieceClass'
+
+export default class BishopClass extends PieceClass {
+  constructor (props) {
+    super (props)
+    this.paths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
+    this.imgSrc = props.name.charAt(0) + '-bishop.svg'
+  }
 
   static movelogic = (x, y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1)
 
@@ -37,13 +44,11 @@ export default class BishopClass {
             blockedFlag = true
           }
         }
+        else if (!blockedFlag) {
+          pathsObject[cellTest] = 'm'
+        }
         else {
-          if (!blockedFlag) {
-            pathsObject[cellTest] = 'm'
-          }
-          else {
-            pathsObject[cellTest] = 'b'
-          }
+          pathsObject[cellTest] = 'b'
         }
       }
     })

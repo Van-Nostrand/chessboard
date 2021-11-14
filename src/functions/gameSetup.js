@@ -39,19 +39,32 @@ export const gameSetup = () => {
   Object.keys(initialPiecesObject).forEach( piece => {
 
     switch (true) {
-    case /^(w|b)Q/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['Q']; initialPieceNumbers[`${piece.charAt(0)}Q`] += 1
+    case /^(w|b)Q/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['Q']
+      initialPieceNumbers[`${piece.charAt(0)}Q`] += 1
       break
-    case /^(w|b)K/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['K']
+    case /^(w|b)K/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['K']
       break
-    case /^(w|b)B/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['B']; initialPieceNumbers[`${piece.charAt(0)}B`] += 1
+    case /^(w|b)B/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['B']
+      initialPieceNumbers[`${piece.charAt(0)}B`] += 1
       break
-    case /^(w|b)R/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['R']; initialPieceNumbers[`${piece.charAt(0)}R`] += 1
+    case /^(w|b)R/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['R']
+      initialPieceNumbers[`${piece.charAt(0)}R`] += 1
       break
-    case /^wP/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['wP']; initialPieceNumbers[`${piece.charAt(0)}P`] += 1
+    case /^wP/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['wP']
+      initialPieceNumbers[`${piece.charAt(0)}P`] += 1
       break
-    case /^bP/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['bP']; initialPieceNumbers[`${piece.charAt(0)}P`] += 1
+    case /^bP/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['bP']
+      initialPieceNumbers[`${piece.charAt(0)}P`] += 1
       break
-    case /^(w|b)N/.test(piece): initialPiecesObject[piece].paths = PIECEPATHS['N']; initialPieceNumbers[`${piece.charAt(0)}N`] += 1
+    case /^(w|b)N/.test(piece):
+      initialPiecesObject[piece].paths = PIECEPATHS['N']
+      initialPieceNumbers[`${piece.charAt(0)}N`] += 1
       break
     default: console.log('something went wrong while assigning paths')
     }
