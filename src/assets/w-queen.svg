@@ -5,15 +5,38 @@
    version="1.1"
    id="svg5181"
    width="379.25848"
-   height="347.0712"
-   viewBox="0 0 379.25848 347.0712"
+   height="379.0712"
+   viewBox="0 0 379.25848 379.0712"
+   sodipodi:docname="w-queen.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview21"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.3328667"
+     inkscape:cx="156.80488"
+     inkscape:cy="158.68054"
+     inkscape:window-width="1920"
+     inkscape:window-height="1004"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5181"
+     height="379.0712px" />
   <defs
      id="defs5185" />
   <g
      id="g5187"
-     transform="translate(-50.398583,-42.159071)">
+     transform="translate(-50.398583,-24.159071)">
     <path
        style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round"
        d=""

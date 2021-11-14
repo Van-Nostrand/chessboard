@@ -1,3 +1,9 @@
 @use './base/base';
-@use './ChessGame.scss';
-@use './PromotionMenu.scss';
+
+@use './components/piece';
+@use './components/tile';
+@use './components/promotion-menu';
+@use './components/graveyard';
+
+@use './layout/main-layout';
+@use './layout/chessboard';

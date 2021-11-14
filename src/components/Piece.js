@@ -23,6 +23,11 @@ export default function Piece ({ pieceData, border = '', size, onClick }) {
     }
   }
 
+  const svgStyle = {
+    maxWidth: '100%',
+    maxHeight: '100%'
+  }
+
 
   return (
     <div
@@ -32,7 +37,7 @@ export default function Piece ({ pieceData, border = '', size, onClick }) {
       onClick={(e) => onClick(e, name)}
     >
       <img
-        style={{ maxWidth: "100%", maxHeight: "100%" }}
+        style={svgStyle}
         src={require(`../assets/${imgSrc}`)}
       />
     </div>

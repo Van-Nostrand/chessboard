@@ -27,7 +27,7 @@ export default function ChessGame () {
   const { chessGameState, dispatch } = useContext(ChessGameContext)
 
   const piecesContainerRef = useRef(null)
-  const tileSize = useWindowToGetTileSize()
+  const [ tileSize, windowSize ] = useWindowToGetTileSize()
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -458,29 +458,29 @@ export default function ChessGame () {
   }
 
   const checkResize = () => {
-    const currentWidth = window.innerWidth
-    let newScreenType
-    switch (true) {
-    case currentWidth > 1800: newScreenType = 'big'; break
-    case currentWidth <= 1800 && currentWidth > 1200: newScreenType = 'desktop'; break
-    case currentWidth <= 1200 && currentWidth > 900: newScreenType = 'tab-land'; break
-    case currentWidth <= 900 && currentWidth > 600: newScreenType = 'tab-port'; break
-    case currentWidth <= 600: newScreenType = 'phone'; break
-    default: console.log('ERROR IN HANDLE RESIZE')
-    }
-    if (newScreenType !== chessGameState.screenType) {
-      dispatch({
-        type: 'screenBreakpoint',
-        screenType: newScreenType,
-        windowSize: currentWidth
-      })
-    }
-    else {
-      dispatch({
-        type: 'windowWidthChange',
-        windowSize: currentWidth
-      })
-    }
+    // const currentWidth = window.innerWidth
+    // let newScreenType
+    // switch (true) {
+    // case currentWidth > 1800: newScreenType = 'big'; break
+    // case currentWidth <= 1800 && currentWidth > 1200: newScreenType = 'desktop'; break
+    // case currentWidth <= 1200 && currentWidth > 900: newScreenType = 'tab-land'; break
+    // case currentWidth <= 900 && currentWidth > 600: newScreenType = 'tab-port'; break
+    // case currentWidth <= 600: newScreenType = 'phone'; break
+    // default: console.log('ERROR IN HANDLE RESIZE')
+    // }
+    // if (newScreenType !== chessGameState.screenType) {
+    //   dispatch({
+    //     type: 'screenBreakpoint',
+    //     screenType: newScreenType,
+    //     windowSize: currentWidth
+    //   })
+    // }
+    // else {
+    //   dispatch({
+    //     type: 'windowWidthChange',
+    //     windowSize: currentWidth
+    //   })
+    // }
   }
 
 
@@ -679,7 +679,7 @@ export default function ChessGame () {
   return (
     <div className="game-container" >
       {theMenu}
-      <h2 className="turn-board" >{chessGameState.turn ? 'White turn' : 'Black turn'}</h2>
+      <h2 className="turn-header" >{chessGameState.turn ? 'White turn' : 'Black turn'}</h2>
       <div className="tile-container" style={tileContainerStyle}>
         {boardTiles}
       </div>

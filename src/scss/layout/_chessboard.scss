@@ -1,0 +1,49 @@
+.middle-container {
+  grid-column: 3;
+  grid-row: 2;
+  position: relative;
+  margin: 0 auto;
+}
+
+.tile-container {
+  grid-column: 3;
+  grid-row: 2;
+  margin: auto;
+  padding: 0;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+}
+
+.pieces-container {
+  grid-column: 3;
+  grid-row: 2;
+  margin: auto;
+  padding: 0;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.graveyard {
+  grid-row: 2;
+}
+
+.w-graveyard { grid-column: 2; }
+.b-graveyard { grid-column: 4; }
+
+.message-board {
+  grid-column: 3;
+  grid-row: 3;
+  position: relative;
+  place-self: center;
+
+  display: inline-block;
+  text-align: center;
+  font-size: 3rem;
+}

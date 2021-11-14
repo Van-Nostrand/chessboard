@@ -1,14 +1,15 @@
 .promotion-menu {
-  z-index: 2;
   width: 400px;
   height: 100px;
-  background-color: #ccc;
-  font-family: Helvetica, sans-serif;
+
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  z-index: 2;
+  background-color: #ccc;
+  font-family: Helvetica, sans-serif;
 }
 
 .promotion-menu > p {
@@ -20,9 +21,9 @@
 .promotion-choice {
   width: 60px;
   height: 60px;
+  margin: 2px;
+  box-sizing: border-box;
   border: 1px dotted red;
   text-align: center;
-  margin: 2px;
   line-height: 105px;
-  box-sizing: border-box;
 }

@@ -9,12 +9,12 @@ export default function ChessGraveyard ({ pieces, classString }) {
   }
 
   const text = classString.charAt(0) === 'w' ? 'WHITE GRAVEYARD' : 'BLACK GRAVEYARD'
-  const transformString = `rotate(${classString.charAt(0) === 'w' ? '-90deg' : '90deg'})`
-  const style = { transform: transformString }
+  // const transformString = `rotate(${classString.charAt(0) === 'w' ? '-90deg' : '90deg'})`
+  // const style = { transform: transformString }
 
   return (
     <div className={`graveyard ${classString}`} >
-      <h3 style={style}>{text}</h3>
+      <h3>{text}</h3>
       {piecesToRender}
     </div>
   )
