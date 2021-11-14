@@ -39,6 +39,8 @@ export default function ChessGame () {
   // - illegal move attempt
   const tileClick = (e, coordinates) => {
 
+    console.log('clicked it')
+
     const { selectedPiece, piecesObject } = chessGameState
 
     // Accidental, or clicking a tile while no piece selected
@@ -458,7 +460,6 @@ export default function ChessGame () {
   const checkResize = () => {
     const currentWidth = window.innerWidth
     let newScreenType
-    console.log(currentWidth)
     switch (true) {
     case currentWidth > 1800: newScreenType = 'big'; break
     case currentWidth <= 1800 && currentWidth > 1200: newScreenType = 'desktop'; break
@@ -542,6 +543,7 @@ export default function ChessGame () {
     Object.keys(piecesObject).forEach( name => {
       livePieces.push(
         <Piece
+          pieceData={piecesObject[name]}
           x={piecesObject[name].x}
           y={piecesObject[name].y}
           dead={piecesObject[name].dead}
