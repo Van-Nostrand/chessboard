@@ -4,7 +4,7 @@ import pieceImg from '../assets/pieces.png'
 // const BACKGROUNDSIZE = 400
 
 //TODO - remove need for hard-coded BACKGROUNDSIZE property
-const Piece = ({ border = '', name, dead, x, y, size, onClick, backgroundSize }) => {
+export default function Piece ({ border = '', name, dead, x, y, size, onClick, backgroundSize }) {
 
   const borderLogic = border === name ? '0.1rem solid yellow' : ''
   let style, divElement, pngPos
@@ -74,6 +74,4 @@ const Piece = ({ border = '', name, dead, x, y, size, onClick, backgroundSize })
 
   return divElement
 }
-
-export default Piece
 

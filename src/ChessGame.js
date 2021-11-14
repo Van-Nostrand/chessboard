@@ -1,11 +1,10 @@
-import React, { useEffect, useReducer, useRef } from 'react'
-import Tile from './Tile'
+import React, { useEffect, useRef, useContext } from 'react'
+import Tile from './components/Tile'
 import Piece from './components/Piece'
 import ChessGraveyard from './components/ChessGraveyard'
 import { PromotionMenu } from './components/PromotionMenu'
 
 import {
-  BOARDDIMENSIONS,
   PIECEPATHS,
   PIECE_PROTOTYPES
 } from './constants/CONSTANTS'
@@ -13,101 +12,16 @@ import {
 import {
   recursiveStateCopy
 } from './functions/recursiveStateCopy'
+import useWindowToGetTileSize from './hooks/useWindowToGetTileSize'
 
-import { gameSetup } from './functions/gameSetup'
 import { updatePieceVision } from  './functions/updatePieceVision'
 import { buildNewCellMap } from './functions/buildNewCellMap'
-
-const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
-
-const initialState = {
-  boardDimensions: BOARDDIMENSIONS,
-  tileArr: initTileArr,
-  cellMap: initialCellMap,
-  piecesObject: initialPiecesObject,
-  wGraveyard: {},
-  bGraveyard: {},
-  turn: true,
-  selectedPiece: '',
-  enPassantPiece: '',
-  messageBoard: 'CHESS!',
-  pawnPromotionFlag: false,
-  pieceNumbering: initialPieceNumbers,
-  windowSize: '',
-  screenType: ''
-}
-
-function reducer (state, action) {
-  switch (action.type) {
-  case 'illegal':
-    return {
-      ...state,
-      selectedPiece: '',
-      messageBoard: action.message
-    }
-  case 'selected':
-    return {
-      ...state,
-      selectedPiece: action.name,
-      messageBoard: `piece ${action.name} is selected`
-    }
-  case 'deselected':
-    return {
-      ...state,
-      selectedPiece: '',
-      messageBoard: 'no piece selected'
-    }
-  case 'promoted':
-    return {
-      ...state,
-      piecesObject: action.piecesObject,
-      cellMap: action.cellMap,
-      messageBoard: action.messageBoard,
-      pieceNumbering: action.pieceNumbering,
-      selectedPiece: '',
-      pawnPromotionFlag: false,
-      turn: !state.turn
-    }
-  case 'promoting':
-    return {
-      ...state,
-      piecesObject: action.piecesObject,
-      cellMap: action.cellMap,
-      pawnPromotionFlag: true,
-      messageBoard: `${state.selectedPiece} is being promoted`
-    }
-  case 'maintenance':
-    return {
-      ...state,
-      piecesObject: action.piecesObject,
-      cellMap: action.cellMap,
-      messageBoard: action.messageBoard,
-      enPassantPiece: action.enPassantPiece,
-      wGraveyard: action.wGraveyard,
-      bGraveyard: action.bGraveyard,
-      selectedPiece: '',
-      turn: !state.turn
-    }
-  case 'windowWidthChange':
-    return {
-      ...state,
-      windowSize: action.windowSize
-    }
-  case 'screenBreakpoint':
-    return {
-      ...state,
-      screenType: action.screenType,
-      windowSize: action.windowSize
-    }
-  default:
-    throw new Error('3RR0RZ')
-  }
-}
+import { ChessGameContext } from './context'
 
 export default function ChessGame () {
-
-  const [ chessGameState, dispatch ] = useReducer(reducer, initialState)
+  const { chessGameState, dispatch } = useContext(ChessGameContext)
   const piecesContainerRef = useRef(null)
+  const tileSize = useWindowToGetTileSize()
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -122,18 +36,13 @@ export default function ChessGame () {
     const { selectedPiece, piecesObject } = chessGameState
 
     // Accidental, or clicking a tile while no piece selected
-    if (selectedPiece.length === 0) {
-      return
-    }
+    if (selectedPiece.length === 0) return
 
     // a piece is already selected, user wants to move here
     if (selectedPiece.length > 0) {
-
-      // const rect = document.querySelector('.pieces-container')[0].getBoundingClientRect()
+      // todo - refactor the next 3 lines
       const rect = piecesContainerRef.current.getBoundingClientRect()
-      // In order for this game to dynamically scale with window sizes, Tilesize needs to be dynamic
-      // getTileSize checks the current window width and returns a dynamic tilesize
-      const cell = [ Math.floor((e.clientX - rect.left) / getTileSize()), Math.floor((e.clientY - rect.top) / getTileSize()) ]
+      const cell = [ Math.floor((e.clientX - rect.left) / tileSize), Math.floor((e.clientY - rect.top) / tileSize) ]
       const cellString = `${cell[0]},${cell[1]}`
 
       //MOVING
@@ -574,12 +483,10 @@ export default function ChessGame () {
 
   // erases selection, sets messageboard text
   const illegalMove = (newMessageBoard) => {
-
     dispatch({
       type: 'illegal',
       messageBoard: newMessageBoard
     })
-
   }
 
 
@@ -674,41 +581,6 @@ export default function ChessGame () {
   }
 
 
-  const getTileSize = () => {
-    /*
-    ASSUMPTIONS:
-    - browser fontsize is set to default - 16px
-    - dynamic scale styling is set up:
-    - - html element font-size is set to 62.5%
-    - - 1rem therefore equals 10px, a nice round number
-    - I built the game with a TILESIZE of 60px
-    - if the tilesize is 60 at 62.5%, then it would be 96 at 100%
-    */
-
-    const BASETILESIZE = 96
-
-    //big desktop
-    if (window.innerWidth > 1800) {
-      return BASETILESIZE * 0.75
-    }
-    //desktop
-    else if (window.innerWidth > 1200 && window.innerWidth <= 1800) {
-      return BASETILESIZE * 0.625
-    }
-    //tablet landscape
-    else if (window.innerWidth <= 1200 && window.innerWidth > 900) {
-      return BASETILESIZE * 0.5625
-    }
-    //tablet portrait
-    else if (window.innerWidth <= 900 && window.innerWidth > 600) {
-      return BASETILESIZE * 0.5
-    }
-    //phone
-    else if (window.innerWidth <= 600) {
-      return BASETILESIZE * 0.4
-    }
-  }
-
   const getBackgroundSize = () => {
     /*
     ASSUMPTIONS:
@@ -756,7 +628,7 @@ export default function ChessGame () {
 
   //GENERATE SCALING
   const backgroundSize = getBackgroundSize()
-  const tileSize = getTileSize()
+
 
   //GENERATE TILES
   const boardTiles = makeTiles(tileSize)
