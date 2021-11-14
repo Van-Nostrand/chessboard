@@ -1,61 +1,12 @@
-:root {
-  --light-tile: #f98f39;
-  --dark-tile: #603d0b;
-  --light-tile2: #ecb379;
-  --dark-tile2: #745120;
-}
+@use './abstracts/vars';
 
-*,
-*::after,
-*::before {
-  margin: 0;
-  padding: 0;
-  box-sizing: inherit;
-}
-
-html {
-  font-size: 62.5%;
-  
-  font-family: Helvetica, sans-serif;
-}
-/* under 1200px ~ tablet-landscape */
-@media screen and (max-width: 75em){
-  html{
-    font-size: 56.25%;
-  }
-}
-/* under 900px ~ tablet-portrait */
-@media screen and (max-width: 56.25em){
-  html{
-    font-size: 50%;
-  }
-}
-/* under 600px ~ phone */
-@media screen and (max-width: 37.5em){ 
-  html{
-    font-size: 40%;
-  }
-}
-/* over 1800px ~ big desktops */
-@media (min-width: 112.5em){
-  html{
-    font-size: 75%;
-  }
-}
-
-body {
-  /* box-sizing: border-box; */
-  margin: 0 auto;
-}
-
-.game-container{
-  display: grid; 
+.game-container {
+  display: grid;
   grid-template-columns: 8rem 15rem 48rem 15rem 8rem;
   grid-template-rows: 8rem 48rem 8rem;
 }
 
-
-.turn-board{
+.turn-board {
   width: 100%;
   display: inline-block;
   position: relative;
@@ -66,15 +17,15 @@ body {
   font-size: 4rem;
 }
 
-.middle-container{
+.middle-container {
   position: relative;
   margin: 0 auto;
   grid-column: 3;
   grid-row: 2;
-  
+
 }
 
-.tile-container{
+.tile-container {
   margin: auto;
   padding: 0;
   display: flex;
@@ -93,14 +44,14 @@ body {
 }
 
 .light-tile {
-  background-color: var(--light-tile2);
+  background-color: vars.$light-tile2;
 }
 
-.dark-tile{
-  background-color: var(--dark-tile2);
+.dark-tile {
+  background-color: vars.$dark-tile2;
 }
 
-.pieces-container{
+.pieces-container {
   margin: auto;
   padding: 0;
   display: flex;
@@ -113,13 +64,13 @@ body {
   grid-row: 2;
 }
 
-.piece{
+.piece {
   background-origin: border-box;
   box-sizing: border-box;
   pointer-events: all;
 }
 
-.wGraveyard, .bGraveyard{
+.wGraveyard, .bGraveyard {
   grid-row: 2;
   display: flex;
   flex-flow: column;
@@ -127,11 +78,11 @@ body {
   background-color: #aaa;
 }
 
-.wGraveyard{grid-column: 2;}
-.bGraveyard{grid-column: 4;}
+.wGraveyard { grid-column: 2; }
+.bGraveyard { grid-column: 4; }
 
 .wGraveyard > h3,
-.bGraveyard > h3{
+.bGraveyard > h3 {
   position: absolute;
   top: 31rem;
   font-size: 2.5rem;
@@ -145,13 +96,11 @@ body {
   left: -7.4rem;
 }
 
-.bGraveyard > h3{
+.bGraveyard > h3 {
   left: 54rem;
 }
 
-
-
-.message-board{
+.message-board {
   display: inline-block;
   position: relative;
   grid-column: 3;

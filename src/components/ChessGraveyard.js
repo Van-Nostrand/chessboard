@@ -20,7 +20,7 @@ export default function ChessGraveyard ({ pieces, classString }) {
   )
 }
 
-ChessGraveyard.PropTypes = {
+ChessGraveyard.propTypes = {
   pieces: PropTypes.array,
   classString: PropTypes.string
 }

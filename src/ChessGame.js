@@ -1,21 +1,21 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect, useReducer, useRef } from 'react'
 import Tile from './Tile'
-import Piece from './Piece'
-import ChessGraveyard from './ChessGraveyard'
-import { PromotionMenu } from './PromotionMenu'
+import Piece from './components/Piece'
+import ChessGraveyard from './components/ChessGraveyard'
+import { PromotionMenu } from './components/PromotionMenu'
 
 import {
   BOARDDIMENSIONS,
   PIECEPATHS,
   PIECE_PROTOTYPES
-} from './CONSTANTS'
+} from './constants/CONSTANTS'
 
 import {
   recursiveStateCopy
 } from './functions/recursiveStateCopy'
 
-import './ChessGame.css'
-import './PromotionMenu.css'
+import './scss/main.scss'
+// import './PromotionMenu.scss'
 
 import { gameSetup } from './functions/gameSetup'
 import { updatePieceVision } from  './functions/updatePieceVision'
@@ -110,6 +110,7 @@ function reducer (state, action) {
 export default function ChessGame () {
 
   const [ chessGameState, dispatch ] = useReducer(reducer, initialState)
+  const piecesContainerRef = useRef(null)
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -131,8 +132,8 @@ export default function ChessGame () {
     // a piece is already selected, user wants to move here
     if (selectedPiece.length > 0) {
 
-      const rect = document.getElementById('pieces-container').getBoundingClientRect()
-
+      // const rect = document.querySelector('.pieces-container')[0].getBoundingClientRect()
+      const rect = piecesContainerRef.current.getBoundingClientRect()
       // In order for this game to dynamically scale with window sizes, Tilesize needs to be dynamic
       // getTileSize checks the current window width and returns a dynamic tilesize
       const cell = [ Math.floor((e.clientX - rect.left) / getTileSize()), Math.floor((e.clientY - rect.top) / getTileSize()) ]
@@ -794,7 +795,11 @@ export default function ChessGame () {
       <div className="tile-container" style={tileContainerStyle}>
         {boardTiles}
       </div>
-      <div className="pieces-container" style={piecesContainerStyle} >
+      <div
+        className="pieces-container"
+        ref={piecesContainerRef}
+        style={piecesContainerStyle}
+      >
         {pieceObjects}
       </div>
       <h3 className="message-board" >{chessGameState.messageBoard}</h3>

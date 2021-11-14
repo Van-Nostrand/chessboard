@@ -1,5 +1,5 @@
 import React from 'react'
-import pieceImg from './assets/pieces.png'
+import pieceImg from '../assets/pieces.png'
 
 // const BACKGROUNDSIZE = 400
 

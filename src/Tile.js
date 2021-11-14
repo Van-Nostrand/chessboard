@@ -1,6 +1,7 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-const Tile = ({ size, onClick, classString }) => {
+export default function Tile ({ size, onClick, classString }) {
   const style = {
     width: `${size}px`,
     height: `${size}px`,
@@ -12,4 +13,8 @@ const Tile = ({ size, onClick, classString }) => {
     </div>)
 }
 
-export default Tile
+Tile.propTypes = {
+  size: PropTypes.number,
+  onClick: PropTypes.func,
+  classString: PropTypes.string
+}

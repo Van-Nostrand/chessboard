@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import pieceImg from './assets/pieces.png'
-
+import pieceImg from '../assets/pieces.png'
+import PropTypes from 'prop-types'
 
 export const PromotionMenu = ({ selectPiece, team }) => {
   const [pieceSelection, setPieceSelection] = useState('')
@@ -47,3 +47,7 @@ export const PromotionMenu = ({ selectPiece, team }) => {
   )
 }
 
+PromotionMenu.propTypes = {
+  selectPiece: PropTypes.func,
+  team: PropTypes.string
+}

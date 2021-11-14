@@ -5,7 +5,7 @@ import {
   BOARDDIMENSIONS,
   PIECE_OBJECTS,
   PIECEPATHS
-} from '../CONSTANTS'
+} from '../constants/CONSTANTS'
 
 //sets up the game. I want to add a check window function and scale game accordingly
 export const gameSetup = () => {
