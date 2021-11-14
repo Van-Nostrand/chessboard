@@ -22,7 +22,6 @@
   margin: 0 auto;
   grid-column: 3;
   grid-row: 2;
-
 }
 
 .tile-container {
@@ -32,12 +31,11 @@
   flex-flow: row;
   flex-wrap: wrap;
   box-sizing: border-box;
-
   grid-column: 3;
   grid-row: 2;
 }
 
-.tile{
+.tile {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -59,7 +57,6 @@
   flex-wrap: wrap;
   pointer-events: none;
   box-sizing: border-box;
-
   grid-column: 3;
   grid-row: 2;
 }
@@ -70,7 +67,8 @@
   pointer-events: all;
 }
 
-.wGraveyard, .bGraveyard {
+.w-graveyard,
+.b-graveyard {
   grid-row: 2;
   display: flex;
   flex-flow: column;
@@ -78,11 +76,11 @@
   background-color: #aaa;
 }
 
-.wGraveyard { grid-column: 2; }
-.bGraveyard { grid-column: 4; }
+.w-graveyard { grid-column: 2; }
+.b-graveyard { grid-column: 4; }
 
-.wGraveyard > h3,
-.bGraveyard > h3 {
+.w-graveyard > h3,
+.b-graveyard > h3 {
   position: absolute;
   top: 31rem;
   font-size: 2.5rem;
@@ -92,11 +90,11 @@
   color: #ccc;
 }
 
-.wGraveyard > h3 {
+.w-graveyard > h3 {
   left: -7.4rem;
 }
 
-.bGraveyard > h3 {
+.b-graveyard > h3 {
   left: 54rem;
 }
 

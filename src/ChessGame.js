@@ -14,9 +14,6 @@ import {
   recursiveStateCopy
 } from './functions/recursiveStateCopy'
 
-import './scss/main.scss'
-// import './PromotionMenu.scss'
-
 import { gameSetup } from './functions/gameSetup'
 import { updatePieceVision } from  './functions/updatePieceVision'
 import { buildNewCellMap } from './functions/buildNewCellMap'
@@ -803,8 +800,8 @@ export default function ChessGame () {
         {pieceObjects}
       </div>
       <h3 className="message-board" >{chessGameState.messageBoard}</h3>
-      <ChessGraveyard pieces={wGraveyardPieces} classString="wGraveyard" />
-      <ChessGraveyard pieces={bGraveyardPieces} classString="bGraveyard" />
+      <ChessGraveyard pieces={wGraveyardPieces} classString="w-graveyard" />
+      <ChessGraveyard pieces={bGraveyardPieces} classString="b-graveyard" />
     </div>
   )
 }
