@@ -1,4 +1,20 @@
 {
-  "presets":["@babel/preset-env", "@babel/preset-react"],
-  "plugins": ["@babel/plugin-transform-arrow-functions", "@babel/plugin-proposal-class-properties"]
+  "presets":[
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-proposal-class-properties",
+    [
+      "module-resolver",
+      {
+        "root": "./src",
+        "extensions": [".js", ".scss", ".css", ".json", ".svg"],
+        "alias": {
+          "@": "./src"
+        }
+      }
+    ]
+  ]
 }

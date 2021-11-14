@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import pieceImg from '../assets/pieces.png'
 import PropTypes from 'prop-types'
 
-export const PromotionMenu = ({ selectPiece, team }) => {
+export default function PromotionMenu ({ selectPiece, team }) {
   const [pieceSelection, setPieceSelection] = useState('')
 
   useEffect(() => {

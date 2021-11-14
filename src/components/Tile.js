@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function Tile ({ size, onClick, classString }) {
+export default function Tile ({ size, onClick, classString, coordinates }) {
   const style = {
     width: `${size}px`,
     height: `${size}px`,
@@ -9,12 +9,17 @@ export default function Tile ({ size, onClick, classString }) {
   }
 
   return (
-    <div className={classString} onClick={onClick} style={style}>
-    </div>)
+    <div
+      className={classString}
+      onClick={(e) => onClick(e, coordinates)}
+      style={style}
+    />
+  )
 }
 
 Tile.propTypes = {
   size: PropTypes.number,
   onClick: PropTypes.func,
-  classString: PropTypes.string
+  classString: PropTypes.string,
+  coordinates: PropTypes.string
 }

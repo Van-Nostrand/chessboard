@@ -1,22 +1,29 @@
-import React, { useEffect, useRef, useContext } from 'react'
-import Tile from './components/Tile'
-import Piece from './components/Piece'
-import ChessGraveyard from './components/ChessGraveyard'
-import { PromotionMenu } from './components/PromotionMenu'
+import React, {
+  useEffect,
+  useRef,
+  useContext
+} from 'react'
+
+import {
+  Tile,
+  Piece,
+  ChessGraveyard,
+  PromotionMenu
+} from '@/components'
 
 import {
   PIECEPATHS,
   PIECE_PROTOTYPES
-} from './constants/CONSTANTS'
+} from '@/constants'
 
+import { useWindowToGetTileSize } from '@/hooks'
 import {
-  recursiveStateCopy
-} from './functions/recursiveStateCopy'
-import useWindowToGetTileSize from './hooks/useWindowToGetTileSize'
+  recursiveStateCopy,
+  updatePieceVision,
+  buildNewCellMap
+} from '@/functions'
 
-import { updatePieceVision } from  './functions/updatePieceVision'
-import { buildNewCellMap } from './functions/buildNewCellMap'
-import { ChessGameContext } from './context'
+import { ChessGameContext } from '@/context'
 
 export default function ChessGame () {
   const { chessGameState, dispatch } = useContext(ChessGameContext)
@@ -31,7 +38,7 @@ export default function ChessGame () {
   // - - Castling
   // - - En Passant
   // - illegal move attempt
-  const tileClick = (e) => {
+  const tileClick = (e, coordinates) => {
 
     const { selectedPiece, piecesObject } = chessGameState
 
@@ -40,22 +47,18 @@ export default function ChessGame () {
 
     // a piece is already selected, user wants to move here
     if (selectedPiece.length > 0) {
-      // todo - refactor the next 3 lines
-      const rect = piecesContainerRef.current.getBoundingClientRect()
-      const cell = [ Math.floor((e.clientX - rect.left) / tileSize), Math.floor((e.clientY - rect.top) / tileSize) ]
-      const cellString = `${cell[0]},${cell[1]}`
 
       //MOVING
-      if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'm') {
-        tryMoving(cell)
+      if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'm') {
+        tryMoving(coordinates.split(','))
       }
       //CASTLING
-      else if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'c') {
-        processCastling(cell)
+      else if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'c') {
+        processCastling(coordinates.split(','))
       }
       //ENPASSANT
-      else if (piecesObject[selectedPiece].view[cellString] && piecesObject[selectedPiece].view[cellString] === 'e') {
-        processEnPassant(cell)
+      else if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'e') {
+        processEnPassant(coordinates.split(','))
       }
       //ILLEGAL MOVE
       else {
@@ -504,17 +507,32 @@ export default function ChessGame () {
     //               onClick={tileClick} />
     //   });
     // });
-    return new Array(8).fill().map((column, i) => {
-      return new Array(8).fill().map((tile, j) => {
-        return <Tile
-          key={`tile-${i}-${j}`}
-          size={tileSize}
-          borderColour="red"
-          classString={chessGameState.tileArr[i][j]}
-
-          onClick={tileClick} />
+    return chessGameState.tileArr.map((column, i) => {
+      return column.map((tile, j) => {
+        return (
+          <Tile
+            key={`t${j}-${i}`}
+            size={tileSize}
+            classString={tile}
+            coordinates={`${j},${i}`}
+            onClick={tileClick}
+          />
+        )
       })
     })
+    // chessGameState.tileArr[0].forEach(tile => console.log('HERES A TILE:', tile))
+    // console.log('iterable?', chessGameState.tileArr[0][0])
+    // return new Array(8).fill().map((column, i) => {
+    //   return new Array(8).fill().map((tile, j) => {
+    //     return <Tile
+    //       key={`tile-${i}-${j}`}
+    //       size={tileSize}
+    //       borderColour="red"
+    //       classString={chessGameState.tileArr[i][j]}
+
+    //       onClick={tileClick} />
+    //   })
+    // })
   }
 
   //makes pieces for the render method
