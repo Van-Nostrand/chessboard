@@ -56,6 +56,7 @@ export default class RookClass extends PieceClass {
         }
       }
     })
-    return pathsObject
+    // return pathsObject
+    this.view = pathsObject
   }
 }

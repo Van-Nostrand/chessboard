@@ -68,8 +68,8 @@ export default class QueenClass extends PieceClass {
       }
     })
     // return object
-    // this.newview = pathsObject;
-    return pathsObject
+    this.view = pathsObject
+    // return pathsObject
   }
 
 }

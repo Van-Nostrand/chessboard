@@ -42,6 +42,7 @@ export default class KnightClass extends PieceClass {
         pathsObject[cellCheck] = 'b'
       }
     })
-    return pathsObject
+    this.view = pathsObject
+    // return pathsObject
   }
 }

@@ -13,18 +13,13 @@ export default class PawnClass extends PieceClass {
     this.paths = props.name.charAt(0) === 'w'
       ? [[0, -1], [0, -2], [-1, -1], [1, -1]]
       : [[0, 1], [0, 2], [-1, 1], [1, 1]]
-    this.direction = props.name.charAt(0) === 'w'
-      ? -1
-      : 1
+    this.direction = props.name.charAt(0) === 'w' ? -1 : 1
     // fifthRank is a y index starting from the top
-    this.fifthRank = props.name.charAt(0) === 'w'
-      ? 3
-      : 4
+    this.fifthRank = props.name.charAt(0) === 'w' ? 3 : 4
   }
 
   // unused
   attacklogic (x, y) {
-    console.log('called attack logic')
     return (x === 1 || x === -1) && (1 * this.direction === y)
   }
 
@@ -46,17 +41,16 @@ export default class PawnClass extends PieceClass {
 
   // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
   vision = (cellMap, enPassantPiece, piecesObject) => {
-    // const { x, y, fifthRank, paths, firstMove } = piecesObject[name]
     const BOARDSIZE = 8
-
-    // if (/^wP/.test(this.name)) console.log('white pawn vision', this)
 
     // create an empty object that will store potential moves
     const pathsObject = {}
-    const direction = this.name.charAt(0) === 'w' ? -1 : 1
 
     // for each path
-    this.paths.forEach( path => {
+    for (const path of this.paths) {
+    // this.paths.forEach( path => {
+      if (!this.firstMove && Math.abs(path[1]) === 2) continue
+      // console.log('checking pawn', this.name, ' and path is', path)
 
       const checkX = path[0] + this.x
       const checkY = path[1] + this.y
@@ -73,7 +67,7 @@ export default class PawnClass extends PieceClass {
           // piece is an enemy
           if (testedCell.charAt(0) !== this.name.charAt(0)) {
             // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
-            if (this.attacklogic(path[0], path[1], direction)) {
+            if (this.attacklogic(path[0], path[1], this.direction)) {
               pathsObject[cellString] = 'a'
 
             }
@@ -92,7 +86,7 @@ export default class PawnClass extends PieceClass {
           }
           else if (this.fifthRank === this.y) {
             // if enemy pawn in cell "behind" empty cell
-            const EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`
+            const EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - this.direction}`
             if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
 
               // if piece just moved two spaces
@@ -107,10 +101,12 @@ export default class PawnClass extends PieceClass {
           }
         }
       }
-
-    })
-    return pathsObject
-
+    }
+    this.view(pathsObject)
+    // return pathsObject
   }
 
+  set view (value) {
+    this.view = value
+  }
 }

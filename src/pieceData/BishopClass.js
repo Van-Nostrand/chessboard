@@ -47,6 +47,7 @@ export default class BishopClass extends PieceClass {
         }
       }
     })
-    return pathsObject
+    // return pathsObject
+    this.view = pathsObject
   }
 }

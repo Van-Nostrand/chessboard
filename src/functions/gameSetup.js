@@ -4,7 +4,7 @@ import { buildNewCellMap } from './buildNewCellMap'
 import {
   BOARDDIMENSIONS,
   PIECE_OBJECTS,
-  PIECEPATHS
+  // PIECEPATHS
 } from '@/constants'
 import { createPiece } from './createPiece'
 
@@ -36,48 +36,18 @@ export const gameSetup = () => {
 
   //declare pieces, give them their paths
   //will eventually phase this out
-  let initialPiecesObject = {}
+  const initialPiecesObject = {}
   PIECE_OBJECTS.forEach( piece => {
     initialPiecesObject[piece.name] = createPiece(piece)
   })
 
-
-  // switch (true) {
-  //   case /^(w|b)Q/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['Q']
-  //     initialPieceNumbers[`${piece.charAt(0)}Q`] += 1
-  //     break
-  //   case /^(w|b)K/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['K']
-  //     break
-  //   case /^(w|b)B/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['B']
-  //     initialPieceNumbers[`${piece.charAt(0)}B`] += 1
-  //     break
-  //   case /^(w|b)R/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['R']
-  //     initialPieceNumbers[`${piece.charAt(0)}R`] += 1
-  //     break
-  //   case /^wP/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['wP']
-  //     initialPieceNumbers[`${piece.charAt(0)}P`] += 1
-  //     break
-  //   case /^bP/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['bP']
-  //     initialPieceNumbers[`${piece.charAt(0)}P`] += 1
-  //     break
-  //   case /^(w|b)N/.test(piece):
-  //     initialPiecesObject[piece].paths = PIECEPATHS['N']
-  //     initialPieceNumbers[`${piece.charAt(0)}N`] += 1
-  //     break
-  //   default: console.log('something went wrong while assigning paths')
-  // }
-
   //cellMap is used for piece name lookup by cell
   const initialCellMap = buildNewCellMap(initialPiecesObject)
-
+  console.log('before update, pieces is ', initialPiecesObject)
   //build the view properties of each piece
-  initialPiecesObject = updatePieceVision(initialPiecesObject, initialCellMap)
+  updatePieceVision(initialPiecesObject, initialCellMap)
+
+  console.log('after update func, pieces is', initialPiecesObject)
 
   return [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ]
 }

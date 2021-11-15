@@ -53,8 +53,8 @@ export default class KingClass extends PieceClass {
         //are [1,y] [2,y] and [3,y] empty?
         if (!cellMap[`2,${this.y}`] && !cellMap[`1,${this.y}`] && !cellMap[`3,${this.y}`]) {
           // checkmate check at [2,y] and [3,y]
-          const longPieces2y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 2, y: this.y } }, this.name)
-          const longPieces3y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x:3, y: this.y } }, this.name)
+          const longPieces2y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 2, y: this.y } })
+          const longPieces3y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x:3, y: this.y } })
           if (Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0) {
             pathsObject[`2,${this.y}`] = 'c'
           }
@@ -66,22 +66,23 @@ export default class KingClass extends PieceClass {
         if (!cellMap[`6,${this.y}`] && !cellMap[`5,${this.y}`]) {
 
           // checkmate check at [5,y] and [6,y]
-          const shortPieces5y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 5, y: this.y } }, this.name)
-          const shortPieces6y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 6, y: this.y } }, this.name)
+          const shortPieces5y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 5, y: this.y } })
+          const shortPieces6y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 6, y: this.y } })
           if (Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0) {
             pathsObject[`6,${this.y}`] = 'c'
           }
         }
       }
     }
-    return pathsObject
+    this.view = pathsObject
+    // return pathsObject
   }
 
-  amIChecked = (cellMap, piecesObject, name) => {
+  amIChecked = (cellMap, piecesObject) => {
 
     const pathsObject = {}
     const BOARDSIZE = 8
-    const enemyChar = name.charAt(0) === 'w' ? 'b' : 'w'
+    const enemyChar = this.name.charAt(0) === 'w' ? 'b' : 'w'
 
     const bishopPaths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
     const rookPaths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
@@ -94,8 +95,8 @@ export default class KingClass extends PieceClass {
     const pawnRegex = new RegExp('^' + enemyChar + 'P')
     const knightRegex = new RegExp('^' + enemyChar + 'N')
 
-    const testX = piecesObject[name].x
-    const testY = piecesObject[name].y
+    const testX = piecesObject[this.name].x
+    const testY = piecesObject[this.name].y
 
     // test queen bishop attacks
     // for(const n = 0; n < bishopPaths.length; n++){
@@ -165,11 +166,11 @@ export default class KingClass extends PieceClass {
     return pathsObject
   }
 
-  static amICheckedBool = (cellMap, piecesObject, name) => {
+  amICheckedBool = (cellMap, piecesObject) => {
 
     const pathsObject = {}
     const BOARDSIZE = 8
-    const enemyChar = name.charAt(0) === 'w' ? 'b' : 'w'
+    const enemyChar = this.name.charAt(0) === 'w' ? 'b' : 'w'
 
     const bishopPaths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
     const rookPaths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
@@ -182,8 +183,8 @@ export default class KingClass extends PieceClass {
     const pawnRegex = new RegExp('^' + enemyChar + 'P')
     const knightRegex = new RegExp('^' + enemyChar + 'N')
 
-    const testX = piecesObject[name].x
-    const testY = piecesObject[name].y
+    const testX = piecesObject[this.name].x
+    const testY = piecesObject[this.name].y
 
     // test queen bishop attacks
     for (let n = 0; n < bishopPaths.length; n++) {
