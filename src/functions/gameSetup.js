@@ -1,7 +1,6 @@
 import {
   BOARDDIMENSIONS,
-  PIECE_OBJECTS,
-  EN_PASSANT_TEST
+  PIECE_OBJECTS
   // PIECEPATHS
 } from '@/constants'
 import { updatePieceVision } from './updatePieceVision'
@@ -13,9 +12,8 @@ import { createPiece } from './createPiece'
  * @returns initial game data
  */
 export const gameSetup = () => {
-
   // create checkerboard
-  // might not be necessary anymore... 
+  // might not be necessary anymore...
   let tileBool = true
   const initTileArr = new Array(BOARDDIMENSIONS[0]).fill().map(() => {
     return new Array(BOARDDIMENSIONS[1]).fill().map((tile, j) => {

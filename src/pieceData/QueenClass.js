@@ -7,12 +7,7 @@ export default class QueenClass extends PieceClass {
     this.paths = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
   }
 
-  movelogic = (x, y) => {
-    const result = (x === 0 ^ y === 0) ^ x/y === 1 || x/y === -1
-    if (result === 1) return true
-    else if (result === 0) return false
-    else return result
-  }
+  movelogic = (x, y) => ((((x === 0 ^ y === 0) === 1 ) ^ ( x / y === 1 || x / y === -1)) === 1)
 
   vision (cellMap) {
     const pathsObject = {}

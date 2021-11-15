@@ -10,7 +10,6 @@ export default class BishopClass extends PieceClass {
   movelogic = (x, y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1)
 
   vision (cellMap) {
-
     const pathsObject = {}
     const BOARDSIZE = 8
 
@@ -21,7 +20,7 @@ export default class BishopClass extends PieceClass {
       const startY = this.y + path[1]
       let blockedFlag = false
 
-      for (let i = startX, j = startY; 0 <= i < BOARDSIZE && 0 <= j < BOARDSIZE; i += path[0], j += path[1]) {
+      for (let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]) {
         const cellTest = `${i},${j}`
 
         if (cellMap[cellTest]) {

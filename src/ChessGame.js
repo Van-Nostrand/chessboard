@@ -83,7 +83,7 @@ export default function ChessGame () {
       //ENPASSANT
       else if (piecesObject[selectedPiece]?.view?.[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'e') {
         console.log('piece is trying to kill en passant')
-        tryEnPasssant([xCoord, yCoord])
+        tryEnPassant([xCoord, yCoord])
       }
       //ILLEGAL MOVE
       else {
@@ -306,8 +306,7 @@ export default function ChessGame () {
   }
 
 
-  const tryEnPasssant = (cell) => {
-
+  const tryEnPassant = (cell) => {
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
@@ -329,7 +328,7 @@ export default function ChessGame () {
 
     const newCellMap = buildNewCellMap(newPiecesObject)
 
-    // is king in check? 
+    // is king in check?
     const isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap )
     if (!isKingInCheck) {
       turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })

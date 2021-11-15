@@ -13,7 +13,7 @@ export default class KingClass extends PieceClass {
     this.firstMove = true
   }
 
-  movelogic = (x, y) => (-2 < x < 2) && (-2 < y < 2)
+  movelogic = (x, y) => -2 < x && x < 2 && -2 < y && y < 2
 
   //add in an option for castleing
   //spaces will be labelled "c" if castling possible

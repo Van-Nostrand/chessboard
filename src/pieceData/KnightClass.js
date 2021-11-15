@@ -11,7 +11,7 @@ export default class KnightClass extends PieceClass {
   }
 
   movelogic = (x, y) =>
-    x !== 0 !== y &&
+    x !== 0 && y !== 0 &&
     3 > Math.abs(x) &&
     3 > Math.abs(y) &&
     ((Math.abs(x) === 2 ^ Math.abs(y) === 2) === 1)
