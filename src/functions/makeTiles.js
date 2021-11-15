@@ -1,12 +1,20 @@
 import React from 'react'
 import { Tile } from '@/components'
 
+/**
+ * makes the gameboard
+ * @param {number} tileSize size of tile in pixels
+ * @param {Array} dimensions array representing width and height of board. integers above 0 only.
+ * @param {function} clickHandler the function that gets called when this tile is clicked
+ * @returns an array of arrays of Tile components
+ */
 export const makeTiles = (tileSize, dimensions, clickHandler) => {
   let tilebool = false
   let tileAtStartOfLastRow = false
   return new Array(dimensions[1]).fill().map((row, i) => {
     return new Array(dimensions[0]).fill().map((tile, j) => {
-      // not sure about this logic... ?
+      // double check this sometime, I flipped i and j for some reason
+      // I just need to check if the length is odd or even... this is silly
       if (j === 0) {
         if (tilebool === tileAtStartOfLastRow) {
           tilebool = !tileAtStartOfLastRow

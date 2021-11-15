@@ -9,10 +9,18 @@ export const recursiveStateCopy = (oldState) => {
       return recursiveStateCopy(value)
     })
   } else if (thisIsAnObject(oldState)) {
-    newState = {}
-    Object.keys(oldState).forEach(key => {
-      newState[key] = recursiveStateCopy(oldState[key])
-    })
+    if (Object.getPrototypeOf(oldState).constructor.name === 'Object') {
+      // this is a normal object
+      newState = {}
+      Object.keys(oldState).forEach(key => {
+        newState[key] = recursiveStateCopy(oldState[key])
+      })
+    } else {
+      // the object must be an instance of some special class
+      // I haven't tested this thoroughly...
+      // Might lose properties or inheritance or something
+      return Object.assign(Object.create(Object.getPrototypeOf(oldState)), oldState)
+    }
   }
   return newState
 }

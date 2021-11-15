@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production ",
-    "start": "webpack serve --mode development"
+    "start": "node --max-old-space-size=8192 node_modules/webpack-dev-server/bin/webpack-dev-server.js --mode=development",
+    "dev": "webpack serve --max-old-space-size=8192 --mode development"
   },
   "dependencies": {
     "prop-types": "^15.7.2",

@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ChessGame from './ChessGame'
-import './scss/main.scss'
-import ChessGameProvider from './context'
+import ChessGame from '@/ChessGame'
+import ChessGameProvider from '@/context'
+import '@/scss/main.scss'
 
 ReactDOM.render(
   <ChessGameProvider>

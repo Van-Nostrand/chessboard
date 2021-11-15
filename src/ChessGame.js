@@ -83,7 +83,7 @@ export default function ChessGame () {
       //ENPASSANT
       else if (piecesObject[selectedPiece]?.view?.[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'e') {
         console.log('piece is trying to kill en passant')
-        processEnPassant([xCoord, yCoord])
+        tryEnPasssant([xCoord, yCoord])
       }
       //ILLEGAL MOVE
       else {
@@ -150,8 +150,8 @@ export default function ChessGame () {
     //make a copy of state and carry out the attack
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
-    // eslint-disable-next-line
-    [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ]  = targetCell
+    newPiecesObject[selectedPiece].x = targetCell[0]
+    newPiecesObject[selectedPiece].y = targetCell[1]
     const targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`]
 
     if (targetPiece.charAt(0) === 'w') {
@@ -172,10 +172,10 @@ export default function ChessGame () {
       const newMessageBoard = `${selectedPiece} attacked ${targetPieceName}`
 
       turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })
-    }
-
-    else {
+    } else {
       console.log('that attack puts your king in check...')
+      illegalMoveButKeepSelection('that attack puts your king in check')
+      // dispatch({ type: 'illegal-keep-selection', message: 'that attack puts your king in check' })
     }
   }
 
@@ -201,12 +201,12 @@ export default function ChessGame () {
         const newMessageBoard = `${selectedPiece} moved to ${cell[0]},${cell[1]}`
         turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
       }
-    }
-
-    else {
-      illegalMove('you\'re endangering your king...')
+    } else {
+      illegalMoveButKeepSelection('that move puts your king in check')
+      // dispatch({ type: 'illegal-keep-selection', message: 'that move puts your king in check' })
     }
   }
+
 
   // swaps a pawn with a piece of the users choice
   const promotePawn = ( newPieceType ) => {
@@ -241,7 +241,6 @@ export default function ChessGame () {
       messageBoard: newMessageBoard,
       pieceNumbering: newPieceNumbering
     })
-
   }
 
 
@@ -270,7 +269,6 @@ export default function ChessGame () {
   // called when a pawn reaches their 8th rank
   // flags the pawn promotion menu to appear
   const pawnBeingPromoted = (newPiecesObject, newCellMap) => {
-
     dispatch({
       type: 'promoting',
       piecesObject: newPiecesObject,
@@ -280,9 +278,8 @@ export default function ChessGame () {
 
 
   //this will be hard coded so that I don't go insane thinking about it. Make it dynamic later
-  //KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame?
+  //KingClass.vision has it's own "amIChecked" method, so this is "process" instead of "try"
   const processCastling = (cell) => {
-    // const { piecesObject, selectedPiece } = chessGameState
     let rookName
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
@@ -309,9 +306,7 @@ export default function ChessGame () {
   }
 
 
-  const processEnPassant = (cell) => {
-
-    // const { wGraveyard, bGraveyard, selectedPiece, enPassantPiece, piecesObject } = chessGameState
+  const tryEnPasssant = (cell) => {
 
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
@@ -319,8 +314,8 @@ export default function ChessGame () {
     const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} en passent`
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
-    //eslint-disable-next-line
-    [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ] = cell
+    newPiecesObject[selectedPiece].x = cell[0]
+    newPiecesObject[selectedPiece].y = cell[1]
 
     if (enPassantPiece.charAt(0) === 'w') {
       newWGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
@@ -330,15 +325,22 @@ export default function ChessGame () {
       newBGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
       newBGraveyard[enPassantPiece].dead = true
     }
+    delete newPiecesObject[enPassantPiece]
 
     const newCellMap = buildNewCellMap(newPiecesObject)
 
-    turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })
+    // is king in check? 
+    const isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap )
+    if (!isKingInCheck) {
+      turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })
+    } else {
+      illegalMoveButKeepSelection('en passent would put your king in check right now')
+    }
   }
+
 
   // todo - does this need to exist here and in a king class?
   const isMyKingInCheck = ( newPiecesObject, newCellMap ) => {
-    // const { turn } = chessGameState
 
     const kingName = turn ? 'wK' : 'bK'
     const BOARDSIZE = 8
@@ -359,7 +361,7 @@ export default function ChessGame () {
 
     const kingX = newPiecesObject[kingName].x
     const kingY = newPiecesObject[kingName].y
-    let inCheckFlag = false
+    let inCheck = false
 
     //test bishop and diagonal queen attacks
     bishopPaths.forEach( path => {
@@ -376,7 +378,7 @@ export default function ChessGame () {
         //if the tested cell is occupied by either an enemy queen or bishop, stop checking
         if (newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || bishReg.test(newCellMap[`${i},${j}`]))) {
           pathDone = true
-          inCheckFlag = true
+          inCheck = true
           return
         }
         //if the tested cell is occupied, but not by an enemy queen or bishop, this path is done but continue checking other paths
@@ -387,8 +389,7 @@ export default function ChessGame () {
     })
 
     //if it's proven that the king is being attacked, then no need to continue checking
-    if (!inCheckFlag) {
-
+    if (!inCheck) {
       //test for linear queen and rook attacks
       rookPaths.forEach(path => {
         const startX = kingX + path[0]
@@ -404,7 +405,7 @@ export default function ChessGame () {
           //
           if (newCellMap[`${i},${j}`] && (queenReg.test(newCellMap[`${i},${j}`]) || rookReg.test(newCellMap[`${i},${j}`]))) {
             pathDone = true
-            inCheckFlag = true
+            inCheck = true
             return
           } else if (newCellMap[`${i},${j}`]) {
             pathDone = true
@@ -414,29 +415,29 @@ export default function ChessGame () {
     }
 
     //test for enemy pawn attacks
-    if (!inCheckFlag) {
+    if (!inCheck) {
       pawnPaths.forEach(path => {
         const cellTest = `${kingX - path[0]},${kingY - path[1]}`
 
         if (newCellMap[cellTest] && pawnReg.test(newCellMap[cellTest])) {
-          inCheckFlag = true
+          inCheck = true
           return
         }
       })
     }
 
     //test for knight attacks
-    if (!inCheckFlag) {
+    if (!inCheck) {
       knightPaths.forEach(path => {
         const cellTest = `${kingX + path[0]},${kingY + path[1]}`
 
         if (newCellMap[cellTest] && knightReg.test(newCellMap[cellTest])) {
-          inCheckFlag = true
+          inCheck = true
           return
         }
       })
     }
-    return inCheckFlag
+    return inCheck
   }
 
   // triggered after most turns
@@ -458,7 +459,7 @@ export default function ChessGame () {
       newPiecesObject[selectedPiece].firstMove = false
 
       //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if (/^(w|b)P/.test(selectedPiece) && (newPiecesObject[selectedPiece].y === 4 || newPiecesObject[selectedPiece].y === 3)) {
+      if (/^\wP/.test(selectedPiece) && (newPiecesObject[selectedPiece].y === 4 || newPiecesObject[selectedPiece].y === 3)) {
         newEnPassantPiece = selectedPiece
       }
     }
@@ -484,6 +485,13 @@ export default function ChessGame () {
     dispatch({
       type: 'illegal',
       messageBoard: newMessageBoard
+    })
+  }
+
+  const illegalMoveButKeepSelection = (message) => {
+    dispatch({
+      type: 'illegal-keep-selection',
+      messageBoard: message
     })
   }
 

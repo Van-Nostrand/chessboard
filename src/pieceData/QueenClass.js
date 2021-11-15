@@ -14,7 +14,7 @@ export default class QueenClass extends PieceClass {
     else return result
   }
 
-  vision = (cellMap) => {
+  vision (cellMap) {
     const pathsObject = {}
     const BOARDSIZE = 8
     // for each path: iterate over all cells
@@ -67,9 +67,7 @@ export default class QueenClass extends PieceClass {
         }
       }
     })
-    // return object
+    console.log('called vision on queen. this is', this, 'paths object is', pathsObject)
     this.view = pathsObject
-    // return pathsObject
   }
-
 }

@@ -6,6 +6,11 @@ export default function chessReducer (state, action) {
         selectedPiece: '',
         messageBoard: action.message
       }
+    case 'illegal-keep-selection':
+      return {
+        ...state,
+        messageBoard: action.message
+      }
     case 'selected':
       return {
         ...state,

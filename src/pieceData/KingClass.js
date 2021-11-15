@@ -17,7 +17,7 @@ export default class KingClass extends PieceClass {
 
   //add in an option for castleing
   //spaces will be labelled "c" if castling possible
-  vision = (cellMap, piecesObject) => {
+  vision (cellMap, piecesObject) {
     // const { x, y, paths, firstMove } = piecesObject[name]
 
     const pathsObject = {}

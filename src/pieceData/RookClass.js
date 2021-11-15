@@ -10,7 +10,7 @@ export default class RookClass extends PieceClass {
 
   movelogic = (x, y) => (x === 0 ^ y === 0) === 1
 
-  vision = (cellMap) => {
+  vision (cellMap) {
 
     const pathsObject = {}
     const BOARDSIZE = 8

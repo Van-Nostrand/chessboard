@@ -5,6 +5,7 @@ import PieceClass from './PieceClass'
 * fifthRank - Used to track en passant
 */
 export default class PawnClass extends PieceClass {
+
   constructor (props) {
     super(props)
     this.firstMove = true
@@ -40,7 +41,7 @@ export default class PawnClass extends PieceClass {
   }
 
   // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
-  vision = (cellMap, enPassantPiece, piecesObject) => {
+  vision (cellMap, enPassantPiece, piecesObject) {
     const BOARDSIZE = 8
 
     // create an empty object that will store potential moves
@@ -85,28 +86,37 @@ export default class PawnClass extends PieceClass {
             }
           }
           else if (this.fifthRank === this.y) {
+            console.log('doing an enpassant check in vision for ', this, 'following path', path)
             // if enemy pawn in cell "behind" empty cell
-            const EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - this.direction}`
+            const splitCellString = cellString.split(',')// cell diagonal to pawn
+            const EPTest = `${splitCellString[0]},${parseInt(splitCellString[1]) - this.direction}` // cell to the side of pawn
+            // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn... 
+            console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)
+            console.log('cellMap[EPTest] is ', cellMap[EPTest])
             if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
-
               // if piece just moved two spaces
               const EPEnemy = piecesObject[cellMap[EPTest]]
               if (EPEnemy.name === enPassantPiece) {
+                console.log('PASSED NEXT TEST')
 
                 // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
                 pathsObject[cellString] = 'e'
-                return
+                // return
               }
             }
           }
         }
       }
     }
-    this.view(pathsObject)
-    // return pathsObject
+    this.view = pathsObject
+    return pathsObject
   }
 
-  set view (value) {
-    this.view = value
-  }
+  // get view () {
+  //   return this.#viewObject
+  // }
+
+  // set view (value) {
+  //   this.#viewObject = value
+  // }
 }

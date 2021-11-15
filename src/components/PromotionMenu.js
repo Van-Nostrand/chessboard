@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import pieceImg from '../assets/pieces.png'
 import PropTypes from 'prop-types'
-
+/**
+ * todo - This is broken, fix it
+ * @param {*} param0 
+ * @returns 
+ */
 export default function PromotionMenu ({ selectPiece, team }) {
   const [pieceSelection, setPieceSelection] = useState('')
 

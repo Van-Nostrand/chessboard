@@ -17,7 +17,7 @@ export default class KnightClass extends PieceClass {
     ((Math.abs(x) === 2 ^ Math.abs(y) === 2) === 1)
 
 
-  vision = (cellMap) => {
+  vision (cellMap) {
     // const { x, y, paths } = piecesObject[name]
 
     const pathsObject = {}

@@ -1,17 +1,21 @@
-// import React from 'react'
-import { updatePieceVision } from './updatePieceVision'
-import { buildNewCellMap } from './buildNewCellMap'
 import {
   BOARDDIMENSIONS,
   PIECE_OBJECTS,
+  EN_PASSANT_TEST
   // PIECEPATHS
 } from '@/constants'
+import { updatePieceVision } from './updatePieceVision'
+import { buildNewCellMap } from './buildNewCellMap'
 import { createPiece } from './createPiece'
 
-//sets up the game. I want to add a check window function and scale game accordingly
+/**
+ * This sets up the chess game and initializes all data
+ * @returns initial game data
+ */
 export const gameSetup = () => {
 
-  //create checkerboard
+  // create checkerboard
+  // might not be necessary anymore... 
   let tileBool = true
   const initTileArr = new Array(BOARDDIMENSIONS[0]).fill().map(() => {
     return new Array(BOARDDIMENSIONS[1]).fill().map((tile, j) => {
@@ -21,6 +25,7 @@ export const gameSetup = () => {
     })
   })
 
+  // used for dynamic piece numbering
   const initialPieceNumbers = {
     'wP': 0,
     'wR': 0,
@@ -34,8 +39,7 @@ export const gameSetup = () => {
     'bQ': 0
   }
 
-  //declare pieces, give them their paths
-  //will eventually phase this out
+  //declare pieces according to one of the game piece constants
   const initialPiecesObject = {}
   PIECE_OBJECTS.forEach( piece => {
     initialPiecesObject[piece.name] = createPiece(piece)
@@ -43,11 +47,9 @@ export const gameSetup = () => {
 
   //cellMap is used for piece name lookup by cell
   const initialCellMap = buildNewCellMap(initialPiecesObject)
-  console.log('before update, pieces is ', initialPiecesObject)
-  //build the view properties of each piece
-  updatePieceVision(initialPiecesObject, initialCellMap)
 
-  console.log('after update func, pieces is', initialPiecesObject)
+  //build the view properties for each piece
+  updatePieceVision(initialPiecesObject, initialCellMap)
 
   return [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ]
 }
