@@ -1,8 +1,8 @@
 // this will deep copy objects and arrays
 // it's borked if you pass in any "array-like objects" or Date objects, weird things like that.
-// but it can handle Arrays, Objects, Number, String, Boolean
+// but it can handle Arrays, Objects, Number, String, Boolean, and functions
 export const recursiveStateCopy = (oldState) => {
-  if (thisIsPrimitive(oldState)) return oldState
+  if (thisIsPrimitive(oldState) || typeof oldState === 'function') return oldState
   let newState
   if (Array.isArray(oldState)) {
     newState = oldState.map(value => {

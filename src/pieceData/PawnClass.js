@@ -23,60 +23,55 @@ export default class PawnClass extends PieceClass {
   }
 
   // unused
-  static attacklogic (x, y) {
+  attacklogic (x, y) {
     console.log('called attack logic')
     return (x === 1 || x === -1) && (1 * this.direction === y)
   }
 
   // unused
-  static movelogic = (x, y) => {
+  movelogic = (x, y) => {
     // if x is not zero, or the pawn is moving in the wrong direction, return false
     if (x !== 0 || !((y > 0 && this.direction > 0) || (y < 0 && this.direction < 0))) return false
     // otherwise test to make sure it's moving 1 or 2 spaces based on first move
     return (this.firstMove && 0 < Math.abs(y) < 3 ) || (!this.firstMove && Math.abs(y) === 1)
   }
 
-  // unused
-  static enpassantlogic = (targetcell, victim) => {
+  // unused and wrong
+  enpassantlogic = (targetcell, victim) => {
     return (
       targetcell[0] === victim[0] &&
       (targetcell[1] === victim[1] + 1 ||
         targetcell[1] === victim[1] - 1))
   }
 
-  // unused
-  static getPaths (team) {
-    if (team === 'w') return [[0, -1], [0, -2], [-1, -1], [1, -1]]
-    else if (team === 'b') return [[0, 1], [0, 2], [-1, 1], [1, 1]]
-  }
-
-
   // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
-  static vision (cellMap, piecesObject, name, enPassantPiece) {
-    const { x, y, fifthRank, paths, firstMove } = piecesObject[name]
+  vision = (cellMap, enPassantPiece, piecesObject) => {
+    // const { x, y, fifthRank, paths, firstMove } = piecesObject[name]
     const BOARDSIZE = 8
+
+    // if (/^wP/.test(this.name)) console.log('white pawn vision', this)
 
     // create an empty object that will store potential moves
     const pathsObject = {}
-    const direction = name.charAt(0) === 'w' ? -1 : 1
+    const direction = this.name.charAt(0) === 'w' ? -1 : 1
 
     // for each path
-    paths.forEach( path => {
+    this.paths.forEach( path => {
 
-      const checkX = path[0] + x
-      const checkY = path[1] + y
+      const checkX = path[0] + this.x
+      const checkY = path[1] + this.y
 
       // if the cell is within the board
-      if (checkX >= 0 && checkX < BOARDSIZE && checkY >= 0 && checkY < BOARDSIZE) {
+      if (0 <= checkX < BOARDSIZE && 0 <= checkY < BOARDSIZE) {
 
-        const cellString = `${path[0] + x},${path[1] + y}`
+        const cellString = `${path[0] + this.x},${path[1] + this.y}`
 
         //cell contains a piece
         if (cellMap[cellString]) {
           const testedCell = cellMap[cellString]
 
           // piece is an enemy
-          if (testedCell.charAt(0) !== name.charAt(0)) {
+          if (testedCell.charAt(0) !== this.name.charAt(0)) {
             // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
             if (this.attacklogic(path[0], path[1], direction)) {
               pathsObject[cellString] = 'a'
@@ -87,19 +82,18 @@ export default class PawnClass extends PieceClass {
         // cell is empty
         else {
           //cell in move path
-          if (checkX === x) {
-            if (firstMove) {
+          if (checkX === this.x) {
+            if (this.firstMove) {
               pathsObject[cellString] = 'm'
-
             }
-            else if (!firstMove && Math.abs(path[1]) === 1) {
+            else if (!this.firstMove && Math.abs(path[1]) === 1) {
               pathsObject[cellString] = 'm'
             }
           }
-          else if (fifthRank === y ) {
+          else if (this.fifthRank === this.y) {
             // if enemy pawn in cell "behind" empty cell
             const EPTest = `${cellString.charAt(0)},${parseInt(cellString.charAt(2)) - direction}`
-            if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
+            if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
 
               // if piece just moved two spaces
               const EPEnemy = piecesObject[cellMap[EPTest]]

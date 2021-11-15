@@ -26,7 +26,7 @@ module.exports = {
       'error',
       2,
       {
-        'switchCase': 1
+        'SwitchCase': 1
       }
     ],
     'linebreak-style': [

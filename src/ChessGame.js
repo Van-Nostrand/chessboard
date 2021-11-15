@@ -5,10 +5,9 @@ import React, {
 } from 'react'
 
 import {
-  Tile,
-  Piece,
   ChessGraveyard,
-  PromotionMenu
+  PromotionMenu,
+  TestingBoard
 } from '@/components'
 import {
   PIECEPATHS,
@@ -18,16 +17,37 @@ import { ChessGameContext } from '@/context'
 import {
   recursiveStateCopy,
   updatePieceVision,
-  buildNewCellMap
+  buildNewCellMap,
+  makeTiles,
+  makePieces,
+  makeGraveyards
 } from '@/functions'
 import { useWindowToGetTileSize } from '@/hooks'
 
 
 export default function ChessGame () {
   const { chessGameState, dispatch } = useContext(ChessGameContext)
-
+  const {
+    pieceNumbering,
+    enPassantPiece,
+    selectedPiece,
+    piecesObject,
+    turn,
+    cellMap,
+    wGraveyard,
+    bGraveyard,
+    testmode,
+    tileSize
+    // boardDimensions
+    // tileArr
+  } = chessGameState
   const piecesContainerRef = useRef(null)
-  const [ tileSize, windowSize ] = useWindowToGetTileSize()
+  // eslint-disable-next-line no-unused-vars
+  const [ newTileSize, newWindowSize ] = useWindowToGetTileSize()
+
+  useEffect(() => {
+    dispatch({ type: 'update-tileSize', tileSize: newTileSize })
+  }, [newTileSize])
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -41,28 +61,32 @@ export default function ChessGame () {
 
     console.log('clicked it')
 
-    const { selectedPiece, piecesObject } = chessGameState
-
     // Accidental, or clicking a tile while no piece selected
     if (selectedPiece.length === 0) return
 
     // a piece is already selected, user wants to move here
     if (selectedPiece.length > 0) {
-
+      console.log('determining intent of ', piecesObject[selectedPiece])
+      const xCoord = parseInt(coordinates.split(',')[0])
+      const yCoord = parseInt(coordinates.split(',')[1])
       //MOVING
       if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'm') {
-        tryMoving(coordinates.split(','))
+        console.log('piece is trying to move')
+        tryMoving([xCoord, yCoord])
       }
       //CASTLING
       else if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'c') {
-        processCastling(coordinates.split(','))
+        console.log('piece is trying to castle')
+        processCastling([xCoord, yCoord])
       }
       //ENPASSANT
       else if (piecesObject[selectedPiece].view[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'e') {
-        processEnPassant(coordinates.split(','))
+        console.log('piece is trying to kill en passant')
+        processEnPassant([xCoord, yCoord])
       }
       //ILLEGAL MOVE
       else {
+        console.log('the move was illegal')
         illegalMove('Illegal Move')
       }
     }
@@ -76,8 +100,6 @@ export default function ChessGame () {
   // - to deselect
   // - to attack
   const pieceClick = (e, name) => {
-
-    const { selectedPiece, turn, piecesObject } = chessGameState
 
     //if selecting a piece
     if (selectedPiece.length === 0) {
@@ -118,8 +140,6 @@ export default function ChessGame () {
   //tests and completes attacks
   const tryAttacking = (targetCell, targetPieceName) => {
 
-    const { wGraveyard, bGraveyard, piecesObject, selectedPiece, cellMap } = chessGameState
-
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
@@ -158,10 +178,11 @@ export default function ChessGame () {
 
   // tests and completes moves
   const tryMoving = (cell) => {
-    const { piecesObject, selectedPiece } = chessGameState
-    const newPiecesObject = recursiveStateCopy(piecesObject);
+    const newPiecesObject = recursiveStateCopy(piecesObject)
 
-    [newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y] = cell
+    newPiecesObject[selectedPiece].x = cell[0]
+    newPiecesObject[selectedPiece].y = cell[1]
+    // [ newPiecesObject[selectedPiece].x, newPiecesObject[selectedPiece].y ] = cell
 
     //test whether move puts own king in check
     const newCellMap = buildNewCellMap(newPiecesObject)
@@ -188,7 +209,6 @@ export default function ChessGame () {
 
   // swaps a pawn with a piece of the users choice
   const promotePawn = ( newPieceType ) => {
-    const { pieceNumbering, selectedPiece, piecesObject } = chessGameState
     const newPieceNumbering = recursiveStateCopy(pieceNumbering)
 
     const newPieceTeam = selectedPiece.charAt(0)
@@ -261,7 +281,7 @@ export default function ChessGame () {
   //this will be hard coded so that I don't go insane thinking about it. Make it dynamic later
   //KingClass.vision performs it's own "amIChecked" calls... does it make sense for that to happen in KingClass AND in ChessGame?
   const processCastling = (cell) => {
-    const { piecesObject, selectedPiece } = chessGameState
+    // const { piecesObject, selectedPiece } = chessGameState
     let rookName
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
@@ -290,7 +310,7 @@ export default function ChessGame () {
 
   const processEnPassant = (cell) => {
 
-    const { wGraveyard, bGraveyard, selectedPiece, enPassantPiece, piecesObject } = chessGameState
+    // const { wGraveyard, bGraveyard, selectedPiece, enPassantPiece, piecesObject } = chessGameState
 
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
@@ -317,7 +337,7 @@ export default function ChessGame () {
 
   // todo - does this need to exist here and in a king class?
   const isMyKingInCheck = ( newPiecesObject, newCellMap ) => {
-    const { turn } = chessGameState
+    // const { turn } = chessGameState
 
     const kingName = turn ? 'wK' : 'bK'
     const BOARDSIZE = 8
@@ -457,33 +477,6 @@ export default function ChessGame () {
     })
   }
 
-  const checkResize = () => {
-    // const currentWidth = window.innerWidth
-    // let newScreenType
-    // switch (true) {
-    // case currentWidth > 1800: newScreenType = 'big'; break
-    // case currentWidth <= 1800 && currentWidth > 1200: newScreenType = 'desktop'; break
-    // case currentWidth <= 1200 && currentWidth > 900: newScreenType = 'tab-land'; break
-    // case currentWidth <= 900 && currentWidth > 600: newScreenType = 'tab-port'; break
-    // case currentWidth <= 600: newScreenType = 'phone'; break
-    // default: console.log('ERROR IN HANDLE RESIZE')
-    // }
-    // if (newScreenType !== chessGameState.screenType) {
-    //   dispatch({
-    //     type: 'screenBreakpoint',
-    //     screenType: newScreenType,
-    //     windowSize: currentWidth
-    //   })
-    // }
-    // else {
-    //   dispatch({
-    //     type: 'windowWidthChange',
-    //     windowSize: currentWidth
-    //   })
-    // }
-  }
-
-
   // erases selection, sets messageboard text
   const illegalMove = (newMessageBoard) => {
     dispatch({
@@ -492,170 +485,20 @@ export default function ChessGame () {
     })
   }
 
-
-  //makes board tiles
-  const makeTiles = (tileSize) => {
-
-    // return new Array(state.boardDimensions[0]).fill().map((column, i) => {
-    //   return new Array(state.boardDimensions[1]).fill().map((tile,j) => {
-    //     return <Tile
-    //               key={`tile-${i}-${j}`}
-    //               size={tileSize}
-    //               borderColour="red"
-    //               classString={state.tileArr[i][j]}
-
-    //               onClick={tileClick} />
-    //   });
-    // });
-    return chessGameState.tileArr.map((column, i) => {
-      return column.map((tile, j) => {
-        return (
-          <Tile
-            key={`t${j}-${i}`}
-            size={tileSize}
-            classString={tile}
-            coordinates={`${j},${i}`}
-            onClick={tileClick}
-          />
-        )
-      })
-    })
-    // chessGameState.tileArr[0].forEach(tile => console.log('HERES A TILE:', tile))
-    // console.log('iterable?', chessGameState.tileArr[0][0])
-    // return new Array(8).fill().map((column, i) => {
-    //   return new Array(8).fill().map((tile, j) => {
-    //     return <Tile
-    //       key={`tile-${i}-${j}`}
-    //       size={tileSize}
-    //       borderColour="red"
-    //       classString={chessGameState.tileArr[i][j]}
-
-    //       onClick={tileClick} />
-    //   })
-    // })
-  }
-
-  //makes pieces for the render method
-  const makeLivePieces = (tileSize, backgroundSize) => {
-    const { piecesObject, selectedPiece } = chessGameState
-    const livePieces = []
-
-    Object.keys(piecesObject).forEach( name => {
-      livePieces.push(
-        <Piece
-          pieceData={piecesObject[name]}
-          x={piecesObject[name].x}
-          y={piecesObject[name].y}
-          dead={piecesObject[name].dead}
-          key={name}
-          name={name}
-          size={tileSize}
-          backgroundSize={backgroundSize}
-          border={selectedPiece}
-          onClick={pieceClick} />
-      )
-    })
-    return livePieces
-  }
-
-
-  const makeDeadPieces = (tileSize, backgroundSize) => {
-    const { wGraveyard, bGraveyard } = chessGameState
-
-    const wPieces = []
-    const bPieces = []
-    const wGraveyardKeys = Object.keys(wGraveyard)
-    const bGraveyardKeys = Object.keys(bGraveyard)
-
-    if (wGraveyardKeys.length > 0) {
-      wGraveyardKeys.forEach(name => {
-        wPieces.push(
-          <Piece
-            x={wGraveyard[name].x}
-            y={wGraveyard[name].y}
-            dead={wGraveyard[name].dead}
-            key={name}
-            name={name}
-            backgroundSize={backgroundSize}
-            size={tileSize} />
-        )
-      })
-    }
-
-    if (bGraveyardKeys.length > 0) {
-      bGraveyardKeys.forEach(name => {
-        bPieces.push(
-          <Piece
-            x={bGraveyard[name].x}
-            y={bGraveyard[name].y}
-            dead={bGraveyard[name].dead}
-            key={name}
-            name={name}
-            backgroundSize={backgroundSize}
-            size={tileSize} />
-        )
-      })
-    }
-    return [wPieces, bPieces]
-  }
-
-
-  const getBackgroundSize = () => {
-    /*
-    ASSUMPTIONS:
-    - same assumptions as in getTileSize()
-    - exception being that BACKGROUNDSIZE in each <Piece /> was set at 400 through development
-    - at html font-size: 100%, BACKGROUNDSIZE would be 640
-    */
-
-    const BASEBACKGROUNDSIZE = 640
-
-    //big desktop
-    if (window.innerWidth > 1800) {
-      return BASEBACKGROUNDSIZE * 0.75
-    }
-    //desktop
-    else if (window.innerWidth > 1200 && window.innerWidth <= 1800) {
-      return BASEBACKGROUNDSIZE * 0.625
-    }
-    //tablet landscape
-    if (window.innerWidth <= 1200 && window.innerWidth > 900) {
-      return BASEBACKGROUNDSIZE * 0.5625
-    }
-    //tablet portrait
-    else if (window.innerWidth <= 900 && window.innerWidth > 600) {
-      return BASEBACKGROUNDSIZE * 0.5
-    }
-    //phone
-    else if (window.innerWidth <= 600) {
-      return BASEBACKGROUNDSIZE * 0.4
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('resize', checkResize)
-
-    return function removeWindowListener () {
-      window.removeEventListener('resize', checkResize)
-    }
-  }, [chessGameState.screenType])
-
-
   // =======================
-  // START PROCESSING RENDER
+  // RENDERING
   // =======================
 
-  //GENERATE SCALING
-  const backgroundSize = getBackgroundSize()
+  // GENERATE TILES
+  const boardTiles = makeTiles(tileSize, [8, 8], tileClick)
 
+  // GENERATE PIECES
+  const pieceObjects = makePieces(piecesObject, pieceClick, tileSize, selectedPiece)
 
-  //GENERATE TILES
-  const boardTiles = makeTiles(tileSize)
+  // GENERATE GRAVEYARDS
+  const [ wGraveyardPieces, bGraveyardPieces ] = makeGraveyards(wGraveyard, bGraveyard, tileSize)
 
-  //GENERATE PIECES
-  const pieceObjects = makeLivePieces(tileSize, backgroundSize)
-  const [ wGraveyardPieces, bGraveyardPieces ] = makeDeadPieces(tileSize, backgroundSize)
-
+  // IF PAWN PROMOTING GENERATE MENU
   const theMenu = chessGameState.pawnPromotionFlag
     ? (
       <PromotionMenu
@@ -666,6 +509,7 @@ export default function ChessGame () {
     : ''
 
   //STYLES
+  // todo - phase this out?
   const tileContainerStyle = {
     width: `${chessGameState.boardDimensions[0] * tileSize}px`,
     height: `${chessGameState.boardDimensions[1] * tileSize}px`,
@@ -677,22 +521,34 @@ export default function ChessGame () {
   }
 
   return (
-    <div className="game-container" >
+    <div className='game-container' >
       {theMenu}
-      <h2 className="turn-header" >{chessGameState.turn ? 'White turn' : 'Black turn'}</h2>
-      <div className="tile-container" style={tileContainerStyle}>
+      <h2 className={ testmode ? 'turn-header--hidden' : 'turn-header' }>
+        {turn ? 'White turn' : 'Black turn'}
+      </h2>
+      <div
+        className={ testmode ? 'tile-container--hidden' : 'tile-container' }
+        style={tileContainerStyle}
+      >
         {boardTiles}
       </div>
       <div
-        className="pieces-container"
+        className={ testmode ? 'pieces-container--hidden' : 'pieces-container' }
         ref={piecesContainerRef}
         style={piecesContainerStyle}
       >
         {pieceObjects}
       </div>
-      <h3 className="message-board" >{chessGameState.messageBoard}</h3>
-      <ChessGraveyard pieces={wGraveyardPieces} classString="w-graveyard" />
-      <ChessGraveyard pieces={bGraveyardPieces} classString="b-graveyard" />
+      <h3 className='message-board' >{chessGameState.messageBoard}</h3>
+      <ChessGraveyard
+        pieces={wGraveyardPieces}
+        classString={testmode ? 'w-graveyard--hidden' : 'w-graveyard' }
+      />
+      <ChessGraveyard
+        pieces={bGraveyardPieces}
+        classString={ testmode ? 'b-graveyard--hidden' : 'b-graveyard' }
+      />
+      <TestingBoard />
     </div>
   )
 }

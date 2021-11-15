@@ -1,6 +1,6 @@
 import React, { createContext, useMemo, useReducer } from 'react'
 import { initialState } from './initialState'
-import chessReducer from './reducer'
+import chessReducer from './chessReducer'
 
 export const ChessGameContext = createContext({})
 

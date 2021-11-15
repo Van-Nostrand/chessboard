@@ -7,26 +7,17 @@ export default class RookClass extends PieceClass {
     this.paths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
     this.firstMove = true
   }
-  static movelogic = (x, y) => (x === 0 ^ y === 0) === 1
 
-  // unimplemented...?
-  static castlelogic = () => {
-    return true
-  }
+  movelogic = (x, y) => (x === 0 ^ y === 0) === 1
 
-  static getPaths = () => {
-    return [[0, -1], [1, 0], [0, 1], [-1, 0]]
-  }
-
-  static vision = (cellMap, piecesObject, name) => {
-    const { x, y, paths } = piecesObject[name]
+  vision = (cellMap) => {
 
     const pathsObject = {}
     const BOARDSIZE = 8
 
-    paths.forEach( path => {
-      const startX = x + path[0]
-      const startY = y + path[1]
+    this.paths.forEach( path => {
+      const startX = this.x + path[0]
+      const startY = this.y + path[1]
       let blockedFlag = false
 
       for (let i = startX, j = startY; i < BOARDSIZE && i >= 0 && j >= 0 && j < BOARDSIZE; i += path[0], j += path[1]) {

@@ -13,29 +13,20 @@ export default class KingClass extends PieceClass {
     this.firstMove = true
   }
 
-  static movelogic = (x, y) => x < 2 && x > -2 && y < 2 && y > -2
-
-  //not implemented yet
-  // static castlelogic = (king, rook) => {
-  //     return true;
-  // };
-
-  static getPaths = () => {
-    return [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
-  }
+  movelogic = (x, y) => (-2 < x < 2) && (-2 < y < 2)
 
   //add in an option for castleing
   //spaces will be labelled "c" if castling possible
-  static vision = (cellMap, piecesObject, name) => {
-    const { x, y, paths, firstMove } = piecesObject[name]
+  vision = (cellMap, piecesObject) => {
+    // const { x, y, paths, firstMove } = piecesObject[name]
 
     const pathsObject = {}
     const BOARDSIZE = 8
-    const TEAMCOLOUR = /^w/.test(name) ? 'w' : 'b'
+    const TEAMCOLOUR = /^w/.test(this.name) ? 'w' : 'b'
 
-    paths.forEach( path => {
-      const testX = x + path[0]
-      const testY = y + path[1]
+    this.paths.forEach( path => {
+      const testX = this.x + path[0]
+      const testY = this.y + path[1]
       const cellCheck = `${testX},${testY}`
 
       if (
@@ -45,10 +36,10 @@ export default class KingClass extends PieceClass {
       ) {
         pathsObject[cellCheck] = 'm'
       }
-      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== name.charAt(0)) {
+      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) !== this.name.charAt(0)) {
         pathsObject[cellCheck] = 'a'
       }
-      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === name.charAt(0)) {
+      else if (cellMap[cellCheck] && cellMap[cellCheck].charAt(0) === this.name.charAt(0)) {
         pathsObject[cellCheck] = 'b'
       }
     })
@@ -56,29 +47,29 @@ export default class KingClass extends PieceClass {
     const rook2 = new RegExp('^' + TEAMCOLOUR + 'R2')
     //CASTLING VIEW
     //has king taken first move?
-    if (firstMove) {
+    if (this.firstMove) {
       //is R1 at 0,y and has it moved yet?
-      if (cellMap[`0,${y}`] && rook1.test(cellMap[`0,${y}`]) && piecesObject[cellMap[`0,${y}`]].firstMove) {
+      if (cellMap[`0,${this.y}`] && rook1.test(cellMap[`0,${this.y}`]) && piecesObject[cellMap[`0,${this.y}`]].firstMove) {
         //are [1,y] [2,y] and [3,y] empty?
-        if (!cellMap[`2,${y}`] && !cellMap[`1,${y}`] && !cellMap[`3,${y}`]) {
+        if (!cellMap[`2,${this.y}`] && !cellMap[`1,${this.y}`] && !cellMap[`3,${this.y}`]) {
           // checkmate check at [2,y] and [3,y]
-          const longPieces2y = this.amIChecked(cellMap, { ...piecesObject, [name]: { ...piecesObject[name], x: 2, y } }, name)
-          const longPieces3y = this.amIChecked(cellMap, { ...piecesObject, [name]: { ...piecesObject[name], x:3, y } }, name)
+          const longPieces2y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 2, y: this.y } }, this.name)
+          const longPieces3y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x:3, y: this.y } }, this.name)
           if (Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0) {
-            pathsObject[`2,${y}`] = 'c'
+            pathsObject[`2,${this.y}`] = 'c'
           }
         }
       }
       //is R2 at 7,y and has it moved yet?
-      if (cellMap[`7,${y}`] && rook2.test(cellMap[`7,${y}`]) && piecesObject[cellMap[`7,${y}`]].firstMove) {
+      if (cellMap[`7,${this.y}`] && rook2.test(cellMap[`7,${this.y}`]) && piecesObject[cellMap[`7,${this.y}`]].firstMove) {
         //are [5,y] and [6,y] empty?
-        if (!cellMap[`6,${y}`] && !cellMap[`5,${y}`]) {
+        if (!cellMap[`6,${this.y}`] && !cellMap[`5,${this.y}`]) {
 
           // checkmate check at [5,y] and [6,y]
-          const shortPieces5y = this.amIChecked(cellMap, { ...piecesObject, [name]: { ...piecesObject[name], x: 5, y } }, name)
-          const shortPieces6y = this.amIChecked(cellMap, { ...piecesObject, [name]: { ...piecesObject[name], x: 6, y } }, name)
+          const shortPieces5y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 5, y: this.y } }, this.name)
+          const shortPieces6y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 6, y: this.y } }, this.name)
           if (Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0) {
-            pathsObject[`6,${y}`] = 'c'
+            pathsObject[`6,${this.y}`] = 'c'
           }
         }
       }
@@ -86,7 +77,7 @@ export default class KingClass extends PieceClass {
     return pathsObject
   }
 
-  static amIChecked = (cellMap, piecesObject, name) => {
+  amIChecked = (cellMap, piecesObject, name) => {
 
     const pathsObject = {}
     const BOARDSIZE = 8

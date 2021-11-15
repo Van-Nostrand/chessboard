@@ -1,8 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-export default function Piece ({ pieceData, border = '', size, onClick }) {
+export default function Piece ({ pieceData, border, size, onClick }) {
   const { x, y, name, dead, imgSrc } = pieceData
-  const borderLogic = border === name ? '0.1rem solid yellow' : ''
   let style = {}
 
   if (dead) {
@@ -19,7 +19,7 @@ export default function Piece ({ pieceData, border = '', size, onClick }) {
       height: `${size}px`,
       transform: `translate(${size * x}px,${size * y}px)`,
       position: 'absolute',
-      border: borderLogic
+      border: border ? '0.1rem solid yellow' : ''
     }
   }
 
@@ -44,3 +44,15 @@ export default function Piece ({ pieceData, border = '', size, onClick }) {
   )
 }
 
+Piece.propTypes = {
+  pieceData: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+    name: PropTypes.string,
+    dead: PropTypes.bool,
+    imgSrc: PropTypes.string
+  }),
+  border: PropTypes.bool,
+  size: PropTypes.number,
+  onClick: PropTypes.func
+}

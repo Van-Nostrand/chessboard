@@ -5,8 +5,8 @@
   // auto: space beside board / 15rem: graveyards / 48rem gameboard
   grid-template-columns: auto 15rem 48rem 15rem auto;
 
-  // 8rem: header and footer / 48rem: gameboard
-  grid-template-rows: 8rem 48rem 8rem;
+  // 8rem: header and footer / 48rem: gameboard / last 8rem: testing switch
+  grid-template-rows: 8rem 48rem 8rem 8rem;
 }
 
 .turn-header {

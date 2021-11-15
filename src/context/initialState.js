@@ -5,17 +5,20 @@ const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] 
 
 export const initialState = {
   boardDimensions: BOARDDIMENSIONS,
-  tileArr: initTileArr,
-  cellMap: initialCellMap,
-  piecesObject: initialPiecesObject,
-  wGraveyard: {},
   bGraveyard: {},
-  turn: true,
-  selectedPiece: '',
+  cellMap: initialCellMap,
   enPassantPiece: '',
+  tileArr: initTileArr,
   messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
+  piecesObject: initialPiecesObject,
   pieceNumbering: initialPieceNumbers,
+  screenType: '',
+  selectedPiece: '',
+  testmode: false,
+  testboard: {},
+  tileSize: null,
+  turn: true,
   windowSize: '',
-  screenType: ''
+  wGraveyard: {}
 }

@@ -9,36 +9,7 @@ export default class PieceClass {
     this.attackView = {}
   }
 
-  static moveLogic () {
+  moveLogic () {
     return null
   }
-
-  // get imgSrc () {
-  //   return this.imgSrc
-  // }
-
-  // set imgSrc (s) {
-  //   this.imgSrc = s
-  // }
-
-  // get paths () {
-  //   return this.paths
-  // }
-
-  // get coordinates () {
-  //   return [this.x, this.y]
-  // }
-
-  // set coordinates (value) {
-  //   this.x = value.x
-  //   this.y = value.y
-  // }
-
-  // set view (value) {
-  //   this.view = value
-  // }
-
-  // get view () {
-  //   return this.view
-  // }
 }
