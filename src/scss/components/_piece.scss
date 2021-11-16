@@ -1,0 +1,11 @@
+@use '../abstracts/vars';
+
+.piece {
+  box-sizing: border-box;
+  padding: 0.5rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+}

@@ -1,6 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ChessGame from "./ChessGame";
-import "./PromotionMenu.css";
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ChessGame from '@/ChessGame'
+import ChessGameProvider from '@/context'
+import '@/scss/main.scss'
 
-ReactDOM.render(<ChessGame />, document.getElementById('root'));
+ReactDOM.render(
+  <ChessGameProvider>
+    <ChessGame />
+  </ChessGameProvider>
+  , document.getElementById('root'))

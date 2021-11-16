@@ -1,0 +1,22 @@
+.game-container {
+  display: grid;
+
+  // grid-template-columns: 8rem 15rem 48rem 15rem 8rem;
+  // auto: space beside board / 15rem: graveyards / 48rem gameboard
+  grid-template-columns: auto 15rem 48rem 15rem auto;
+
+  // 8rem: header and footer / 48rem: gameboard / last 8rem: testing switch
+  grid-template-rows: 8rem 48rem 8rem 8rem;
+}
+
+.turn-header {
+  grid-column: 3;
+  grid-row: 1;
+  position: relative;
+  width: 100%;
+  place-self: center;
+
+  display: inline-block;
+  text-align: center;
+  font-size: 4rem;
+}

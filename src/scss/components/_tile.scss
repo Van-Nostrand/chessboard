@@ -1,0 +1,15 @@
+@use '../abstracts/vars';
+
+.tile {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.light-tile {
+  background-color: vars.$light-tile2;
+}
+
+.dark-tile {
+  background-color: vars.$dark-tile2;
+}

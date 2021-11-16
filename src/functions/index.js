@@ -1,0 +1,8 @@
+export { buildNewCellMap } from './buildNewCellMap'
+export { gameSetup } from './gameSetup'
+export { recursiveStateCopy } from './recursiveStateCopy'
+export { updatePieceVision } from './updatePieceVision'
+export { createPiece } from './createPiece'
+export { makeTiles } from './makeTiles'
+export { makePieces } from './makePieces'
+export { makeGraveyards } from './makeGraveyards'

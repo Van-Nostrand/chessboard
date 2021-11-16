@@ -1,0 +1,25 @@
+.testing-board {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.testing-board-off {
+  grid-column: 3;
+  grid-row: 4;
+}
+// .testing-board-hidden {
+//   grid-column: 3;
+//   grid-row: 4;
+
+//   & .tiles-container,
+//   & .pieces-container {
+//     display: none;
+//   }
+// }
+
+.testing-board,
+.testing-board-off {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
