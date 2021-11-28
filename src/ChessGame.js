@@ -9,10 +9,6 @@ import {
   PromotionMenu,
   TestingBoard
 } from '@/components'
-import {
-  PIECEPATHS,
-  PIECE_PROTOTYPES
-} from '@/constants'
 import { ChessGameContext } from '@/context'
 import {
   recursiveStateCopy,
@@ -20,7 +16,8 @@ import {
   buildNewCellMap,
   makeTiles,
   makePieces,
-  makeGraveyards
+  makeGraveyards,
+  getNewPiece
 } from '@/functions'
 import { useWindowToGetTileSize } from '@/hooks'
 
@@ -144,6 +141,8 @@ export default function ChessGame () {
   //tests and completes attacks
   const tryAttacking = (targetCell, targetPieceName) => {
 
+    // I can probably defer this until later when I know the attack works or not
+    // and if only one piece on one side is being attacked, then both graveyards don't need deep copies
     const newWGraveyard = recursiveStateCopy(wGraveyard)
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
@@ -244,23 +243,15 @@ export default function ChessGame () {
   }
 
 
-  // creates a new piece with given arguments
-  const createPiece = (type, team, x, y, newPieceNumbering) => {
-
-    const newPiece = { ...PIECE_PROTOTYPES[type] }
-    newPiece.pngPos = team === 'w' ? PIECE_PROTOTYPES[type].WpngPos : PIECE_PROTOTYPES[type].BpngPos
-    delete newPiece.WpngPos
-    delete newPiece.BpngPos
-
-    if (type === 'pawn') {
-      newPiece.fifthRank = team === 'w' ? 3 : 4
-    }
-
-    const unitNumber = newPieceNumbering[`${team}${type}`] + 1
-    newPiece.x = x
-    newPiece.y = y
-    newPiece.name = `${team}${type}${unitNumber}`
-    newPiece.paths = PIECEPATHS[type]
+  // creates a new piece with given arguments and increments piecenumbering
+  const createPiece = (properties, newPieceNumbering) => {
+    let newPiece
+    if (properties.name.length !== 3)
+      newPiece = getNewPiece({
+        ...properties,
+        name: `${properties.name}${++newPieceNumbering[`${properties.name}`]}`
+      })
+    else newPiece = getNewPiece(properties)
 
     return newPiece
   }
@@ -307,7 +298,7 @@ export default function ChessGame () {
 
 
   const tryEnPassant = (cell) => {
-    const newWGraveyard = recursiveStateCopy(wGraveyard)
+    const newWGraveyard = recursiveStateCopy(wGraveyard)// do I need to do this right away? probably not
     const newBGraveyard = recursiveStateCopy(bGraveyard)
 
     const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} en passent`

@@ -1,11 +1,12 @@
 import {
   BOARDDIMENSIONS,
-  PIECE_OBJECTS
+  // PIECE_OBJECTS,
+  PROMOTION_TEST
   // PIECEPATHS
 } from '@/constants'
 import { updatePieceVision } from './updatePieceVision'
 import { buildNewCellMap } from './buildNewCellMap'
-import { createPiece } from './createPiece'
+import { getNewPiece } from './getNewPiece'
 
 /**
  * This sets up the chess game and initializes all data
@@ -39,8 +40,8 @@ export const gameSetup = () => {
 
   //declare pieces according to one of the game piece constants
   const initialPiecesObject = {}
-  PIECE_OBJECTS.forEach( piece => {
-    initialPiecesObject[piece.name] = createPiece(piece, initialPieceNumbers)
+  PROMOTION_TEST.forEach( piece => {
+    initialPiecesObject[piece.name] = getNewPiece(piece, initialPieceNumbers)
   })
 
   //cellMap is used for piece name lookup by cell

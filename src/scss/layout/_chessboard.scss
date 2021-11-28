@@ -5,6 +5,25 @@
   margin: 0 auto;
 }
 
+.board-container {
+  position: relative;
+
+  &__tiles {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+  }
+
+  &__pieces {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+  }
+}
+
 .tile-container {
   grid-column: 3;
   grid-row: 2;

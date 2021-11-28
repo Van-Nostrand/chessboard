@@ -1,6 +1,7 @@
 .promotion-menu {
-  width: 400px;
-  height: 100px;
+
+  grid-column: 3;
+  grid-row: 2;
 
   display: flex;
   flex-flow: row;

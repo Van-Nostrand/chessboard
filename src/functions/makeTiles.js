@@ -11,8 +11,8 @@ import { Tile } from '@/components'
 export const makeTiles = (tileSize, dimensions, clickHandler) => {
   let tilebool = false
   let tileAtStartOfLastRow = false
-  return new Array(dimensions[1]).fill().map((row, i) => {
-    return new Array(dimensions[0]).fill().map((tile, j) => {
+  return new Array(dimensions[0]).fill().map((row, i) => {
+    return new Array(dimensions[1]).fill().map((tile, j) => {
       // double check this sometime, I flipped i and j for some reason
       // I just need to check if the length is odd or even... this is silly
       if (j === 0) {

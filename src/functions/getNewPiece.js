@@ -7,7 +7,8 @@ import {
   Rook
 } from '@/pieceData'
 
-export const createPiece = (props) => {
+export const getNewPiece = (props) => {
+  console.log('inside getNewPiece, props', props)
   switch (true) {
     case /^\wB/.test(props.name): return new Bishop(props)
     case /^\wK/.test(props.name): return new King(props)
