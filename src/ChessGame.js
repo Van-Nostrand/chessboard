@@ -470,7 +470,7 @@ export default function ChessGame () {
     })
   }
 
-  // erases selection, sets messageboard text
+  // clears selection, sets messageboard text
   const illegalMove = (newMessageBoard) => {
     dispatch({
       type: 'illegal',
@@ -478,6 +478,7 @@ export default function ChessGame () {
     })
   }
 
+  // same as above but do not clear selection
   const illegalMoveButKeepSelection = (message) => {
     dispatch({
       type: 'illegal-keep-selection',
@@ -489,57 +490,48 @@ export default function ChessGame () {
   // RENDERING
   // =======================
 
-  // GENERATE TILES
-  const boardTiles = makeTiles(tileSize, [8, 8], handleTileClick)
-
-  // GENERATE PIECES
-  const pieceObjects = makePieces(piecesObject, handlePieceClick, tileSize, selectedPiece)
-
-  // GENERATE GRAVEYARDS
+  // GENERATE DEAD PIECES
   const [ wGraveyardPieces, bGraveyardPieces ] = makeGraveyards(wGraveyard, bGraveyard, tileSize)
-
-  // IF PAWN PROMOTING GENERATE MENU
-  const theMenu = chessGameState.pawnPromotionFlag
-    ? (
-      <PromotionMenu
-        selectPiece={promotePawn}
-        team={chessGameState.selectedPiece.charAt(0)}
-      />
-    )
-    : ''
 
   //STYLES
   // todo - phase this out?
-  const tileContainerStyle = {
-    width: `${chessGameState.boardDimensions[0] * tileSize}px`,
-    height: `${chessGameState.boardDimensions[1] * tileSize}px`,
-  }
+  // const tileContainerStyle = {
+  //   width: `${chessGameState.boardDimensions[0] * tileSize}px`,
+  //   height: `${chessGameState.boardDimensions[1] * tileSize}px`,
+  // }
 
-  const piecesContainerStyle = {
-    width: `${chessGameState.boardDimensions[0] * tileSize}px`,
-    height: `${chessGameState.boardDimensions[1] * tileSize}px`,
-  }
+  // const piecesContainerStyle = {
+  //   width: `${chessGameState.boardDimensions[0] * tileSize}px`,
+  //   height: `${chessGameState.boardDimensions[1] * tileSize}px`,
+  // }
 
   return (
     <div className='game-container' >
-      {theMenu}
+
+      { chessGameState.pawnPromotionFlag && (
+        <PromotionMenu
+          selectPiece={promotePawn}
+          team={chessGameState.selectedPiece.charAt(0)}
+        />
+      )}
+
       <h2 className={ testmode ? 'turn-header--hidden' : 'turn-header' }>
         {turn ? 'White turn' : 'Black turn'}
       </h2>
-      <div
-        className={ testmode ? 'tile-container--hidden' : 'tile-container' }
-        style={tileContainerStyle}
-      >
-        {boardTiles}
+      <div className={ testmode ? 'board-container--hidden' : 'board-container' }>
+        <div className='board-container__tiles'>
+          { makeTiles(tileSize, [8, 8], handleTileClick) }
+        </div>
+        <div
+          className='board-container__pieces'
+          ref={piecesContainerRef}
+        >
+          { makePieces(piecesObject, handlePieceClick, tileSize, selectedPiece) }
+        </div>
       </div>
-      <div
-        className={ testmode ? 'pieces-container--hidden' : 'pieces-container' }
-        ref={piecesContainerRef}
-        style={piecesContainerStyle}
-      >
-        {pieceObjects}
-      </div>
-      <h3 className='message-board' >{chessGameState.messageBoard}</h3>
+      <h3 className='message-board' >
+        {chessGameState.messageBoard}
+      </h3>
       <ChessGraveyard
         pieces={wGraveyardPieces}
         classString={testmode ? 'w-graveyard--hidden' : 'w-graveyard' }

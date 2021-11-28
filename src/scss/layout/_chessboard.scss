@@ -7,13 +7,15 @@
 
 .board-container {
   position: relative;
+  grid-column: 3;
+  grid-row: 2;
 
   &__tiles {
     position: relative;
     z-index: 2;
     display: flex;
     flex-flow: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
 
   &__pieces {
@@ -24,35 +26,7 @@
   }
 }
 
-.tile-container {
-  grid-column: 3;
-  grid-row: 2;
-  margin: auto;
-  padding: 0;
-  box-sizing: border-box;
-
-  display: flex;
-  flex-flow: row;
-  flex-wrap: wrap;
-}
-
-.pieces-container {
-  grid-column: 3;
-  grid-row: 2;
-  margin: auto;
-  padding: 0;
-  box-sizing: border-box;
-
-  display: flex;
-  flex-flow: row;
-  flex-wrap: wrap;
-  pointer-events: none;
-}
-
-.graveyard {
-  grid-row: 2;
-}
-
+.graveyard { grid-row: 2; }
 .w-graveyard { grid-column: 2; }
 .b-graveyard { grid-column: 4; }
 

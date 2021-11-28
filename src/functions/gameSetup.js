@@ -1,7 +1,7 @@
 import {
   BOARDDIMENSIONS,
-  // PIECE_OBJECTS,
-  PROMOTION_TEST
+  PIECE_OBJECTS
+  // PROMOTION_TEST
   // PIECEPATHS
 } from '@/constants'
 import { updatePieceVision } from './updatePieceVision'
@@ -40,7 +40,7 @@ export const gameSetup = () => {
 
   //declare pieces according to one of the game piece constants
   const initialPiecesObject = {}
-  PROMOTION_TEST.forEach( piece => {
+  PIECE_OBJECTS.forEach( piece => {
     initialPiecesObject[piece.name] = getNewPiece(piece, initialPieceNumbers)
   })
 
