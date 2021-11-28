@@ -90,7 +90,7 @@ export default class PawnClass extends PieceClass {
             // if enemy pawn in cell "behind" empty cell
             const splitCellString = cellString.split(',')// cell diagonal to pawn
             const EPTest = `${splitCellString[0]},${parseInt(splitCellString[1]) - this.direction}` // cell to the side of pawn
-            // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn... 
+            // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn...
             console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)
             console.log('cellMap[EPTest] is ', cellMap[EPTest])
             if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {

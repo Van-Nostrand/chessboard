@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect/*, useContext*/ } from 'react'
 import pieceImg from '../assets/pieces.png'
 import PropTypes from 'prop-types'
+// import { createPiece } from '@/functions'
+// import { ChessGameContext } from '@/context'
 /**
  * todo - This is broken, fix it
- * @param {*} param0 
- * @returns 
+ * @param {*} param0
+ * @returns
  */
 export default function PromotionMenu ({ selectPiece, team }) {
   const [pieceSelection, setPieceSelection] = useState('')
+
+  // const { chessGameState, dispatch } = useContext(ChessGameContext)
+  // const { }
 
   useEffect(() => {
     if (pieceSelection.length > 0) {
       selectPiece(pieceSelection)
     }
   }, [pieceSelection])
+
+  // const queen = createPiece(`${team}Q`)
+  // const knight = createPiece(`${team}N`)
+  // const bishop = createPiece(`${team}B`)
+  // const rook = createPiece(`${team}R`)
 
   const queenStyle = {
     backgroundImage: `url(${pieceImg})`,

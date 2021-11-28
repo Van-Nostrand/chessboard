@@ -40,7 +40,7 @@ export const gameSetup = () => {
   //declare pieces according to one of the game piece constants
   const initialPiecesObject = {}
   PIECE_OBJECTS.forEach( piece => {
-    initialPiecesObject[piece.name] = createPiece(piece)
+    initialPiecesObject[piece.name] = createPiece(piece, initialPieceNumbers)
   })
 
   //cellMap is used for piece name lookup by cell

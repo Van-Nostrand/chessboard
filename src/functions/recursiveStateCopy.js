@@ -19,6 +19,7 @@ export const recursiveStateCopy = (oldState) => {
       // the object must be an instance of some special class
       // I haven't tested this thoroughly...
       // Might lose properties or inheritance or something
+      // actually I don't see why this can't replace the if statment above
       return Object.assign(Object.create(Object.getPrototypeOf(oldState)), oldState)
     }
   }

@@ -4,11 +4,10 @@ import { BOARDDIMENSIONS } from '@/constants'
 const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
 
 export const initialState = {
-  boardDimensions: BOARDDIMENSIONS,
   bGraveyard: {},
+  boardDimensions: BOARDDIMENSIONS,
   cellMap: initialCellMap,
   enPassantPiece: '',
-  tileArr: initTileArr,
   messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
   piecesObject: initialPiecesObject,
@@ -17,6 +16,7 @@ export const initialState = {
   selectedPiece: '',
   testmode: false,
   testboard: {},
+  tileArr: initTileArr,
   tileSize: null,
   turn: true,
   windowSize: '',

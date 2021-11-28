@@ -216,15 +216,15 @@ export default function ChessGame () {
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
     newPieceNumbering[`${newPieceTeam}${newPieceType}`] += 1
+    const newPieceName = `${newPiecesObject[selectedPiece].name.charAt(0)}${newPieceType}${newPieceNumbering[`${newPieceTeam}${newPieceType}`] + 1}`
 
     // a pieces name is made up of team, type, and number, to differentiate them in state
-    const newPiece = createPiece(
-      newPieceType,
-      newPieceTeam,
-      newPiecesObject[selectedPiece].x,
-      newPiecesObject[selectedPiece].y,
-      newPieceNumbering
-    )
+    const newPiece = createPiece({
+      x: newPiecesObject[selectedPiece].x,
+      y: newPiecesObject[selectedPiece].y,
+      name: newPieceName
+    },
+    newPieceNumbering)
 
     delete newPiecesObject[selectedPiece]
     newPiecesObject[newPiece.name] = newPiece
