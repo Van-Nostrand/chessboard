@@ -1,4 +1,6 @@
-//this calls a function on each piece that updates their own view property
+//  this calls a function on each piece that updates their own view property
+//  kings and pawns need different arguments for their vision functions
+//    so there is some logic to handle that
 export const updatePieceVision = (newPiecesObject, newCellMap, newEnPassantPiece = '') => {
 
   for (const piece in newPiecesObject) {
