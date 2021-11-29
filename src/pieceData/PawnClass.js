@@ -91,13 +91,13 @@ export default class PawnClass extends PieceClass {
             const splitCellString = cellString.split(',')// cell diagonal to pawn
             const EPTest = `${splitCellString[0]},${parseInt(splitCellString[1]) - this.direction}` // cell to the side of pawn
             // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn...
-            console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)
-            console.log('cellMap[EPTest] is ', cellMap[EPTest])
+            // console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)
+            // console.log('cellMap[EPTest] is ', cellMap[EPTest])
             if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
               // if piece just moved two spaces
               const EPEnemy = piecesObject[cellMap[EPTest]]
               if (EPEnemy.name === enPassantPiece) {
-                console.log('PASSED NEXT TEST')
+                // console.log('PASSED NEXT TEST')
 
                 // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
                 pathsObject[cellString] = 'e'
@@ -111,12 +111,4 @@ export default class PawnClass extends PieceClass {
     this.view = pathsObject
     return pathsObject
   }
-
-  // get view () {
-  //   return this.#viewObject
-  // }
-
-  // set view (value) {
-  //   this.#viewObject = value
-  // }
 }

@@ -8,6 +8,8 @@ export const buildNewCellMap = (newPiecesObject) => {
     if (!newPiecesObject[piece].dead) {
       const coordinates = `${newPiecesObject[piece].x},${newPiecesObject[piece].y}`
       newCellMap[coordinates] = piece
+    } else if (newPiecesObject[piece].dead) {
+      console.log('buildNewCellMap: found a dead piece, should never have happened', piece)
     }
   })
   return newCellMap

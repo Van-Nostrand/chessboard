@@ -12,31 +12,26 @@ import {
 import { ChessGameContext } from '@/context'
 import {
   recursiveStateCopy,
-  updatePieceVision,
   buildNewCellMap,
   makeTiles,
   makePieces,
-  makeGraveyards,
-  getNewPiece
+  sortAndFillGraveyards
 } from '@/functions'
 import { useWindowToGetTileSize } from '@/hooks'
 
 
 export default function ChessGame () {
-  const { chessGameState, dispatch } = useContext(ChessGameContext)
+  const GameContext = useContext(ChessGameContext)
+  const { chessGameState, dispatch } = GameContext
   const {
-    pieceNumbering,
-    enPassantPiece,
-    selectedPiece,
-    piecesObject,
-    turn,
     cellMap,
-    wGraveyard,
-    bGraveyard,
+    enPassantPiece,
+    graveyard,
+    piecesObject,
+    selectedPiece,
     testmode,
-    tileSize
-    // boardDimensions
-    // tileArr
+    tileSize,
+    turn
   } = chessGameState
   const piecesContainerRef = useRef(null)
   // eslint-disable-next-line no-unused-vars
@@ -45,6 +40,7 @@ export default function ChessGame () {
   useEffect(() => {
     dispatch({ type: 'update-tileSize', tileSize: newTileSize })
   }, [newTileSize])
+
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -107,7 +103,7 @@ export default function ChessGame () {
       //check turn, then confirm selection and update piece.view
       if ((turn && (/^w/.test(name))) || (!turn && (/^b/.test(name)))) {
         console.log('piece can move')
-        dispatch({ type: 'selected', name })
+        GameContext.selectPiece(name)
       }
       //failed selection
       else {
@@ -116,7 +112,7 @@ export default function ChessGame () {
     }
     //if deselecting a piece
     else if (selectedPiece === name) {
-      dispatch({ type: 'deselected' })
+      GameContext.clearPieceSelection()
     }
     //if attacking a piece
     else if (selectedPiece.length > 0 && name.charAt(0) !== selectedPiece.charAt(0)) {
@@ -143,8 +139,7 @@ export default function ChessGame () {
 
     // I can probably defer this until later when I know the attack works or not
     // and if only one piece on one side is being attacked, then both graveyards don't need deep copies
-    const newWGraveyard = recursiveStateCopy(wGraveyard)
-    const newBGraveyard = recursiveStateCopy(bGraveyard)
+    const newGraveyard = recursiveStateCopy(graveyard)
 
     //make a copy of state and carry out the attack
     const newPiecesObject = recursiveStateCopy(piecesObject)
@@ -153,14 +148,8 @@ export default function ChessGame () {
     newPiecesObject[selectedPiece].y = targetCell[1]
     const targetPiece = cellMap[`${targetCell[0]},${targetCell[1]}`]
 
-    if (targetPiece.charAt(0) === 'w') {
-      newWGraveyard[targetPiece] = { ...newPiecesObject[targetPiece] }
-      newWGraveyard[targetPiece].dead = true
-    }
-    else if (targetPiece.charAt(0) === 'b') {
-      newBGraveyard[targetPiece] = { ...newPiecesObject[targetPiece] }
-      newBGraveyard[targetPiece].dead = true
-    }
+    newGraveyard[targetPiece] = recursiveStateCopy(newPiecesObject[targetPiece])
+    newGraveyard[targetPiece].dead = true
 
     delete newPiecesObject[targetPiece]
     const newCellMap = buildNewCellMap(newPiecesObject)
@@ -169,8 +158,7 @@ export default function ChessGame () {
     if (!isKingInCheck) {
       // SUCCESSFUL ATTACK!
       const newMessageBoard = `${selectedPiece} attacked ${targetPieceName}`
-
-      turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })
+      GameContext.turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newGraveyard })
     } else {
       console.log('that attack puts your king in check...')
       illegalMoveButKeepSelection('that attack puts your king in check')
@@ -192,70 +180,19 @@ export default function ChessGame () {
 
     if (!isKingInCheck) {
 
-      //test for pawn promotion
+      //test for pawn promotion - is a pawn on the furthest possible y coordinate based on their team
       if ((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)) {
         pawnBeingPromoted(newPiecesObject, newCellMap)
       } else {
         // if (newPiecesObject[selectedPiece].firstMove) newPiecesObject[selectedPiece].firstMove = false
         const newMessageBoard = `${selectedPiece} moved to ${cell[0]},${cell[1]}`
-        turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
+        GameContext.turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
       }
     } else {
+      // the player is putting their king in check
       illegalMoveButKeepSelection('that move puts your king in check')
-      // dispatch({ type: 'illegal-keep-selection', message: 'that move puts your king in check' })
     }
   }
-
-
-  // swaps a pawn with a piece of the users choice
-  const promotePawn = ( newPieceType ) => {
-    const newPieceNumbering = recursiveStateCopy(pieceNumbering)
-
-    const newPieceTeam = selectedPiece.charAt(0)
-    const newPiecesObject = recursiveStateCopy(piecesObject)
-
-    newPieceNumbering[`${newPieceTeam}${newPieceType}`] += 1
-    const newPieceName = `${newPiecesObject[selectedPiece].name.charAt(0)}${newPieceType}${newPieceNumbering[`${newPieceTeam}${newPieceType}`] + 1}`
-
-    // a pieces name is made up of team, type, and number, to differentiate them in state
-    const newPiece = createPiece({
-      x: newPiecesObject[selectedPiece].x,
-      y: newPiecesObject[selectedPiece].y,
-      name: newPieceName
-    },
-    newPieceNumbering)
-
-    delete newPiecesObject[selectedPiece]
-    newPiecesObject[newPiece.name] = newPiece
-
-    const newCellMap = buildNewCellMap(newPiecesObject)
-    const newMessageBoard = `${selectedPiece} has been promoted to ${newPiece.name}`
-
-    updatePieceVision(newPiecesObject, newCellMap)
-
-    dispatch({
-      type: 'promoted',
-      piecesObject: newPiecesObject,
-      cellMap: newCellMap,
-      messageBoard: newMessageBoard,
-      pieceNumbering: newPieceNumbering
-    })
-  }
-
-
-  // creates a new piece with given arguments and increments piecenumbering
-  const createPiece = (properties, newPieceNumbering) => {
-    let newPiece
-    if (properties.name.length !== 3)
-      newPiece = getNewPiece({
-        ...properties,
-        name: `${properties.name}${++newPieceNumbering[`${properties.name}`]}`
-      })
-    else newPiece = getNewPiece(properties)
-
-    return newPiece
-  }
-
 
   // called when a pawn reaches their 8th rank
   // flags the pawn promotion menu to appear
@@ -293,13 +230,13 @@ export default function ChessGame () {
     const newCellMap = buildNewCellMap(newPiecesObject)
     const newMessageBoard = `${selectedPiece} has castled with ${rookName}`
 
-    turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
+    GameContext.turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
   }
 
 
   const tryEnPassant = (cell) => {
-    const newWGraveyard = recursiveStateCopy(wGraveyard)// do I need to do this right away? probably not
-    const newBGraveyard = recursiveStateCopy(bGraveyard)
+
+    const newGraveyard = recursiveStateCopy(graveyard)
 
     const newMessageBoard = `${selectedPiece} just attacked ${enPassantPiece} en passent`
     const newPiecesObject = recursiveStateCopy(piecesObject)
@@ -307,14 +244,9 @@ export default function ChessGame () {
     newPiecesObject[selectedPiece].x = cell[0]
     newPiecesObject[selectedPiece].y = cell[1]
 
-    if (enPassantPiece.charAt(0) === 'w') {
-      newWGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
-      newWGraveyard[enPassantPiece].dead = true
-    }
-    else if (enPassantPiece.charAt(0) === 'b') {
-      newBGraveyard[enPassantPiece] = { ...newPiecesObject[enPassantPiece] }
-      newBGraveyard[enPassantPiece].dead = true
-    }
+    newGraveyard[enPassantPiece] = recursiveStateCopy(newPiecesObject[enPassantPiece])
+    newGraveyard[enPassantPiece].dead = true
+
     delete newPiecesObject[enPassantPiece]
 
     const newCellMap = buildNewCellMap(newPiecesObject)
@@ -322,7 +254,7 @@ export default function ChessGame () {
     // is king in check?
     const isKingInCheck = isMyKingInCheck( newPiecesObject, newCellMap )
     if (!isKingInCheck) {
-      turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard, newWGraveyard, newBGraveyard })
+      GameContext.turnMaintenance({ newPiecesObject, newCellMap, newMessageBoard })
     } else {
       illegalMoveButKeepSelection('en passent would put your king in check right now')
     }
@@ -430,46 +362,6 @@ export default function ChessGame () {
     return inCheck
   }
 
-  // triggered after most turns
-  // selectedpiece gets a namechange here to avoid redeclaring and confusion of variables. again, strike against this function
-  // todo - change argument to single object
-  const turnMaintenance = (args) => {
-    const {
-      newPiecesObject,
-      newCellMap,
-      newMessageBoard,
-      newWGraveyard = args.newWGraveyard || chessGameState.wGraveyard,
-      newBGraveyard = args.newBGraveyard || chessGameState.bGraveyard
-    } = args
-
-    let newEnPassantPiece = ''
-
-    //if the piece has a firstMove prop, flip it
-    if (newPiecesObject[selectedPiece].firstMove) {
-      newPiecesObject[selectedPiece].firstMove = false
-
-      //if it's a pawn and it just had a double move, flag for enpassant attacks
-      if (/^\wP/.test(selectedPiece) && (newPiecesObject[selectedPiece].y === 4 || newPiecesObject[selectedPiece].y === 3)) {
-        newEnPassantPiece = selectedPiece
-      }
-    }
-
-    //update piece views
-    //not sure I'm handling this properly
-    updatePieceVision(newPiecesObject, newCellMap, newEnPassantPiece)
-    // newPiecesObject = updatePieceVision(newPiecesObject, newCellMap, newEnPassantPiece)
-
-    dispatch({
-      type: 'maintenance',
-      piecesObject: newPiecesObject,
-      cellMap: newCellMap,
-      messageBoard: newMessageBoard,
-      enPassantPiece: newEnPassantPiece,
-      wGraveyard: newWGraveyard,
-      bGraveyard: newBGraveyard
-    })
-  }
-
   // clears selection, sets messageboard text
   const illegalMove = (newMessageBoard) => {
     dispatch({
@@ -491,26 +383,14 @@ export default function ChessGame () {
   // =======================
 
   // GENERATE DEAD PIECES
-  const [ wGraveyardPieces, bGraveyardPieces ] = makeGraveyards(wGraveyard, bGraveyard, tileSize)
-
-  //STYLES
-  // todo - phase this out?
-  // const tileContainerStyle = {
-  //   width: `${chessGameState.boardDimensions[0] * tileSize}px`,
-  //   height: `${chessGameState.boardDimensions[1] * tileSize}px`,
-  // }
-
-  // const piecesContainerStyle = {
-  //   width: `${chessGameState.boardDimensions[0] * tileSize}px`,
-  //   height: `${chessGameState.boardDimensions[1] * tileSize}px`,
-  // }
+  const [ wGraveyardPieces, bGraveyardPieces ] = sortAndFillGraveyards(graveyard, tileSize)
 
   return (
     <div className='game-container' >
 
       { chessGameState.pawnPromotionFlag && (
         <PromotionMenu
-          selectPiece={promotePawn}
+          selectPiece={GameContext.promotePawn}
           team={chessGameState.selectedPiece.charAt(0)}
         />
       )}

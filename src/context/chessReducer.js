@@ -11,13 +11,19 @@ export default function chessReducer (state, action) {
         ...state,
         messageBoard: action.message
       }
-    case 'selected':
+    case 'select-piece':
       return {
         ...state,
         selectedPiece: action.name,
         messageBoard: `piece ${action.name} is selected`
       }
-    case 'deselected':
+    case 'update-graveyard':
+      return {
+        ...state,
+        piecesObject: action.piecesObject,
+        graveyard: action.graveyard
+      }
+    case 'clear-piece-selection':
       return {
         ...state,
         selectedPiece: '',
@@ -49,8 +55,7 @@ export default function chessReducer (state, action) {
         cellMap: action.cellMap,
         messageBoard: action.messageBoard,
         enPassantPiece: action.enPassantPiece,
-        wGraveyard: action.wGraveyard,
-        bGraveyard: action.bGraveyard,
+        graveyard: action.graveyard,
         selectedPiece: '',
         turn: !state.turn
       }
@@ -87,6 +92,6 @@ export default function chessReducer (state, action) {
         tileSize: action.tileSize
       }
     default:
-      throw new Error('3RR0RZ')
+      return state
   }
 }

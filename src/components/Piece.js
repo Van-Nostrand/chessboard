@@ -2,8 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default function Piece ({ pieceData, border, size, onClick }) {
+
   const { x, y, name, dead, imgSrc } = pieceData
   let style = {}
+  const svgSrc = require(`../assets/${imgSrc}`)
 
   if (dead) {
     style = {
@@ -28,7 +30,6 @@ export default function Piece ({ pieceData, border, size, onClick }) {
     maxHeight: '100%'
   }
 
-
   return (
     <div
       className={dead ? 'dead piece' : 'piece'}
@@ -38,7 +39,7 @@ export default function Piece ({ pieceData, border, size, onClick }) {
     >
       <img
         style={svgStyle}
-        src={require(`../assets/${imgSrc}`)}
+        src={svgSrc}
       />
     </div>
   )

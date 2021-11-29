@@ -1,8 +1,7 @@
 import {
   BOARDDIMENSIONS,
-  PIECE_OBJECTS
+  PIECE_OBJECTS,
   // PROMOTION_TEST
-  // PIECEPATHS
 } from '@/constants'
 import { updatePieceVision } from './updatePieceVision'
 import { buildNewCellMap } from './buildNewCellMap'

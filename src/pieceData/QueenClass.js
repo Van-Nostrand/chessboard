@@ -62,7 +62,7 @@ export default class QueenClass extends PieceClass {
         }
       }
     })
-    console.log('called vision on queen. this is', this, 'paths object is', pathsObject)
+    // console.log('called vision on queen. this is', this, 'paths object is', pathsObject)
     this.view = pathsObject
   }
 }

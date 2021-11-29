@@ -8,6 +8,7 @@ export const initialState = {
   boardDimensions: BOARDDIMENSIONS,
   cellMap: initialCellMap,
   enPassantPiece: '',
+  graveyard: {},
   messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
   piecesObject: initialPiecesObject,
