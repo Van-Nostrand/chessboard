@@ -384,7 +384,10 @@ export default function ChessGame () {
 
   // GENERATE DEAD PIECES
   const [ wGraveyardPieces, bGraveyardPieces ] = sortAndFillGraveyards(graveyard, tileSize)
-
+  const boardContainerStyle = {
+    width: `${tileSize * chessGameState.boardDimensions[0]}px`,
+    height: `${tileSize * chessGameState.boardDimensions[1]}px`
+  }
   return (
     <div className='game-container' >
 
@@ -398,7 +401,10 @@ export default function ChessGame () {
       <h2 className={ testmode ? 'turn-header--hidden' : 'turn-header' }>
         {turn ? 'White turn' : 'Black turn'}
       </h2>
-      <div className={ testmode ? 'board-container--hidden' : 'board-container' }>
+      <div
+        className={ testmode ? 'board-container--hidden' : 'board-container' }
+        style={boardContainerStyle}
+      >
         <div className='board-container__tiles'>
           { makeTiles(tileSize, [8, 8], handleTileClick) }
         </div>

@@ -1,6 +1,25 @@
 .testing-board {
   grid-column: 3;
   grid-row: 2;
+  position: relative;
+
+
+  &__inner {
+    & .tile-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-flow: row;
+      flex-wrap: wrap;
+    }
+
+    & .pieces-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+    }
+  }
 }
 
 .testing-board-off {
@@ -17,7 +36,6 @@
 //   }
 // }
 
-.testing-board,
 .testing-board-off {
   display: flex;
   justify-content: center;

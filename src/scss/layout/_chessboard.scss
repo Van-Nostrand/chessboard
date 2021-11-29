@@ -25,6 +25,11 @@
     z-index: 3;
   }
 }
+.board-container.testBoard {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
 .graveyard { grid-row: 2; }
 .w-graveyard { grid-column: 2; }

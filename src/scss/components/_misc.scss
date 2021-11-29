@@ -16,5 +16,7 @@
 }
 
 *[class$="--hidden"] {
-  display: none;
+  // display: none;
+  opacity: 0;
+  transform: translateZ(-100px);
 }

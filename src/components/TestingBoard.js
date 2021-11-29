@@ -54,6 +54,10 @@ export default function TestingBoard () {
     ? { width: `${testboard.width * tileSize}px`, height: `${testboard.height * tileSize}px` }
     : {}
   const pieces = []
+  const testBoardStyle = {
+    width: `${tileSize * testBoardWidth}px`,
+    height: `${tileSize * testBoardHeight}px`
+  }
 
   return (
     <div className={ testmode ? 'testing-board' : 'testing-board-off'}>
@@ -91,15 +95,18 @@ export default function TestingBoard () {
           </div>
         </div>
       )}
-      <div className={ testmode ? 'testing-board__inner' : 'testing-board__inner--hidden'}>
+      <div
+        className={ testmode ? 'board-container test-board' : 'board-container--hidden'}
+        style={ testmode ? testBoardStyle : {} }
+      >
         <div
-          className='tile-container'
+          className='board-container__tiles'
           style={tileContainerStyle}
         >
           {tiles}
         </div>
         <div
-          className='pieces-container'
+          className='board-container__pieces'
           ref={testingContainerRef}
         >
           {pieces}
