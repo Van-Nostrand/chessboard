@@ -1,26 +1,28 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPieceProps } from '@/types'
+
 /*
 ==== KNIGHTS ====
 */
 export default class KnightClass extends PieceClass {
 
-  constructor (props) {
+  constructor (props: IPieceProps) {
     super(props)
     this.imgSrc = props.name.charAt(0) + '-knight.svg'
     this.paths = [[1, -2], [2, -1], [2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2]]
   }
 
-  movelogic = (x, y) =>
-    x !== 0 && y !== 0 &&
-    3 > Math.abs(x) &&
-    3 > Math.abs(y) &&
-    ((Math.abs(x) === 2 ^ Math.abs(y) === 2) === 1)
+  // movelogic = (x: number, y: number) =>
+  //   x !== 0 && y !== 0 &&
+  //   3 > Math.abs(x) &&
+  //   3 > Math.abs(y) &&
+  //   ((Math.abs(x) === 2 ^ Math.abs(y) === 2) === 1)
 
 
-  vision (cellMap) {
+  vision (cellMap: ICellMap) {
     // const { x, y, paths } = piecesObject[name]
 
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
 
     this.paths.forEach(path => {

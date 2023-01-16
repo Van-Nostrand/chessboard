@@ -1,18 +1,19 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPieceProps } from '@/types'
 
 export default class RookClass extends PieceClass {
-  constructor (props) {
+  constructor (props: IPieceProps) {
     super(props)
     this.imgSrc = props.name.charAt(0) + '-rook.svg'
     this.paths = [[0, -1], [1, 0], [0, 1], [-1, 0]]
     this.firstMove = true
   }
 
-  movelogic = (x, y) => (x === 0 ^ y === 0) === 1
+  movelogic = (x: number, y: number) => ((x === 0) !== (y === 0)) && (x === 0 || y === 0)
 
-  vision (cellMap) {
+  vision (cellMap: ICellMap) {
 
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
 
     this.paths.forEach( path => {

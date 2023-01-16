@@ -1,16 +1,21 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPieceProps } from '@/types'
 
 export default class QueenClass extends PieceClass {
-  constructor (props) {
+  constructor (props: IPieceProps) {
     super(props)
     this.imgSrc = props.name.charAt(0) + '-queen.svg'
     this.paths = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
   }
 
-  movelogic = (x, y) => ((((x === 0 ^ y === 0) === 1 ) ^ ( x / y === 1 || x / y === -1)) === 1)
+  movelogic = (x:number, y:number) => {
+    const condition1 = (((x === 0) !== (y === 0)) && (x === 0 || y === 0))
+    const condition2 = ( x / y === 1 || x / y === -1)
+    return (condition1 || condition2) && (condition1 !== condition2)
+  }
 
-  vision (cellMap) {
-    const pathsObject = {}
+  vision (cellMap: ICellMap) {
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
     // for each path: iterate over all cells
     this.paths.forEach( path => {

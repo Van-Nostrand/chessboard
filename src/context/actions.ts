@@ -1,36 +1,38 @@
+import React from 'react'
 import {
   buildNewCellMap,
   recursiveStateCopy,
   getNewPiece,
   updatePieceVision
 } from '@/functions'
+import { IDefaultContext } from './initialState'
 
-export const actions = ( chessGameState, dispatch ) => {
+export const actions = (state: IDefaultContext, dispatch: React.Dispatch<any>) => {
   return ({
-    chessGameState,
+    state,
     dispatch,
     clearPieceSelection: () => {
       dispatch({ type: 'clear-piece-selection' })
     },
-    selectPiece: (name) => {
+    selectPiece: (name: string) => {
       dispatch({ type: 'select-piece', name })
     },
     // similar to turnMaintenance but different enough to get it's own function
-    promotePawn: ( newPieceType ) => {
-      const newPieceNumbering = recursiveStateCopy(chessGameState.pieceNumbering)
-      const newPiecesObject = recursiveStateCopy(chessGameState.piecesObject)
-      const newPieceName = `${chessGameState.selectedPiece.charAt(0)}${newPieceType}${++newPieceNumbering[`${chessGameState.selectedPiece.charAt(0)}${newPieceType}`]}`
+    promotePawn: (newPieceType: string) => {
+      const newPieceNumbering = recursiveStateCopy(state.pieceNumbering)
+      const newPiecesObject = recursiveStateCopy(state.piecesObject)
+      const newPieceName = `${state.selectedPiece.charAt(0)}${newPieceType}${++newPieceNumbering[`${state.selectedPiece.charAt(0)}${newPieceType}`]}`
 
       const newPiece = getNewPiece({
         name: newPieceName,
-        x: newPiecesObject[chessGameState.selectedPiece].x,
-        y: newPiecesObject[chessGameState.selectedPiece].y
+        x: newPiecesObject[state.selectedPiece].x,
+        y: newPiecesObject[state.selectedPiece].y
       })
       // remove old pawn, add new piece to object
-      delete newPiecesObject[chessGameState.selectedPiece]
+      delete newPiecesObject[state.selectedPiece]
       newPiecesObject[newPiece.name] = newPiece
       const newCellMap = buildNewCellMap(newPiecesObject)
-      const newMessageBoard = `${chessGameState.selectedPiece} has been promoted to ${newPiece.name}`
+      const newMessageBoard = `${state.selectedPiece} has been promoted to ${newPiece.name}`
       updatePieceVision(newPiecesObject, newCellMap)
 
       dispatch({
@@ -42,24 +44,29 @@ export const actions = ( chessGameState, dispatch ) => {
       })
     },
     // called at the end of most turns
-    turnMaintenance: (args) => {
+    turnMaintenance: (args: {
+      newPiecesObject: any
+      newCellMap: any
+      newMessageBoard: any
+      newGraveyard: any
+    }) => {
       const {
         newPiecesObject,
         newCellMap,
         newMessageBoard,
-        newGraveyard = args.newGraveyard || chessGameState.graveyard
+        newGraveyard = args.newGraveyard || state.graveyard
       } = args
       let newEnPassantPiece = ''
       //if the piece has a firstMove prop, flip it
-      if (newPiecesObject[chessGameState.selectedPiece].firstMove) {
-        newPiecesObject[chessGameState.selectedPiece].firstMove = false
+      if (newPiecesObject[state.selectedPiece].firstMove) {
+        newPiecesObject[state.selectedPiece].firstMove = false
 
         //if it's a pawn and it just had a double move, flag for enpassant attacks
-        if ( /^\wP/.test(chessGameState.selectedPiece) && (
-          newPiecesObject[chessGameState.selectedPiece].y === 4 ||
-          newPiecesObject[chessGameState.selectedPiece].y === 3)
+        if ( /^\wP/.test(state.selectedPiece) && (
+          newPiecesObject[state.selectedPiece].y === 4 ||
+          newPiecesObject[state.selectedPiece].y === 3)
         ) {
-          newEnPassantPiece = chessGameState.selectedPiece
+          newEnPassantPiece = state.selectedPiece
         }
       }
       updatePieceVision(newPiecesObject, newCellMap, newEnPassantPiece)
