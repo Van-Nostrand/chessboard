@@ -1,6 +1,9 @@
 # Chess!
 This is a project that has haunted me since College. I originally tried to do it in Java but never finished it. I figured I'd try to finish it in react  
 
+### January 2023
+finished adding typescript and fixed some immediate bugs
+
 ### November 28 2021  
 altering how context is used  
 * moved some functions to context/actions.js which is now imported with state  
