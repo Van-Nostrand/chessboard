@@ -82,6 +82,9 @@ const config = {
       chunkFilename: '[id].css'
     })
   ],
+  watchOptions: {
+    ignored: /node_modules/
+  },
   devtool: 'source-map'
 }
 
