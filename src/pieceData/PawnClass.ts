@@ -1,12 +1,18 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPiecesObject, IPieceProps } from '@/types'
+
 /**==== PAWNS ====
 * attacklogic() - similar to movelogic(), this pawn-exclusive function determines if a pawn can attack
 * direction - a property set by props.name.charAt(0) which determines the direction this pawn may move in
 * fifthRank - Used to track en passant
 */
 export default class PawnClass extends PieceClass {
+  // firstMove: boolean
+  canBeCapturedInPassing: boolean
+  direction: number
+  fifthRank: number
 
-  constructor (props) {
+  constructor (props: IPieceProps) {
     super(props)
     this.firstMove = true
     this.canBeCapturedInPassing = false
@@ -19,33 +25,32 @@ export default class PawnClass extends PieceClass {
     this.fifthRank = props.name.charAt(0) === 'w' ? 3 : 4
   }
 
-  // unused
-  attacklogic (x, y) {
+  attacklogic (x: number, y: number) {
     return (x === 1 || x === -1) && (1 * this.direction === y)
   }
 
   // unused
-  movelogic = (x, y) => {
-    // if x is not zero, or the pawn is moving in the wrong direction, return false
-    if (x !== 0 || !((y > 0 && this.direction > 0) || (y < 0 && this.direction < 0))) return false
-    // otherwise test to make sure it's moving 1 or 2 spaces based on first move
-    return (this.firstMove && 0 < Math.abs(y) < 3 ) || (!this.firstMove && Math.abs(y) === 1)
-  }
+  // movelogic = (x: number, y: number) => {
+  //   // if x is not zero, or the pawn is moving in the wrong direction, return false
+  //   if (x !== 0 || !((y > 0 && this.direction > 0) || (y < 0 && this.direction < 0))) return false
+  //   // otherwise test to make sure it's moving 1 or 2 spaces based on first move
+  //   return (this.firstMove && 0 < Math.abs(y) && Math.abs(y) < 3 ) || (!this.firstMove && Math.abs(y) === 1)
+  // }
 
   // unused and wrong
-  enpassantlogic = (targetcell, victim) => {
-    return (
-      targetcell[0] === victim[0] &&
-      (targetcell[1] === victim[1] + 1 ||
-        targetcell[1] === victim[1] - 1))
-  }
+  // enpassantlogic = (targetcell, victim) => {
+  //   return (
+  //     targetcell[0] === victim[0] &&
+  //     (targetcell[1] === victim[1] + 1 ||
+  //       targetcell[1] === victim[1] - 1))
+  // }
 
   // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
-  vision (cellMap, enPassantPiece, piecesObject) {
+  vision (cellMap: ICellMap, enPassantPiece: any, piecesObject: IPiecesObject) {
     const BOARDSIZE = 8
 
     // create an empty object that will store potential moves
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
 
     // for each path
     for (const path of this.paths) {
@@ -57,7 +62,7 @@ export default class PawnClass extends PieceClass {
       const checkY = path[1] + this.y
 
       // if the cell is within the board
-      if (0 <= checkX < BOARDSIZE && 0 <= checkY < BOARDSIZE) {
+      if (0 <= checkX && checkX < BOARDSIZE && 0 <= checkY && checkY < BOARDSIZE) {
 
         const cellString = `${path[0] + this.x},${path[1] + this.y}`
 
@@ -68,7 +73,7 @@ export default class PawnClass extends PieceClass {
           // piece is an enemy
           if (testedCell.charAt(0) !== this.name.charAt(0)) {
             // if residing in attack path, create key/value "cell,coordinates": [x,y,"a"]
-            if (this.attacklogic(path[0], path[1], this.direction)) {
+            if (this.attacklogic(path[0], path[1])) {
               pathsObject[cellString] = 'a'
 
             }

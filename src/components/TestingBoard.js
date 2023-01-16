@@ -3,7 +3,7 @@ import { ChessGameContext } from '@/context'
 import { makeTiles } from '@/functions'
 
 export default function TestingBoard () {
-  const { chessGameState, dispatch } = useContext(ChessGameContext)
+  const { state: chessGameState, dispatch } = useContext(ChessGameContext)
   const {
     testmode,
     testboard,

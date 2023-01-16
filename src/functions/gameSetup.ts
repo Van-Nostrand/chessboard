@@ -6,17 +6,18 @@ import {
 import { updatePieceVision } from './updatePieceVision'
 import { buildNewCellMap } from './buildNewCellMap'
 import { getNewPiece } from './getNewPiece'
+import PieceClass from '@/pieceData/PieceClass'
 
 /**
  * This sets up the chess game and initializes all data
  * @returns initial game data
  */
-export const gameSetup = () => {
+export function gameSetup () {
   // create checkerboard
   // might not be necessary anymore...
   let tileBool = true
-  const initTileArr = new Array(BOARDDIMENSIONS[0]).fill().map(() => {
-    return new Array(BOARDDIMENSIONS[1]).fill().map((tile, j) => {
+  const initTileArr = new Array(BOARDDIMENSIONS[0]).fill(null).map(() => {
+    return new Array(BOARDDIMENSIONS[1]).fill(null).map((tile, j) => {
       tileBool = j % BOARDDIMENSIONS[0] === 0 ? tileBool : !tileBool
       // return tileBool? LIGHT_TILE : DARK_TILE;
       return tileBool? 'light-tile tile' : 'dark-tile tile'
@@ -38,10 +39,17 @@ export const gameSetup = () => {
   }
 
   //declare pieces according to one of the game piece constants
-  const initialPiecesObject = {}
-  PIECE_OBJECTS.forEach( piece => {
-    initialPiecesObject[piece.name] = getNewPiece(piece, initialPieceNumbers)
-  })
+  // const initialPiecesObject = {}
+  // PIECE_OBJECTS.forEach((piece) => {
+  //   initialPiecesObject[piece.name] = getNewPiece(piece)
+  // })
+  type TInitPieces = {
+    [c: string]: PieceClass
+  }
+  const initialPiecesObject: TInitPieces = PIECE_OBJECTS.reduce((acc: TInitPieces, cur) => {
+    acc[cur.name] = getNewPiece(cur)
+    return acc
+  }, {})
 
   //cellMap is used for piece name lookup by cell
   const initialCellMap = buildNewCellMap(initialPiecesObject)

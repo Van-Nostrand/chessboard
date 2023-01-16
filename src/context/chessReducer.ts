@@ -1,4 +1,23 @@
-export default function chessReducer (state, action) {
+import { IDefaultContext } from '@/types'
+
+interface IAction {
+  message?: string
+  name?: string
+  piecesObject?: any
+  graveyard?: any
+  pieceNumbering?: any
+  messageBoard?: string
+  cellMap?: any
+  selectedPiece?: any,
+  type: string
+  enPassantPiece?: any
+  windowSize?: any
+  screenType?: any
+  payload?: any
+  tileSize?: any
+}
+
+export default function chessReducer (state: IDefaultContext, action: IAction) {
   switch (action.type) {
     case 'illegal':
       return {

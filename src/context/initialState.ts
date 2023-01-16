@@ -3,7 +3,28 @@ import { BOARDDIMENSIONS } from '@/constants'
 
 const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
 
-export const initialState = {
+export interface IDefaultContext {
+  bGraveyard: any
+  boardDimensions: number[]
+  cellMap: any
+  enPassantPiece: string
+  graveyard: any
+  messageBoard: string
+  pawnPromotionFlag: boolean
+  piecesObject: any
+  pieceNumbering: any
+  screenType: string
+  selectedPiece: string
+  testmode: boolean
+  testboard: any
+  tileArr: any
+  tileSize: number
+  turn: boolean
+  windowSize: string
+  wGraveyard: any
+}
+
+export const initialState: IDefaultContext = {
   bGraveyard: {},
   boardDimensions: BOARDDIMENSIONS,
   cellMap: initialCellMap,
@@ -18,7 +39,7 @@ export const initialState = {
   testmode: false,
   testboard: {},
   tileArr: initTileArr,
-  tileSize: null,
+  tileSize: undefined,
   turn: true,
   windowSize: '',
   wGraveyard: {}

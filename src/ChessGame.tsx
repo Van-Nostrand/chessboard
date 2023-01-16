@@ -19,10 +19,12 @@ import {
 } from '@/functions'
 import { useWindowToGetTileSize } from '@/hooks'
 
+import { ICellMap, IPiecesObject } from '@/types'
+
 
 export default function ChessGame () {
   const GameContext = useContext(ChessGameContext)
-  const { chessGameState, dispatch } = GameContext
+  const { state: chessGameState, dispatch } = GameContext
   const {
     cellMap,
     enPassantPiece,
@@ -35,7 +37,7 @@ export default function ChessGame () {
   } = chessGameState
   const piecesContainerRef = useRef(null)
   // eslint-disable-next-line no-unused-vars
-  const [ newTileSize, newWindowSize ] = useWindowToGetTileSize()
+  const [newTileSize] = useWindowToGetTileSize()
 
   useEffect(() => {
     dispatch({ type: 'update-tileSize', tileSize: newTileSize })
@@ -50,7 +52,7 @@ export default function ChessGame () {
   // - - Castling
   // - - En Passant
   // - illegal move attempt
-  const handleTileClick = (e, coordinates) => {
+  const handleTileClick = (_e: any, coordinates: string) => {
 
     console.log('clicked a tile @', coordinates)
 
@@ -93,7 +95,7 @@ export default function ChessGame () {
   // - to select
   // - to deselect
   // - to attack with a selected piece
-  const handlePieceClick = (e, name) => {
+  const handlePieceClick = (_e: any, name: string) => {
     console.log('clicked a piece named', name)
     //if selecting a piece
     if (selectedPiece.length === 0) {
@@ -135,7 +137,7 @@ export default function ChessGame () {
 
 
   //tests and completes attacks
-  const tryAttacking = (targetCell, targetPieceName) => {
+  const tryAttacking = (targetCell: number[], targetPieceName: string) => {
 
     // I can probably defer this until later when I know the attack works or not
     // and if only one piece on one side is being attacked, then both graveyards don't need deep copies
@@ -168,7 +170,7 @@ export default function ChessGame () {
 
 
   // tests and completes moves
-  const tryMoving = (cell) => {
+  const tryMoving = (cell: number[]) => {
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
     newPiecesObject[selectedPiece].x = cell[0]
@@ -196,7 +198,7 @@ export default function ChessGame () {
 
   // called when a pawn reaches their 8th rank
   // flags the pawn promotion menu to appear
-  const pawnBeingPromoted = (newPiecesObject, newCellMap) => {
+  const pawnBeingPromoted = (newPiecesObject: IPiecesObject, newCellMap: ICellMap) => {
     dispatch({
       type: 'promoting',
       piecesObject: newPiecesObject,
@@ -207,7 +209,7 @@ export default function ChessGame () {
 
   //this will be hard coded so that I don't go insane thinking about it. Make it dynamic later
   //KingClass.vision has it's own "amIChecked" method, so this is "process" instead of "try"
-  const processCastling = (cell) => {
+  const processCastling = (cell: number[]) => {
     let rookName
     const newPiecesObject = recursiveStateCopy(piecesObject)
 
@@ -234,7 +236,7 @@ export default function ChessGame () {
   }
 
 
-  const tryEnPassant = (cell) => {
+  const tryEnPassant = (cell: number[]) => {
 
     const newGraveyard = recursiveStateCopy(graveyard)
 
@@ -262,7 +264,7 @@ export default function ChessGame () {
 
 
   // todo - does this need to exist here and in a king class?
-  const isMyKingInCheck = ( newPiecesObject, newCellMap ) => {
+  const isMyKingInCheck = (newPiecesObject: IPiecesObject, newCellMap: ICellMap) => {
 
     const kingName = turn ? 'wK' : 'bK'
     const BOARDSIZE = 8
@@ -363,7 +365,7 @@ export default function ChessGame () {
   }
 
   // clears selection, sets messageboard text
-  const illegalMove = (newMessageBoard) => {
+  const illegalMove = (newMessageBoard: string) => {
     dispatch({
       type: 'illegal',
       messageBoard: newMessageBoard
@@ -371,7 +373,7 @@ export default function ChessGame () {
   }
 
   // same as above but do not clear selection
-  const illegalMoveButKeepSelection = (message) => {
+  const illegalMoveButKeepSelection = (message: string) => {
     dispatch({
       type: 'illegal-keep-selection',
       messageBoard: message

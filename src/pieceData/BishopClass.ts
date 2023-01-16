@@ -1,16 +1,21 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPieceProps } from '@/types'
+
+export interface IBishopProps extends IPieceProps {
+  name: string
+}
 
 export default class BishopClass extends PieceClass {
-  constructor (props) {
+  constructor (props: IBishopProps) {
     super (props)
     this.paths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
-    this.imgSrc = props.name.charAt(0) + '-bishop.svg'
+    this.imgSrc = `${props.name.charAt(0)}-bishop.svg`
   }
 
-  movelogic = (x, y) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1)
+  movelogic = (x: number, y: number) => x !== 0 && y !== 0 && (x/y === 1 || x/y === -1)
 
-  vision (cellMap) {
-    const pathsObject = {}
+  vision (cellMap: ICellMap) {
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
 
     this.paths.forEach( path => {
@@ -46,7 +51,7 @@ export default class BishopClass extends PieceClass {
         }
       }
     })
-    // return pathsObject
+
     this.view = pathsObject
   }
 }

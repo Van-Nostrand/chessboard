@@ -1,4 +1,6 @@
 import PieceClass from './PieceClass'
+import { ICellMap, IPieceView, IPiecesObject, IPieceProps } from '@/types'
+import { recursiveStateCopy } from '@/functions'
 /*
 ==== KINGS ====
 amIChecked() - this looks for attackers and reports them back
@@ -6,21 +8,22 @@ amIChecked() - this looks for attackers and reports them back
 TODO - make amIChecked a function that returns bool instead of a list of cells. not important now to know every cell that can attack, just need to know if one can
 */
 export default class KingClass extends PieceClass {
-  constructor (props) {
+
+  constructor (props: IPieceProps) {
     super(props)
     this.imgSrc = props.name.charAt(0) + '-king.svg'
     this.paths = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
     this.firstMove = true
   }
 
-  movelogic = (x, y) => -2 < x && x < 2 && -2 < y && y < 2
+  movelogic = (x: number, y: number) => -2 < x && x < 2 && -2 < y && y < 2
 
   //add in an option for castleing
   //spaces will be labelled "c" if castling possible
-  vision (cellMap, piecesObject) {
+  vision (cellMap: ICellMap, piecesObject: IPiecesObject) {
     // const { x, y, paths, firstMove } = piecesObject[name]
 
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
     const TEAMCOLOUR = /^w/.test(this.name) ? 'w' : 'b'
 
@@ -49,12 +52,22 @@ export default class KingClass extends PieceClass {
     //has king taken first move?
     if (this.firstMove) {
       //is R1 at 0,y and has it moved yet?
-      if (cellMap[`0,${this.y}`] && rook1.test(cellMap[`0,${this.y}`]) && piecesObject[cellMap[`0,${this.y}`]].firstMove) {
+      if (cellMap[`0,${this.y}`] && rook1.test(cellMap[`0,${this.y}`]) && piecesObject[cellMap[`0,${this.y}`]]?.firstMove) {
         //are [1,y] [2,y] and [3,y] empty?
         if (!cellMap[`2,${this.y}`] && !cellMap[`1,${this.y}`] && !cellMap[`3,${this.y}`]) {
           // checkmate check at [2,y] and [3,y]
-          const longPieces2y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 2, y: this.y } })
-          const longPieces3y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x:3, y: this.y } })
+          const test2y = recursiveStateCopy(piecesObject)
+          test2y[this.name] = recursiveStateCopy(piecesObject[this.name])
+          test2y[this.name].x = 2
+          test2y[this.name].y = this.y
+
+          const test3y = recursiveStateCopy(piecesObject)
+          test3y[this.name] = recursiveStateCopy(piecesObject[this.name])
+          test3y[this.name].x = 3
+          test3y[this.name].y = this.y
+
+          const longPieces2y = this.amIChecked(cellMap, test2y)
+          const longPieces3y = this.amIChecked(cellMap, test3y)
           if (Object.keys(longPieces2y).length === 0 && Object.keys(longPieces3y).length === 0) {
             pathsObject[`2,${this.y}`] = 'c'
           }
@@ -66,8 +79,18 @@ export default class KingClass extends PieceClass {
         if (!cellMap[`6,${this.y}`] && !cellMap[`5,${this.y}`]) {
 
           // checkmate check at [5,y] and [6,y]
-          const shortPieces5y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 5, y: this.y } })
-          const shortPieces6y = this.amIChecked(cellMap, { ...piecesObject, [this.name]: { ...piecesObject[this.name], x: 6, y: this.y } })
+          const test5y = recursiveStateCopy(piecesObject)
+          test5y[this.name] = recursiveStateCopy(piecesObject[this.name])
+          test5y[this.name].x = 5
+          test5y[this.name].y = this.y
+
+          const test6y = recursiveStateCopy(piecesObject)
+          test5y[this.name] = recursiveStateCopy(piecesObject[this.name])
+          test5y[this.name].x = 6
+          test5y[this.name].y = this.y
+
+          const shortPieces5y = this.amIChecked(cellMap, test5y)
+          const shortPieces6y = this.amIChecked(cellMap, test6y)
           if (Object.keys(shortPieces5y).length === 0 && Object.keys(shortPieces6y).length === 0) {
             pathsObject[`6,${this.y}`] = 'c'
           }
@@ -78,9 +101,9 @@ export default class KingClass extends PieceClass {
     // return pathsObject
   }
 
-  amIChecked = (cellMap, piecesObject) => {
+  amIChecked = (cellMap: ICellMap, piecesObject: IPiecesObject) => {
 
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
     const enemyChar = this.name.charAt(0) === 'w' ? 'b' : 'w'
 
@@ -166,9 +189,9 @@ export default class KingClass extends PieceClass {
     return pathsObject
   }
 
-  amICheckedBool = (cellMap, piecesObject) => {
+  amICheckedBool = (cellMap: ICellMap, piecesObject: IPiecesObject) => {
 
-    const pathsObject = {}
+    const pathsObject: IPieceView = {}
     const BOARDSIZE = 8
     const enemyChar = this.name.charAt(0) === 'w' ? 'b' : 'w'
 
