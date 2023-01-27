@@ -1,31 +1,10 @@
 import React, { createContext, useMemo, useReducer, ReactNode } from 'react'
-import { initialState } from './initialState'
+import { initialState, IContext } from './initialState'
 import { actions } from './actions'
 import chessReducer from './chessReducer'
 
-export interface IDefaultContext {
-  bGraveyard: any
-  boardDimensions: number[]
-  cellMap: any
-  enPassantPiece: string
-  graveyard: any
-  messageBoard: string
-  pawnPromotionFlag: boolean
-  piecesObject: any
-  pieceNumbering: any
-  screenType: string
-  selectedPiece: string
-  testmode: boolean
-  testboard: any
-  tileArr: any
-  tileSize: number
-  turn: boolean
-  windowSize: string
-  wGraveyard: any
-}
-
 interface IProvider {
-  state: IDefaultContext
+  state: IContext
   dispatch: React.Dispatch<any>
   clearPieceSelection: () => void
   selectPiece: (name: string) => void

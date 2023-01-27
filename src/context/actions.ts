@@ -5,9 +5,9 @@ import {
   getNewPiece,
   updatePieceVision
 } from '@/functions'
-import { IDefaultContext } from './initialState'
+import { IContext } from './initialState'
 
-export const actions = (state: IDefaultContext, dispatch: React.Dispatch<any>) => {
+export const actions = (state: IContext, dispatch: React.Dispatch<any>) => {
   return ({
     state,
     dispatch,

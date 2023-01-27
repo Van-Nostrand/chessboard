@@ -26,9 +26,13 @@ export default function ChessGame () {
   const GameContext = useContext(ChessGameContext)
   const { state: chessGameState, dispatch } = GameContext
   const {
+    boardDimensions,
     cellMap,
     enPassantPiece,
     graveyard,
+    graveyardDimensions,
+    messageBoard,
+    pawnPromotionFlag,
     piecesObject,
     selectedPiece,
     testmode,
@@ -36,13 +40,11 @@ export default function ChessGame () {
     turn
   } = chessGameState
   const piecesContainerRef = useRef(null)
-  // eslint-disable-next-line no-unused-vars
   const [newTileSize] = useWindowToGetTileSize()
 
   useEffect(() => {
     dispatch({ type: 'update-tileSize', tileSize: newTileSize })
   }, [newTileSize])
-
 
   // this function decides why a user clicked a tile and then calls the appropriate function
   // reasons a user would click a tile:
@@ -387,16 +389,18 @@ export default function ChessGame () {
   // GENERATE DEAD PIECES
   const [ wGraveyardPieces, bGraveyardPieces ] = sortAndFillGraveyards(graveyard, tileSize)
   const boardContainerStyle = {
-    width: `${tileSize * chessGameState.boardDimensions[0]}px`,
-    height: `${tileSize * chessGameState.boardDimensions[1]}px`
+    width: `${(tileSize * boardDimensions[0]) + ((graveyardDimensions[0] * tileSize) * 2)}px`,
+    height: `${Math.max(tileSize * boardDimensions[1], graveyardDimensions[1] * tileSize)}px`
   }
-  return (
-    <div className='game-container' >
 
-      { chessGameState.pawnPromotionFlag && (
+  const boardSize = tileSize * 8
+  return (
+    <div className='game-container'>
+
+      { pawnPromotionFlag && (
         <PromotionMenu
           selectPiece={GameContext.promotePawn}
-          team={chessGameState.selectedPiece.charAt(0)}
+          team={selectedPiece.charAt(0)}
         />
       )}
 
@@ -407,27 +411,31 @@ export default function ChessGame () {
         className={ testmode ? 'board-container--hidden' : 'board-container' }
         style={boardContainerStyle}
       >
-        <div className='board-container__tiles'>
+        <ChessGraveyard
+          pieces={wGraveyardPieces}
+          classString={testmode ? 'w-graveyard--hidden' : 'w-graveyard' }
+        />
+        <div
+          className='board-container__tiles'
+          style={{ flexBasis: `${boardSize}px`, height: `${boardSize}px` }}
+        >
           { makeTiles(tileSize, [8, 8], handleTileClick) }
         </div>
         <div
           className='board-container__pieces'
           ref={piecesContainerRef}
+          style={{ width: `${boardSize}px`, height: `${boardSize}px`, left: `${tileSize * 3}px` }}
         >
           { makePieces(piecesObject, handlePieceClick, tileSize, selectedPiece) }
         </div>
+        <ChessGraveyard
+          pieces={bGraveyardPieces}
+          classString={ testmode ? 'b-graveyard--hidden' : 'b-graveyard' }
+        />
       </div>
-      <h3 className='message-board' >
-        {chessGameState.messageBoard}
+      <h3 className='message-board'>
+        {messageBoard}
       </h3>
-      <ChessGraveyard
-        pieces={wGraveyardPieces}
-        classString={testmode ? 'w-graveyard--hidden' : 'w-graveyard' }
-      />
-      <ChessGraveyard
-        pieces={bGraveyardPieces}
-        classString={ testmode ? 'b-graveyard--hidden' : 'b-graveyard' }
-      />
       <TestingBoard />
     </div>
   )

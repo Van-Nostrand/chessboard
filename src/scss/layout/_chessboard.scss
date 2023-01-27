@@ -9,13 +9,13 @@
   position: relative;
   grid-column: 3;
   grid-row: 2;
+  display: flex;
 
   &__tiles {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: flex;
-    flex-flow: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
   }
 
   &__pieces {
@@ -23,6 +23,10 @@
     top: 0;
     left: 0;
     z-index: 3;
+    pointer-events: none;
+  }
+
+  .graveyard {
   }
 }
 .board-container.testBoard {
@@ -30,10 +34,6 @@
   top: 0;
   left: 0;
 }
-
-.graveyard { grid-row: 2; }
-.w-graveyard { grid-column: 2; }
-.b-graveyard { grid-column: 4; }
 
 .message-board {
   grid-column: 3;

@@ -1,4 +1,4 @@
-import { IDefaultContext } from '@/types'
+import { IContext } from '@/context/initialState'
 
 interface IAction {
   message?: string
@@ -17,7 +17,7 @@ interface IAction {
   tileSize?: any
 }
 
-export default function chessReducer (state: IDefaultContext, action: IAction) {
+export default function chessReducer (state: IContext, action: IAction) {
   switch (action.type) {
     case 'illegal':
       return {

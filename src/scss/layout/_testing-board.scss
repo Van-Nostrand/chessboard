@@ -3,14 +3,12 @@
   grid-row: 2;
   position: relative;
 
-
   &__inner {
     & .tile-container {
       position: relative;
       z-index: 2;
       display: flex;
-      flex-flow: row;
-      flex-wrap: wrap;
+      flex-flow: row wrap;
     }
 
     & .pieces-container {
@@ -26,15 +24,6 @@
   grid-column: 3;
   grid-row: 4;
 }
-// .testing-board-hidden {
-//   grid-column: 3;
-//   grid-row: 4;
-
-//   & .tiles-container,
-//   & .pieces-container {
-//     display: none;
-//   }
-// }
 
 .testing-board-off {
   display: flex;

@@ -3,12 +3,13 @@ import { BOARDDIMENSIONS } from '@/constants'
 
 const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
 
-export interface IDefaultContext {
+export interface IContext {
   bGraveyard: any
   boardDimensions: number[]
   cellMap: any
   enPassantPiece: string
   graveyard: any
+  graveyardDimensions: number[]
   messageBoard: string
   pawnPromotionFlag: boolean
   piecesObject: any
@@ -24,12 +25,13 @@ export interface IDefaultContext {
   wGraveyard: any
 }
 
-export const initialState: IDefaultContext = {
+export const initialState: IContext = {
   bGraveyard: {},
   boardDimensions: BOARDDIMENSIONS,
   cellMap: initialCellMap,
   enPassantPiece: '',
   graveyard: {},
+  graveyardDimensions: [3, 8],
   messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
   piecesObject: initialPiecesObject,
