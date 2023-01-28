@@ -1,17 +1,8 @@
 // import PieceClass from '../PieceClass'
+import { IPiece } from '@/types'
 
 describe('PieceClass', () => {
   test('basic', () => {
-    interface IPiece {
-      x: number
-      y: number
-      imgSrc: string
-      paths: any[]
-      name: string
-      view: any
-      attackView: any,
-      moveLogic: () => void
-    }
     function PieceFunc (this: IPiece, props: any) {
       this.x = props.x
       this.y = props.y

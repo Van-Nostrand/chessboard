@@ -44,10 +44,10 @@ export function gameSetup (): [IPiecesObject, ICellMap, string[][], { [k: string
     return acc
   }, {})
 
-  //cellMap is used for piece name lookup by cell
+  // cellMap is used for piece name lookup by cell
   const initialCellMap = buildNewCellMap(initialPiecesObject)
 
-  //build the view properties for each piece
+  // build the view properties for each piece
   updatePieceVision(initialPiecesObject, initialCellMap)
 
   return [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ]

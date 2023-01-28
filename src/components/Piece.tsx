@@ -1,7 +1,14 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { IPiece } from '@/types'
 
-export default function Piece ({ pieceData, border, size, onClick }) {
+interface IPieceProps {
+  pieceData: IPiece
+  border: boolean
+  size: number
+  onClick?: (e: any, name?: string) => void
+}
+
+export default function Piece ({ pieceData, border, size, onClick }: IPieceProps) {
 
   const { x, y, name, dead, imgSrc } = pieceData
   let style = {}
@@ -25,35 +32,19 @@ export default function Piece ({ pieceData, border, size, onClick }) {
     }
   }
 
-  const svgStyle = {
-    maxWidth: '100%',
-    maxHeight: '100%'
-  }
-
   return (
     <div
       className={dead ? 'dead piece' : 'piece'}
       style={style}
-      name={name}
       onClick={(e) => onClick(e, name)}
     >
       <img
-        style={svgStyle}
+        style={{
+          maxWidth: '100%',
+          maxHeight: '100%'
+        }}
         src={svgSrc}
       />
     </div>
   )
-}
-
-Piece.propTypes = {
-  pieceData: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-    name: PropTypes.string,
-    dead: PropTypes.bool,
-    imgSrc: PropTypes.string
-  }),
-  border: PropTypes.bool,
-  size: PropTypes.number,
-  onClick: PropTypes.func
 }

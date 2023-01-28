@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { ChessGameContext } from '@/context'
 
 interface IChessGraveyardProps {
-  pieces: any
+  pieces: Array<any>
   classString: string
 }
 

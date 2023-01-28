@@ -1,12 +1,8 @@
 import PieceClass from './PieceClass'
 import { ICellMap, IPieceView, IPieceProps } from '@/types'
 
-export interface IBishopProps extends IPieceProps {
-  name: string
-}
-
 export default class BishopClass extends PieceClass {
-  constructor (props: IBishopProps) {
+  constructor (props: IPieceProps) {
     super (props)
     this.paths = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
     this.imgSrc = `${props.name.charAt(0)}-bishop.svg`
