@@ -1,3 +1,5 @@
+@use '@/scss/abstracts/mixins';
+
 .middle-container {
   grid-column: 3;
   grid-row: 2;
@@ -11,11 +13,17 @@
   grid-row: 2;
   display: flex;
 
+  &__tiles, &__pieces {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
   &__tiles {
     position: relative;
     z-index: 3;
     display: flex;
     flex-flow: row wrap;
+    width: auto;
   }
 
   &__pieces {
@@ -24,9 +32,6 @@
     left: 0;
     z-index: 3;
     pointer-events: none;
-  }
-
-  .graveyard {
   }
 }
 .board-container.testBoard {
@@ -44,4 +49,12 @@
   display: inline-block;
   text-align: center;
   font-size: 3rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+@include mixins.breakpoint(xs-only) {
+  .board-container {
+    flex-flow: column nowrap;
+  }
 }

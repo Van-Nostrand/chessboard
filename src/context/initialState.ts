@@ -1,5 +1,6 @@
 import { gameSetup } from '@/functions/gameSetup'
 import { BOARDDIMENSIONS } from '@/constants'
+import { IPiecesObject } from '@/types'
 
 const [ initialPiecesObject, initialCellMap, initTileArr, initialPieceNumbers ] = gameSetup()
 
@@ -12,7 +13,7 @@ export interface IContext {
   graveyardDimensions: number[]
   messageBoard: string
   pawnPromotionFlag: boolean
-  piecesObject: any
+  piecesObject: IPiecesObject
   pieceNumbering: any
   screenType: string
   selectedPiece: string
@@ -31,7 +32,7 @@ export const initialState: IContext = {
   cellMap: initialCellMap,
   enPassantPiece: '',
   graveyard: {},
-  graveyardDimensions: [3, 8],
+  graveyardDimensions: [2, 8],
   messageBoard: 'CHESS!',
   pawnPromotionFlag: false,
   piecesObject: initialPiecesObject,

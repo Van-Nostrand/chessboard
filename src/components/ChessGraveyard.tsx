@@ -24,8 +24,12 @@ export default function ChessGraveyard ({ pieces, classString }: IChessGraveyard
         height: `${chessGameState.tileSize * chessGameState.graveyardDimensions[1]}px`
       }}
     >
-      <h3>{text}</h3>
-      {piecesToRender}
+      <div className="graveyard__text">
+        <h3>{text}</h3>
+      </div>
+      <div className="graveyard__pieces">
+        {piecesToRender}
+      </div>
     </div>
   )
 }

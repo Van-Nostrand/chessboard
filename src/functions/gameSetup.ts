@@ -6,13 +6,14 @@ import {
 import { updatePieceVision } from './updatePieceVision'
 import { buildNewCellMap } from './buildNewCellMap'
 import { getNewPiece } from './getNewPiece'
-import PieceClass from '@/pieceData/PieceClass'
+// import PieceClass from '@/pieceData/PieceClass'
+import { IPiecesObject, ICellMap } from '@/types'
 
 /**
  * This sets up the chess game and initializes all data
  * @returns initial game data
  */
-export function gameSetup () {
+export function gameSetup (): [IPiecesObject, ICellMap, string[][], { [k: string]: number }] {
   // create checkerboard
   // might not be necessary anymore...
   let tileBool = true
@@ -38,15 +39,7 @@ export function gameSetup () {
     'bQ': 0
   }
 
-  //declare pieces according to one of the game piece constants
-  // const initialPiecesObject = {}
-  // PIECE_OBJECTS.forEach((piece) => {
-  //   initialPiecesObject[piece.name] = getNewPiece(piece)
-  // })
-  type TInitPieces = {
-    [c: string]: PieceClass
-  }
-  const initialPiecesObject: TInitPieces = PIECE_OBJECTS.reduce((acc: TInitPieces, cur) => {
+  const initialPiecesObject: IPiecesObject = PIECE_OBJECTS.reduce((acc: IPiecesObject, cur) => {
     acc[cur.name] = getNewPiece(cur)
     return acc
   }, {})
