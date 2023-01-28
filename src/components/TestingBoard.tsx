@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { ChessGameContext } from '@/context'
 import { makeTiles } from '@/functions'
 
@@ -9,9 +9,9 @@ export default function TestingBoard () {
     testboard,
     tileSize
   } = chessGameState
-  const testingContainerRef = useRef(null)
-  const [ testBoardWidth, setTestBoardWidth ] = useState('')
-  const [ testBoardHeight, setTestBoardHeight ] = useState('')
+  // const testingContainerRef = useRef(null)
+  const [testBoardWidth, setTestBoardWidth] = useState(0)
+  const [testBoardHeight, setTestBoardHeight] = useState(0)
 
   const handleTestModeSwitch = () => {
     testmode
@@ -27,23 +27,23 @@ export default function TestingBoard () {
         height: testBoardHeight
       }
     })
-    setTestBoardWidth('')
-    setTestBoardHeight('')
+    setTestBoardWidth(0)
+    setTestBoardHeight(0)
   }
 
-  const handleNumericInput = (value, propName) => {
+  const handleNumericInput = (value: string, propName: string) => {
     if (/^[0-9]+$/.test(value)) {
       propName === 'width'
         ? setTestBoardWidth(parseInt(value))
         : setTestBoardHeight(parseInt(value))
     } else if (value === '') {
       propName === 'width'
-        ? setTestBoardWidth('')
-        : setTestBoardHeight('')
+        ? setTestBoardWidth(0)
+        : setTestBoardHeight(0)
     }
   }
 
-  const handleClickTile = (e) => {
+  const handleClickTile = (e: any) => {
     console.log('you clikced this ', e)
   }
 
@@ -53,7 +53,6 @@ export default function TestingBoard () {
   const tileContainerStyle = testBoardIsRendering
     ? { width: `${testboard.width * tileSize}px`, height: `${testboard.height * tileSize}px` }
     : {}
-  const pieces = []
   const testBoardStyle = {
     width: `${tileSize * testBoardWidth}px`,
     height: `${tileSize * testBoardHeight}px`
@@ -95,23 +94,25 @@ export default function TestingBoard () {
           </div>
         </div>
       )}
-      <div
-        className={ testmode ? 'board-container test-board' : 'board-container--hidden'}
-        style={ testmode ? testBoardStyle : {} }
-      >
+      {testBoardIsRendering && (
         <div
-          className='board-container__tiles'
-          style={tileContainerStyle}
+          className={ testmode ? 'board-container test-board' : 'board-container--hidden'}
+          style={ testmode ? testBoardStyle : {} }
         >
-          {tiles}
+          <div
+            className='board-container__tiles'
+            style={tileContainerStyle}
+          >
+            {tiles}
+          </div>
+          {/* <div
+            className='board-container__pieces'
+            ref={testingContainerRef}
+          >
+            {pieces}
+          </div> */}
         </div>
-        <div
-          className='board-container__pieces'
-          ref={testingContainerRef}
-        >
-          {pieces}
-        </div>
-      </div>
+      )}
     </div>
   )
 }

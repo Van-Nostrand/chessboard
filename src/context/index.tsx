@@ -1,41 +1,24 @@
 import React, { createContext, useMemo, useReducer, ReactNode } from 'react'
-import { initialState } from './initialState'
+import { initialState, IContext } from './initialState'
 import { actions } from './actions'
 import chessReducer from './chessReducer'
-
-export interface IDefaultContext {
-  bGraveyard: any
-  boardDimensions: number[]
-  cellMap: any
-  enPassantPiece: string
-  graveyard: any
-  messageBoard: string
-  pawnPromotionFlag: boolean
-  piecesObject: any
-  pieceNumbering: any
-  screenType: string
-  selectedPiece: string
-  testmode: boolean
-  testboard: any
-  tileArr: any
-  tileSize: number
-  turn: boolean
-  windowSize: string
-  wGraveyard: any
-}
+import { IPiecesObject, ICellMap } from '@/types'
 
 interface IProvider {
-  state: IDefaultContext
+  state: IContext
   dispatch: React.Dispatch<any>
   clearPieceSelection: () => void
   selectPiece: (name: string) => void
   promotePawn: (name: string) => void
-  turnMaintenance: (args: any) => void
+  turnMaintenance: (args: any) => void,
+  pawnBeingPromoted: (piecesObject: IPiecesObject, cellMap: ICellMap) => void,
+  illegalMove: (message: string) => void
+  illegalMoveButKeepSelection: (message: string) => void
+  updateTilesize: (tileSize: number) => void
 }
 
 export const ChessGameContext = createContext<IProvider>(undefined)
 
-// eslint-disable-next-line react/prop-types
 export default function ChessGameProvider ({ children }: { children: ReactNode }) {
 
   const [ chessGameState, dispatch ] = useReducer(chessReducer, initialState)

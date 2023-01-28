@@ -5,9 +5,10 @@ import {
   getNewPiece,
   updatePieceVision
 } from '@/functions'
-import { IDefaultContext } from './initialState'
+import { IContext } from './initialState'
+import { IPiecesObject, ICellMap } from '@/types'
 
-export const actions = (state: IDefaultContext, dispatch: React.Dispatch<any>) => {
+export const actions = (state: IContext, dispatch: React.Dispatch<any>) => {
   return ({
     state,
     dispatch,
@@ -78,7 +79,38 @@ export const actions = (state: IDefaultContext, dispatch: React.Dispatch<any>) =
         enPassantPiece: newEnPassantPiece,
         graveyard: newGraveyard
       })
+    },
+    updateGraveyard: (newGraveyard: any) => {
+      dispatch({
+        type: 'update-graveyard',
+        graveyard: newGraveyard
+      })
+    },
+    updateTilesize: (tileSize: number) => {
+      dispatch({
+        type: 'update-tileSize',
+        tileSize
+      })
+    },
+    pawnBeingPromoted: (newPiecesObject: IPiecesObject, newCellMap: ICellMap) => {
+      console.log('DISPATCHING PROMOTING')
+      dispatch({
+        type: 'promoting',
+        piecesObject: newPiecesObject,
+        cellMap: newCellMap
+      })
+    },
+    illegalMove: (messageBoard: string) => {
+      dispatch({
+        type: 'illegal',
+        messageBoard
+      })
+    },
+    illegalMoveButKeepSelection: (messageBoard: string) => {
+      dispatch({
+        type: 'illegal-keep-selection',
+        messageBoard
+      })
     }
-
   })
 }

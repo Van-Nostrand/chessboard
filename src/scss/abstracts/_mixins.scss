@@ -1,17 +1,33 @@
-@mixin respond($breakpoint) {
-  @if $breakpoint == phone {
-    @media only screen and (max-width: 37.5em) { @content; } // 600px
+@mixin breakpoint($break) {
+  @if $break == xxs {
+    @media only screen and (max-width: 360px) { @content; }
   }
 
-  @if $breakpoint == tab-port {
-    @media only screen and (max-width: 56.25em) { @content; } // 900px | 1em = 38.4px
+  @if $break == xs-only {
+    @media only screen and (max-width: 599px) { @content; }
   }
 
-  @if $breakpoint == tab-land {
-    @media only screen and (max-width: 75em) { @content; } // 1200px | 1em = 48px
+  @if $break == sm {
+    @media only screen and (min-width: 600px) { @content; }
   }
 
-  @if $breakpoint == big-desk {
-    @media only screen and (min-width: 112.5em) { @content; }// 1800px
+  @if $break == sm-and-down {
+    @media only screen and (max-width: 899px) { @content; }
+  }
+
+  @if $break == md {
+    @media only screen and (min-width: 900px) { @content; }
+  }
+
+  @if $break == md-and-down {
+    @media only screen and (max-width: 1199px) { @content; }
+  }
+
+  @if $break == lg {
+    @media only screen and (min-width: 1200px) { @content; }
+  }
+
+  @if $break == xl {
+    @media only screen and (min-width: 1800px) { @content; }
   }
 }

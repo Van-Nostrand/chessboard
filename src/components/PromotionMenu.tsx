@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react'
-import PropTypes from 'prop-types'
 import {
   getNewPiece,
   buildPiecesObject,
@@ -7,21 +6,20 @@ import {
   makeTiles
 } from '@/functions'
 import { ChessGameContext } from '@/context'
-/**
- *
- * @param {*} param0
- * @returns jsx
- */
-export default function PromotionMenu ({ selectPiece, team }) {
+
+
+export default function PromotionMenu () {
   const [pieceSelection, setPieceSelection] = useState('')
 
-  const { chessGameState } = useContext(ChessGameContext)
+  const { state: { tileSize, selectedPiece }, promotePawn } = useContext(ChessGameContext)
 
   useEffect(() => {
     if (pieceSelection.length > 0) {
-      selectPiece(pieceSelection)
+      promotePawn(pieceSelection)
     }
   }, [pieceSelection])
+
+  const team = selectedPiece.charAt(0)
 
   const queen = getNewPiece({ name: `${team}Q`, x: 0, y: 0 })
   const knight = getNewPiece({ name: `${team}N`, x: 1, y: 0 })
@@ -29,8 +27,8 @@ export default function PromotionMenu ({ selectPiece, team }) {
   const rook = getNewPiece({ name: `${team}R`, x: 3, y: 0 })
 
   const tempPiecesObject = buildPiecesObject([queen, knight, bishop, rook])
-  const pieces = makePieces(tempPiecesObject, (e, name) => setPieceSelection(name.charAt(1)), chessGameState.tileSize, '')
-  const boardTiles = makeTiles(chessGameState.tileSize, [4, 1], () => {})
+  const pieces = makePieces(tempPiecesObject, (_e: any, name: string) => setPieceSelection(name.charAt(1)), tileSize, '')
+  const boardTiles = makeTiles(tileSize, [4, 1], () => {})
 
   return (
     <div className="promotion-menu">
@@ -47,7 +45,4 @@ export default function PromotionMenu ({ selectPiece, team }) {
   )
 }
 
-PromotionMenu.propTypes = {
-  selectPiece: PropTypes.func,
-  team: PropTypes.string
-}
+
