@@ -1,11 +1,11 @@
 {
   "name": "chessboard",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": false,
   "description": "a chess game written with React",
-  "author": "Daniel Doull",
+  "author": "Daniel Doull <dmdoull43@gmail.com>",
   "license": "GPL-3.0-only",
-  "main": "index.js",
+  "main": "src/index.tsx",
   "scripts": {
     "build": "webpack --mode production ",
     "dev": "webpack serve --mode development",
