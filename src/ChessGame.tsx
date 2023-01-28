@@ -138,8 +138,6 @@ export default function ChessGame () {
 
   const boardSize = tileSize * 8
 
-  // console.log('PAWN PROMOTION FLAG??', pawnPromotionFlag)
-
   return (
     <div className='game-container'>
 

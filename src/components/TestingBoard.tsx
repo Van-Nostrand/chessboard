@@ -9,7 +9,6 @@ export default function TestingBoard () {
     testboard,
     tileSize
   } = chessGameState
-  // const testingContainerRef = useRef(null)
   const [testBoardWidth, setTestBoardWidth] = useState(0)
   const [testBoardHeight, setTestBoardHeight] = useState(0)
 
@@ -105,12 +104,6 @@ export default function TestingBoard () {
           >
             {tiles}
           </div>
-          {/* <div
-            className='board-container__pieces'
-            ref={testingContainerRef}
-          >
-            {pieces}
-          </div> */}
         </div>
       )}
     </div>

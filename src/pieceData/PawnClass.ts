@@ -93,7 +93,7 @@ export default class PawnClass extends PieceClass {
           else if (this.fifthRank === this.y) {
             console.log('doing an enpassant check in vision for ', this, 'following path', path)
             // if enemy pawn in cell "behind" empty cell
-            const splitCellString = cellString.split(',')// cell diagonal to pawn
+            const splitCellString = cellString.split(',') // cell diagonal to pawn
             const EPTest = `${splitCellString[0]},${parseInt(splitCellString[1]) - this.direction}` // cell to the side of pawn
             // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn...
             // console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)

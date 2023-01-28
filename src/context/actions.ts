@@ -58,11 +58,11 @@ export const actions = (state: IContext, dispatch: React.Dispatch<any>) => {
         newGraveyard = args.newGraveyard || state.graveyard
       } = args
       let newEnPassantPiece = ''
-      //if the piece has a firstMove prop, flip it
+      // if the piece has a firstMove prop, flip it
       if (newPiecesObject[state.selectedPiece].firstMove) {
         newPiecesObject[state.selectedPiece].firstMove = false
 
-        //if it's a pawn and it just had a double move, flag for enpassant attacks
+        // if it's a pawn and it just had a double move, flag for enpassant attacks
         if ( /^\wP/.test(state.selectedPiece) && (
           newPiecesObject[state.selectedPiece].y === 4 ||
           newPiecesObject[state.selectedPiece].y === 3)

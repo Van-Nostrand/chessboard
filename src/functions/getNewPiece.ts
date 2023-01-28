@@ -9,7 +9,7 @@ import {
 import { IPieceProps } from '@/types'
 
 export const getNewPiece = (props: IPieceProps) => {
-  // console.log('inside getNewPiece, props', props)
+
   switch (true) {
     case /^\wB/.test(props.name): return new Bishop(props)
     case /^\wK/.test(props.name): return new King(props)

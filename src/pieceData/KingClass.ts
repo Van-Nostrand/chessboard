@@ -18,8 +18,8 @@ export default class KingClass extends PieceClass {
 
   movelogic = (x: number, y: number) => -2 < x && x < 2 && -2 < y && y < 2
 
-  //add in an option for castleing
-  //spaces will be labelled "c" if castling possible
+  // add in an option for castleing
+  // spaces will be labelled "c" if castling possible
   vision (cellMap: ICellMap, piecesObject: IPiecesObject) {
     // const { x, y, paths, firstMove } = piecesObject[name]
 
@@ -48,12 +48,12 @@ export default class KingClass extends PieceClass {
     })
     const rook1 = new RegExp('^' + TEAMCOLOUR + 'R1')
     const rook2 = new RegExp('^' + TEAMCOLOUR + 'R2')
-    //CASTLING VIEW
-    //has king taken first move?
+    // CASTLING VIEW
+    // has king taken first move?
     if (this.firstMove) {
-      //is R1 at 0,y and has it moved yet?
+      // is R1 at 0,y and has it moved yet?
       if (cellMap[`0,${this.y}`] && rook1.test(cellMap[`0,${this.y}`]) && piecesObject[cellMap[`0,${this.y}`]]?.firstMove) {
-        //are [1,y] [2,y] and [3,y] empty?
+        // are [1,y] [2,y] and [3,y] empty?
         if (!cellMap[`2,${this.y}`] && !cellMap[`1,${this.y}`] && !cellMap[`3,${this.y}`]) {
           // checkmate check at [2,y] and [3,y]
           const test2y = recursiveStateCopy(piecesObject)
@@ -73,9 +73,9 @@ export default class KingClass extends PieceClass {
           }
         }
       }
-      //is R2 at 7,y and has it moved yet?
+      // is R2 at 7,y and has it moved yet?
       if (cellMap[`7,${this.y}`] && rook2.test(cellMap[`7,${this.y}`]) && piecesObject[cellMap[`7,${this.y}`]].firstMove) {
-        //are [5,y] and [6,y] empty?
+        // are [5,y] and [6,y] empty?
         if (!cellMap[`6,${this.y}`] && !cellMap[`5,${this.y}`]) {
 
           // checkmate check at [5,y] and [6,y]
@@ -172,7 +172,7 @@ export default class KingClass extends PieceClass {
     pawnPaths.forEach( path => {
       const cellTest = `${testX + path[0]},${testY + path[1]}`
 
-      //test position
+      // test position
       if (cellMap[cellTest] && pawnRegex.test(cellMap[cellTest])) {
         pathsObject[cellTest] = cellMap[cellTest]
       }
@@ -255,7 +255,7 @@ export default class KingClass extends PieceClass {
     for (let n = 0; n < pawnPaths.length; n++) {
       const cellTest = `${testX + pawnPaths[n][0]},${testY + pawnPaths[n][1]}`
 
-      //test position
+      // test position
       if (cellMap[cellTest] && pawnRegex.test(cellMap[cellTest])) {
         pathsObject[cellTest] = cellMap[cellTest]
       }
