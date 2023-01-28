@@ -1,6 +1,6 @@
 {
   "name": "chessboard",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": false,
   "description": "a chess game written with React",
   "author": "Daniel Doull <dmdoull43@gmail.com>",
