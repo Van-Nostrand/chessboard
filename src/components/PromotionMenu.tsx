@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
-import {
-  getNewPiece,
-  buildPiecesObject,
-  makePieces,
-  makeTiles
-} from '@/functions'
+import { Piece } from '@/components'
+import { getNewPiece, buildPiecesObject, makeTiles } from '@/functions'
 import { ChessGameContext } from '@/context'
 
 
@@ -26,8 +22,16 @@ export default function PromotionMenu () {
   const bishop = getNewPiece({ name: `${team}B`, x: 2, y: 0 })
   const rook = getNewPiece({ name: `${team}R`, x: 3, y: 0 })
 
-  const tempPiecesObject = buildPiecesObject([queen, knight, bishop, rook])
-  const pieces = makePieces(tempPiecesObject, (_e: any, name: string) => setPieceSelection(name.charAt(1)), tileSize, '')
+  const piecesObject = buildPiecesObject([queen, knight, bishop, rook])
+  const pieces = Object.keys(piecesObject).map((name, i) =>
+    <Piece
+      key={`piece${i}`}
+      pieceData={piecesObject[name]}
+      size={tileSize}
+      border={selectedPiece === name}
+      onClick={(_e: any, name: string) => setPieceSelection(name.charAt(1))}
+    />
+  )
   const boardTiles = makeTiles(tileSize, [4, 1], () => {})
 
   return (

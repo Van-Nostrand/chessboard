@@ -6,8 +6,9 @@ import {
   Queen,
   Rook
 } from '@/pieceData'
+import { IPieceProps } from '@/types'
 
-export const getNewPiece = (props) => {
+export const getNewPiece = (props: IPieceProps) => {
   // console.log('inside getNewPiece, props', props)
   switch (true) {
     case /^\wB/.test(props.name): return new Bishop(props)

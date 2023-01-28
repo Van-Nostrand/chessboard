@@ -1,6 +1,6 @@
-import { IPieceProps, ICellMap } from '@/types'
+import { IPieceProps, ICellMap, IPiece } from '@/types'
 
-export default class PieceClass {
+export default class PieceClass implements IPiece {
   x: number
   y: number
   imgSrc: string

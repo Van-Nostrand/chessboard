@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useContext } from 'react'
 
-import { ChessGraveyard, PromotionMenu, TestingBoard } from '@/components'
+import { ChessGraveyard, PromotionMenu, TestingBoard, Piece } from '@/components'
 import { ChessGameContext } from '@/context'
-import {
-  makeTiles,
-  makePieces,
-  sortAndFillGraveyards
-} from '@/functions'
+import { makeTiles, sortAndFillGraveyards } from '@/functions'
 import { useWindowToGetTileSize, useGameFunctions } from '@/hooks'
 
 
@@ -60,8 +56,8 @@ export default function ChessGame () {
     // a piece is already selected, user wants to move here
     if (selectedPiece.length > 0) {
       console.log('determining intent of ', piecesObject[selectedPiece])
-      const xCoord = parseInt(coordinates.split(',')[0])
-      const yCoord = parseInt(coordinates.split(',')[1])
+      const [xCoord, yCoord] = coordinates.split(',').map((num) => parseInt(num))
+
       // pieces will have coordinates in their view object if they can do anything
       // MOVING
       if (piecesObject[selectedPiece]?.view?.[coordinates] && piecesObject[selectedPiece].view[coordinates] === 'm') {
@@ -180,7 +176,15 @@ export default function ChessGame () {
             ...(mobileWindow ? {} : { left: `${graveyardDimensions[0] * tileSize}px` })
           }}
         >
-          { makePieces(piecesObject, handlePieceClick, tileSize, selectedPiece) }
+          {Object.keys(piecesObject).map((name, i) =>
+            <Piece
+              key={`piece${i}`}
+              pieceData={piecesObject[name]}
+              size={tileSize}
+              border={selectedPiece === name}
+              onClick={handlePieceClick}
+            />
+          )}
         </div>
 
         <ChessGraveyard
