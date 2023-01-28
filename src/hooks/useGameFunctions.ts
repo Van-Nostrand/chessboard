@@ -41,7 +41,6 @@ export default function useGameFunctions () {
 
       // test for pawn promotion - is a pawn on the furthest possible y coordinate based on their team
       if ((/^wP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 0 ) || (/^bP/.test(selectedPiece) && newPiecesObject[selectedPiece].y === 7)) {
-        console.log('PAWN BEING PROMOTED?')
         pawnBeingPromoted(newPiecesObject, newCellMap)
       } else {
         // if (newPiecesObject[selectedPiece].firstMove) newPiecesObject[selectedPiece].firstMove = false

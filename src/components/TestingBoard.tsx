@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { ChessGameContext } from '@/context'
 import { makeTiles } from '@/functions'
+import { useDevLogger } from '@/hooks'
 
 export default function TestingBoard () {
   const { state: chessGameState, dispatch } = useContext(ChessGameContext)
@@ -11,6 +12,8 @@ export default function TestingBoard () {
   } = chessGameState
   const [testBoardWidth, setTestBoardWidth] = useState(0)
   const [testBoardHeight, setTestBoardHeight] = useState(0)
+
+  const logger = useDevLogger()
 
   const handleTestModeSwitch = () => {
     testmode
@@ -43,7 +46,7 @@ export default function TestingBoard () {
   }
 
   const handleClickTile = (e: any) => {
-    console.log('you clikced this ', e)
+    logger('you clikced this ', e)
   }
 
   const testBoardIsRendering = Object.keys(testboard).length > 0

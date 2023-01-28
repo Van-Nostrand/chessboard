@@ -1,8 +1,7 @@
 /**
- * this will deep copy variables
- * I think it's borked if you pass in any built in weird javascript class instances or Date objects, nodelists, things like that
- * but it can handle Arrays, Objects, Number, String, Boolean, and functions
- * it probably won't work with react components
+ * this will deep copy objects
+ * I think it's borked if you pass in anything instantiated
+ * primitives, Objects, Arrays, Map, and Set are all fine
  */
 export const recursiveStateCopy = (oldState: any): any => {
   if (thisIsPrimitive(oldState) || typeof oldState === 'function') {
