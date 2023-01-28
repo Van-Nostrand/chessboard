@@ -1,16 +1,12 @@
 @use '@/scss/abstracts/mixins';
 
 .middle-container {
-  grid-column: 3;
-  grid-row: 2;
   position: relative;
   margin: 0 auto;
 }
 
 .board-container {
   position: relative;
-  grid-column: 3;
-  grid-row: 2;
   display: flex;
 
   &__tiles, &__pieces {
@@ -41,8 +37,6 @@
 }
 
 .message-board {
-  grid-column: 3;
-  grid-row: 3;
   position: relative;
   place-self: center;
 

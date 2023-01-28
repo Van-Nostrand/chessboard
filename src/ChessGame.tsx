@@ -201,9 +201,11 @@ export default function ChessGame () {
           classString={`b-graveyard${testmode ? '--hidden' : ''}`}
         />
       </div>
+
       <h2 className={`turn-header${testmode ? '--hidden' : ''}`}>
         {turn ? 'White turn' : 'Black turn'}
       </h2>
+
       <footer>
         <a className="iconlink" href="mailto:dmdoull43@gmail.com" target="_blank" rel="noreferrer">
           <img src={require('@/assets/email.png')} alt="email" />
@@ -215,7 +217,6 @@ export default function ChessGame () {
           <img src={require('@/assets/linkedin2.svg')} alt="https://www.linkedin.com/in/mike-doull-34b9211a6/" />
         </a>
       </footer>
-      {/* <TestingBoard /> */}
     </div>
   )
 }
