@@ -148,10 +148,10 @@ export default function ChessGame () {
     <div className='game-container'>
 
       { pawnPromotionFlag && <PromotionMenu />}
+      <h3 className='message-board'>
+        {messageBoard}
+      </h3>
 
-      <h2 className={`turn-header${testmode ? '--hidden' : ''}`}>
-        {turn ? 'White turn' : 'Black turn'}
-      </h2>
       <div
         className={`board-container${testmode ? '--hidden' : ''}`}
         style={boardContainerStyle}
@@ -188,9 +188,9 @@ export default function ChessGame () {
           classString={`b-graveyard${testmode ? '--hidden' : ''}`}
         />
       </div>
-      <h3 className='message-board'>
-        {messageBoard}
-      </h3>
+      <h2 className={`turn-header${testmode ? '--hidden' : ''}`}>
+        {turn ? 'White turn' : 'Black turn'}
+      </h2>
       <TestingBoard />
     </div>
   )
