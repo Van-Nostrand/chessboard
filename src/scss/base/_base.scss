@@ -8,24 +8,17 @@
 html {
   font-size: 62.5%;
   font-family: Helvetica, sans-serif;
-
-  // under 1200px ~ tablet-landscape
-  @media screen and (max-width: 75em) {
-    font-size: 56.25%;
-  }
-
-  // under 900px ~ tablet-portrait
-  @media screen and (max-width: 56.25em) {
-    font-size: 50%;
-  }
-
-  // under 600px ~ phone
-  @media screen and (max-width: 37.5em) {
-    font-size: 40%;
-  }
-
-  // over 1800px ~ big desktops
-  @media (min-width: 112.5em) {
-    font-size: 75%;
-  }
+  height: 100%;
 }
+
+#root, body { min-height: 100%; }
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+a:link { color: #333; }
+a:visited { color: #333; }
+a:hover { color: #444; }
+a:active { color: #333; }
+a:focus { color: #333; }

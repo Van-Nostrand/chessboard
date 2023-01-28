@@ -1,4 +1,3 @@
-// import React from 'react'
 import PieceClass from '@/pieceData/PieceClass'
 import { ICellMap } from '@/types'
 

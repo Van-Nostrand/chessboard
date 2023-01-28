@@ -29,22 +29,6 @@ export default class PawnClass extends PieceClass {
     return (x === 1 || x === -1) && (1 * this.direction === y)
   }
 
-  // unused
-  // movelogic = (x: number, y: number) => {
-  //   // if x is not zero, or the pawn is moving in the wrong direction, return false
-  //   if (x !== 0 || !((y > 0 && this.direction > 0) || (y < 0 && this.direction < 0))) return false
-  //   // otherwise test to make sure it's moving 1 or 2 spaces based on first move
-  //   return (this.firstMove && 0 < Math.abs(y) && Math.abs(y) < 3 ) || (!this.firstMove && Math.abs(y) === 1)
-  // }
-
-  // unused and wrong
-  // enpassantlogic = (targetcell, victim) => {
-  //   return (
-  //     targetcell[0] === victim[0] &&
-  //     (targetcell[1] === victim[1] + 1 ||
-  //       targetcell[1] === victim[1] - 1))
-  // }
-
   // returns an object that describes all cells within a pieces view, and whether or not that piece can act upon that cell
   vision (cellMap: ICellMap, enPassantPiece: any, piecesObject: IPiecesObject) {
     const BOARDSIZE = 8
@@ -56,7 +40,6 @@ export default class PawnClass extends PieceClass {
     for (const path of this.paths) {
     // this.paths.forEach( path => {
       if (!this.firstMove && Math.abs(path[1]) === 2) continue
-      // console.log('checking pawn', this.name, ' and path is', path)
 
       const checkX = path[0] + this.x
       const checkY = path[1] + this.y
@@ -96,13 +79,10 @@ export default class PawnClass extends PieceClass {
             const splitCellString = cellString.split(',') // cell diagonal to pawn
             const EPTest = `${splitCellString[0]},${parseInt(splitCellString[1]) - this.direction}` // cell to the side of pawn
             // if EPTest is the coordinates of an enemy pawn that JUST PRIOR moved two tiles on their first turn...
-            // console.log('splitcellstring is', splitCellString, 'and eptest is ', EPTest)
-            // console.log('cellMap[EPTest] is ', cellMap[EPTest])
             if (cellMap[EPTest] && cellMap[EPTest].charAt(0) !== this.name.charAt(0) && cellMap[EPTest].charAt(1) === 'P') {
               // if piece just moved two spaces
               const EPEnemy = piecesObject[cellMap[EPTest]]
               if (EPEnemy.name === enPassantPiece) {
-                // console.log('PASSED NEXT TEST')
 
                 // create key/value "cell,coordinates": [x,y,"e"] to denote empty attack cell
                 pathsObject[cellString] = 'e'
