@@ -1,8 +1,0 @@
-export { buildNewCellMap } from './buildNewCellMap'
-export { gameSetup } from './gameSetup'
-export { recursiveStateCopy } from './recursiveStateCopy'
-export { updatePieceVision } from './updatePieceVision'
-export { getNewPiece } from './getNewPiece'
-export { makeTiles } from './makeTiles'
-export { buildPiecesObject } from './buildPiecesObject'
-export { sortAndFillGraveyards } from './sortAndFillGraveyards'
